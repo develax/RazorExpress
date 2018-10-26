@@ -1,0 +1,11 @@
+﻿@{
+    var name = "_layoutBlue";
+    Html.layout = "_layoutRed";
+}
+<div style="background-color: blue; padding: 25px;">
+    <div>
+        <strong>@name</strong>
+    </div>
+    @Html.body()
+</div>
+

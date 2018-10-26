@@ -1,0 +1,11 @@
+﻿@{
+    var name = "_layoutOrange";
+    Html.layout = "./home/_layoutHidden";
+}
+<div style="background-color: orange; padding: 25px;">
+    <div>
+        <strong>@name</strong>
+    </div>
+    @Html.body()
+</div>
+

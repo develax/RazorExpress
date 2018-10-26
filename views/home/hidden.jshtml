@@ -1,0 +1,10 @@
+﻿@{
+	var title = 'Check explicit layout path';
+    Html.layout = "_layoutOrange";
+}
+
+<div style="background-color: white">
+    <h1>@title</h1>
+    <p>@Model.message</p>
+</div>
+

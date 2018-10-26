@@ -1,0 +1,6 @@
+﻿@{
+    Html.layout = "_layoutBlue";
+    var start = "The test from the 'home _viewStart'";
+}
+
+<div>@[1, 2, 3]</div>

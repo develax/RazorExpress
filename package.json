@@ -1,0 +1,23 @@
+{
+  "name": "razor-express",
+  "version": "0.0.0",
+  "description": "RazorExpress",
+  "main": "server.js",
+  "author": {
+    "name": ""
+  },
+  "scripts": {
+    "test": "mocha **/*.test.js",
+    "wtest": "nodemon --exec \"npm test\""
+  },
+  "dependencies": {
+    "express": "^4.16.3",
+    "jquery": "^3.3.1",
+    "jsdom": "^12.2.0"
+  },
+  "devDependencies": {
+    "chai": "^4.2.0",
+    "chai-http": "^4.2.0",
+    "mocha": "^5.2.0"
+  }
+}

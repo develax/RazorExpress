@@ -1,0 +1,4 @@
+﻿@{
+    Html.layout = "_layout";
+    var start = "The test from the 'root _viewStart'";
+}

@@ -1,0 +1,10 @@
+﻿@{
+	var title = 'Invalid layout path';
+    Html.layout = "/home/_layoutOrange";
+}
+
+<div style="background-color: white">
+    <h1>@title</h1>
+    <p>@Model.message</p>
+</div>
+
