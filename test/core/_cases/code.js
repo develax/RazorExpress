@@ -92,6 +92,39 @@
     }
 </div>`,
             expected: "\n<div>\n        <span>@</span>\n</div>"
+        },
+        {
+            name: "Code 11",
+            template: `
+@for(var i = 0; i < 2; i++) {
+    <div>@i</div>
+}`,
+            expected: "\n    <div>0</div>\n    <div>1</div>\n"
+        },
+        {
+            name: "Code 12",
+            template: `
+@for(var i = 0; i < 1; i++) {
+<div>
+    <span>@i</span>
+</div>
+}`,
+            expected: "\n<div>\n    <span>0</span>\n</div>\n"
+        },
+        {
+            name: "Code 13",
+            template: `
+<div>  @(2 + 3)</div>`,
+            expected: "\n<div>  5</div>"
+        }
+        ,
+        {
+            name: "Code 14",
+            template: `
+<div>
+    @(2 + 3)
+</div>`,
+            expected: "\n<div>\n    5\n</div>"
         }
     ];
     module.exports = cases;

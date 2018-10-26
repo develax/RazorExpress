@@ -414,12 +414,6 @@ ${Html._js}`
                 flushPadding();
 
             log.debug(`[END] blocks = ${blocks.length}.`);
-
-            function flushPadding() {
-                if (!_padding) return;
-                block.text += _padding;
-                _padding = '';
-            }
         }
 
         function parseHtmlInsideCode(blocks) {
@@ -601,12 +595,6 @@ ${Html._js}`
                 flushPadding();
 
             log.debug(`[END] blocks = ${blocks.length}.`);
-
-            function flushPadding() {
-                if (!_padding) return;
-                block.text += _padding;
-                _padding = '';
-            }
         }
 
         function parseCode(blocks) {
@@ -636,15 +624,29 @@ ${Html._js}`
             var waits = [];
             var wait = null;
             var firstScope = null;
+            flushPadding();// there is no sense to put padding to the expression text since it will be lost while evaluating
             let block = newBlock(type.expr, blocks);
             block.text = _padding;
             _padding = '';
-            var stop = false;
+            var stop = false, checkForBlockCode = false;
             let scopeCollapsed;
             let inText = false;
 
             for (var ch = pickChar(); !stop && ch; ch = pickChar()) { // pick or fetch ??
-                if (inText) {
+                if (checkForBlockCode) {
+                    if (String.isWhiteSpace(ch)) {
+                        _padding += ch;
+                    }
+                    else if (ch === '{') {
+                        block.type = type.code;
+                        return parseJsBlock(blocks, block);
+                    }
+                    else {
+                        stop = true;
+                        break;
+                    }
+                }
+                else if (inText) {
                     if (textQuotes.indexOf(ch) !== -1) { // it's some sort of text qoutes
                         if (ch === wait) {
                             wait = waits.pop(); // collasping quotes..
@@ -668,7 +670,7 @@ ${Html._js}`
                         if (endScopes.indexOf(ch) !== -1) {
                             if (wait === ch) {
                                 wait = waits.pop(); // collasping scope..
-                                stop = (!wait && ch === firstScope && ch !== ']'); // can continue with `[1,2,3].toString()`
+                                checkForBlockCode = (!wait && ch === firstScope && ch !== ']'); // can continue with `[1,2,3].toString()`
                             }
                             else {
                                 throw er.invalidExpressionChar(ch, _lineNum, _pos, _line);
@@ -705,7 +707,7 @@ ${Html._js}`
             log.debug(`[END] blocks = ${blocks.length}.`);
         }
 
-        function parseJsBlock(blocks) {
+        function parseJsBlock(blocks, block) {
             log.debug(`[START] blocks = ${blocks.length}.`);
             const startScopes = '{([';
             const endScopes = '})]';
@@ -717,7 +719,8 @@ ${Html._js}`
             var stop = false;
             let skipCh = true;
             let inText = false;
-            let block = newBlock(type.code, blocks);
+            let hasOperator = !!block;
+            block = block || newBlock(type.code, blocks);
 
             for (var ch = pickChar(); !stop && ch; ch = pickChar()) { // pick or fetch ??
                 skipCh = false;
@@ -735,7 +738,7 @@ ${Html._js}`
                     if (pos !== -1) { // ch === '(' || ch === '['
                         if (!firstScope) {
                             wait = firstScope = endScopes[pos];
-                            skipCh = (ch === '{'); // skip the outer {} of the code-block
+                            skipCh = (ch === '{') && !hasOperator; // skip the outer {} of the code-block
                         }
                         else {
                             if (wait) waits.push(wait);
@@ -748,7 +751,7 @@ ${Html._js}`
                                 wait = waits.pop(); // collasping scope..
                                 if (!wait && ch === firstScope) { // the last & closing scope..
                                     stop = true;
-                                    skipCh = (ch === '}');// skip the outer {} of the code-block
+                                    skipCh = (ch === '}') && !hasOperator;// skip the outer {} of the code-block
                                 }
                             }
                             else {
@@ -816,12 +819,6 @@ ${Html._js}`
             }
 
             log.debug(`[END] blocks = ${blocks.length}.`);
-
-            function flushPadding() {
-                if (!_padding) return;
-                block.text += _padding;
-                _padding = '';
-            }
         }
 
         function parseSection() {
@@ -867,6 +864,13 @@ ${Html._js}`
         }
 
         //////////////////////////////////////
+
+        function flushPadding() {
+            if (!_padding) return;
+            let block = _blocks[_blocks.length - 1]
+            block.text += _padding;
+            _padding = '';
+        }
 
         function getTagName(tag) {
             if (!tag || tag.length < 2) throw er.invalidHtmlTag(tag);
