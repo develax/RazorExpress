@@ -164,6 +164,15 @@
 </div>
 `,
             expected: "\n<div>\n    123\n</div>\n"
+        },
+        {
+            name: "Code 19",
+            template: `
+@function getValue() {
+    return 123;
+}
+<div>@getValue()</div>`,
+            expected: "\n<div>123</div>"
         }
     ];
     module.exports = cases;

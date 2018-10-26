@@ -197,6 +197,7 @@ ${Html._js}`
         }
 
         const _sectionKeyword = "section";
+        const _functionKeyword = "function";
         const type = { none: 0, html: 1, code: 2, expr: 3 };
         const er = require('./localization/errors').parser;
 
@@ -604,9 +605,6 @@ ${Html._js}`
             if (ch === '{') {
                 parseJsBlock(blocks);
             }
-            else if (isSection()) {
-                parseSection();
-            }
             else if (canExpressionStartWith(ch)) {
                 parseJsExpression(blocks);
             }
@@ -624,15 +622,16 @@ ${Html._js}`
             var waits = [];
             var wait = null;
             var firstScope = null;
+            let firstKeyword = '';
             flushPadding();// there is no sense to put padding to the expression text since it will be lost while evaluating
             let block = newBlock(type.expr, blocks);
             block.text = _padding;
             _padding = '';
-            var stop = false, checkForBlockCode = false;
+            var checkForBlockCode = false;
             let scopeCollapsed;
             let inText = false;
 
-            for (var ch = pickChar(); !stop && ch; ch = pickChar()) { // pick or fetch ??
+            for (var ch = pickChar(); ch; ch = pickChar()) { // pick or fetch ??
                 if (checkForBlockCode) {
                     if (String.isWhiteSpace(ch)) {
                         _padding += ch;
@@ -643,7 +642,6 @@ ${Html._js}`
                         return parseJsBlock(blocks, block);
                     }
                     else {
-                        stop = true;
                         break;
                     }
                 }
@@ -684,12 +682,26 @@ ${Html._js}`
                         }
                     }
                     else if (block.text && !canExpressionEndWith(ch)) {
-                        if (ch === '.') { // @Model.text
+                        if (String.isWhiteSpace(ch)) {
+                            if (firstKeyword)
+                                break;
+
+                            firstKeyword = block.text.trim();
+
+                            if (firstKeyword === _sectionKeyword) {
+                                parseSection();
+                            }
+                            else if (firstKeyword !== _functionKeyword) {
+                                firstKeyword = '';
+                                break;
+                            }
+                        }
+                        else if (ch === '.') { // @Model.text
                             let nextCh = pickNextChar();
                             if (!nextCh || !canExpressionEndWith(nextCh))
                                 break;
                         }
-                        else {
+                        else if (!firstKeyword) {
                             break;
                         }
                     }
@@ -907,10 +919,6 @@ ${Html._js}`
             var block = new Block(type);
             blocks.push(block);
             return block;
-        }
-
-        function isSection() {
-            return _text.startsWith(_sectionKeyword + " ", _pos);
         }
 
         function pickChar() {

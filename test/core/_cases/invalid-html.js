@@ -85,7 +85,7 @@
             error: "unexpected character '<' at line 3 pos 6: '    <<' <--"
         },
         {
-            name: "Invalid-HTML 8",
+            name: "Invalid-HTML 9",
             template: `
 <div>
     @{
@@ -93,15 +93,6 @@
     }
 </div>`,
             error: "Invalid or unexpected token"
-        },
-        {
-            name: "Invalid-HTML 9",
-            template: `
-@function getValue() {
-    return 123;
-}
-`,
-            error: "Unexpected end of input"
         }
     ];
 
