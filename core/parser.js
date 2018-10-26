@@ -283,7 +283,7 @@ ${Html._js}`
             const tagKinds = { open: 0, close: 1, selfclose: 2 };
             var openTags = [];
             let openTagLineNum, openTagPos, openTagLine;
-            var tag = '', lineLastLiteral = '';
+            var tag = '', lineLastLiteral = '', lastLiteral = '';
             var block = newBlock(type.html, blocks);
             let stop = false;
             var lastCh = '';
@@ -373,7 +373,7 @@ ${Html._js}`
                             tag += ch;
                     }
                 }
-                else if (!openTags.length && ch === '}') {
+                else if (!openTags.length && ch === '}' && lastLiteral === '>') { // the close curly bracket can follow only a tag (not just a text)
                     stepBack();
                     stop = true;
                     break; // return back to the callee code-block..
@@ -399,7 +399,7 @@ ${Html._js}`
                 else {
                     flushPadding();
                     block.append(ch);
-                    lineLastLiteral = ch;
+                    lastLiteral = lineLastLiteral = ch;
                 }
 
                 lastCh = ch;
@@ -638,6 +638,7 @@ ${Html._js}`
                         _padding += ch;
                     }
                     else if (ch === '{') {
+                        flushPadding();
                         block.type = type.code;
                         return parseJsBlock(blocks, block);
                     }

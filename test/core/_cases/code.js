@@ -116,8 +116,7 @@
             template: `
 <div>  @(2 + 3)</div>`,
             expected: "\n<div>  5</div>"
-        }
-        ,
+        },
         {
             name: "Code 14",
             template: `
@@ -125,6 +124,46 @@
     @(2 + 3)
 </div>`,
             expected: "\n<div>\n    5\n</div>"
+        },
+        {
+            name: "Code 15",
+            template: `<div>@(2 + 3)  </div>`,
+            expected: "<div>5  </div>"
+        },
+        {
+            name: "Code 16",
+            template: `
+<div>
+    @(2 + 3)  
+</div>`,
+            expected: "\n<div>\n    5  \n</div>"
+        },
+        {
+            name: "Code 17",
+            template: `
+@for(var i = 0; i < 1; i++) {
+<div>
+    @{
+        var x = i + 1;
+        <span>@x</span>
+    }
+</div>
+}`,
+            expected: "\n<div>\n        <span>1</span>\n</div>\n"
+        },
+        {
+            name: "Code 18",
+            template: `
+@{
+    function getValue() {
+        return 123;
+    }
+}
+<div>
+    @getValue()
+</div>
+`,
+            expected: "\n<div>\n    123\n</div>\n"
         }
     ];
     module.exports = cases;

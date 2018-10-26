@@ -93,6 +93,15 @@
     }
 </div>`,
             error: "Invalid or unexpected token"
+        },
+        {
+            name: "Invalid-HTML 9",
+            template: `
+@function getValue() {
+    return 123;
+}
+`,
+            error: "Unexpected end of input"
         }
     ];
 

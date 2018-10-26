@@ -1,6 +1,6 @@
 ﻿(function () {
     var expect = require('chai').expect;
-    const parser = require('../../core/parser')({ debug: false });
+    const parser = require('../../core/parser')({ debug: true });
     const er = require('../../core/localization/errors').parser;
 
     describe("INVALID INPUT ARGUMENTS", () => {
