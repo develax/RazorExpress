@@ -2,6 +2,8 @@
 // String
 ////////////////////////////////////////////////
 
+String.whitespaces = '\r\n\t ';
+
 String.format = String.format || function (format) {
     var args = Array.prototype.slice.call(arguments, 1);
     return format.replace(/{(\d+)}/g, function (match, number) {
@@ -37,6 +39,7 @@ if (!global.Char) {
     Char = {};
 }
 
+
 if (!Char.isLetter) {
     Char.isLetter = function (c) {
         return c.toLowerCase() !== c.toUpperCase();
@@ -44,7 +47,15 @@ if (!Char.isLetter) {
 }
 
 Char.isDigit = Char.isDigit || function (c) {
+    if (!c) return false;
+    if (c.length > 1) throw new Error(`Invalid length of argument '${c}'.`);
     return '0123456789'.indexOf(c) !== -1;
+};
+
+Char.isWhiteSpace = Char.isWhiteSpace || function (c) {
+    if (!c) return false;
+    if (c.length > 1) throw new Error(`Invalid length of argument '${c}'.`);
+    return String.whitespaces.indexOf(c) !== -1;
 };
 
 
@@ -65,3 +76,9 @@ path.cutLastSegment = function (dir) {
     if (pos === -1) return '';
     return dir.substring(0, pos);
 };
+
+        //deleteObjectProperties(obj) {
+        //    for (var p in obj)
+        //        if (Object.prototype.hasOwnProperty.call(obj, p))
+        //            delete obj[p];
+        //}

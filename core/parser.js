@@ -1,221 +1,255 @@
 ﻿'use strict';
 
-(function () {
-    require('./utils');
+require('./utils');
 
-    function compilePageSync(Html, Model, debug) {
-            //console.log("DEBUG = " + debug);
-            'use strict';
+function compilePageSync(Html, Model, debug) {
+    //console.log("DEBUG = " + debug);
+    'use strict';
+    var code = Html._js;
 
-            // function (process,...){...}() prevents [this] to exist for the 'vm.runInNewContext()' method
-            var code = `
+    if (debug) {
+        let sandbox = Html._sandbox;
+        let vm = Html._vm;
+        sandbox.Html = Html;
+        sandbox.Model = Model;
+        vm.runInNewContext(code, sandbox);
+    }
+    else {
+        try {
+            eval(code);
+        }
+        catch (exc) {
+            throw new Error(exc.message); // cut the useless stacktrace
+        }
+    }
+
+    return;
+}
+
+function compilePage(Html, Model, debug, done) {
+    try {
+        compilePageSync(Html, Model, debug);
+        return Html.__renderLayout(done);
+    }
+    catch (exc) {
+        return Promise.resolve().then(() => done(exc)), null;
+    }
+}
+
+
+module.exports = function (opts) {
+    opts = opts || {};
+    const log = require('./logger')({ off: !opts.debug });
+    log.debug = () => { };// turn off temporarily 
+    log.debug(`Debug mode is '${!!opts.debug}'.`);
+
+    const vm = opts.debug ? require('vm') : null;
+    const sandbox = opts.debug ? Object.create(null) : null;
+
+    if (sandbox)
+        vm.createContext(sandbox);
+
+    function Html(args) {
+        // Non-user section.
+        this._vm = vm;
+        this._sandbox = sandbox;
+        // function (process,...){...}() prevents [this] to exist for the 'vm.runInNewContext()' method
+        this._js = `
 (function (process, window, global, module, compilePage, compilePageSync, code, undefined) { 
     'use strict';
     delete Html._js;
     delete Html._vm;
     delete Html._sandbox;
-    ${Html._js}
+    ${args.js};
 }).call();`;
+        // User section.
+        this.layout = null;
+        // Private
+        let section = null;
+        let sections = args.sections || {};
 
-            if (debug) {
-                let sandbox = Html._sandbox;
-                let vm = Html._vm;
-                sandbox.Html = Html;
-                sandbox.Model = Model;
-                //sandbox.process = process;
-                //sandbox.window = window;
-                //sandbox.global = global;
-                //sandbox.module = module;
-                //sandbox.compilePage = compilePage;
-                //sandbox.compilePageSync = compilePageSync;
-                //sandbox.debug = debug;
-                //sandbox.undefined = undefined;
-                vm.runInNewContext(code, sandbox);
+        this.__rnd = function (val) { // render
+            if (section) {
+                if (!sections[section])
+                    sections[section] = { html: '' };
+
+                sections[section].html += val;
             }
             else {
-                try {
-                    eval(code);
-                }
-                catch (exc) {
-                    throw new Error(exc.message); // cut the useless stacktrace
-                }
-            }
-        return;
-    }
-
-    function compilePage(Html, Model, done) {
-        try {
-            (function (process, window, global, module, compilePage, compilePageSync, done, undefined) {
-                'use strict';
-                try {
-                    eval(`
-'use strict';
-delete Html._js;
-${Html._js}`
-                    );
-                }
-                catch (exc) {
-                    throw exc;
-                }
-            }).call();
-            return Html.__renderLayout(done);
-        }
-        catch (exc) {
-            return Promise.resolve().then(() => done(exc)), null;
-        }
-    }
-
-    module.exports = function (opts) {
-        opts = opts || {};
-        const log = require('./logger')({ off: !opts.debug });
-        log.debug = () => { };// turn off temporarily 
-        log.debug(`Debug mode is '${!!opts.debug}'.`);
-        const vm = opts.debug ? require('vm') : null;
-        const sandbox = opts.debug ? Object.create(null) : null;
-
-        if (sandbox)
-            vm.createContext(sandbox);
-
-        function Html(args) {
-            // Non-user section.
-            this._vm = vm;
-            this._sandbox = sandbox;
-            this._js = args.js;
-
-            this.__rnd = function (val) { // render
                 args.html += val;
-            };
-
-
-            this.__val = function (i) { // getValueAt
-                return args.valuesQueue.getAt(i);
-            };
-
-
-            this.__renderLayout = (done) => {
-                if (!this.layout)
-                    return Promise.resolve().then(() => done(null, args.html)), null;
-
-                args.findPartial(this.layout, (err, jsHtml, findPartial) => {
-                    if (err) return done(err);
-                    let compileOpt = {
-                        jsHtml,
-                        model: args.model,
-                        bodyHtml: args.html,
-                        findPartial,
-                        findPartialSync: args.findPartialSync
-                    };
-                    compile(compileOpt, done);
-                });
-            };
-
-            // User section.
-            this.layout = null;
-
-            this.body = function () {
-                return args.bodyHtml;
-            };
-
-            this.partial = function (name, model) {
-                // if an exception occurs it will be thron directly to to ExpressApp and shown on the users' page (fix later):
-                // https://expressjs.com/en/guide/error-handling.html
-                let p = args.findPartialSync(name);
-                let compileOpt = {
-                    jsHtml: p.data,
-                    model,
-                    findPartialSync: args.findPartialSync
-                };
-                let html = compileSync(compileOpt);
-                args.html += html;
-                return ''; // for the case of call as expression <div>@Html.partial()</div>
-            };
-        }
-
-        class Block {
-            constructor(type) {
-                this.type = type;
-                this.text = '';
             }
-
-            append(ch) {
-                this.text += ch;
-                //this.text += (ch === '"') ? '\\"' : ch;
-            }
-
-            toScript(valuesQueue) {
-                return toScript(this.text, this.type, valuesQueue);
-            }
-        }
-
-        function toScript(text, blockType, valuesQueue) {
-            let i;
-            switch (blockType) {
-                case type.html:
-                    i = valuesQueue.enq(text);
-                    return "Html.__rnd(Html.__val(" + i + "));";
-                case type.expr:
-                    i = valuesQueue.enq(text);
-                    return "Html.__rnd(eval(Html.__val(" + i + ")));";
-                case type.code:
-                    return text;
-                default:
-                    throw `Unexpected block type = "${blockType}".`;
-            }
-        }
-
-        class Queue {
-            constructor() {
-                this._items = [];
-            }
-
-            enq(item) {
-                //if (opts.debug) log.debug(item);
-                return this._items.push(item) - 1;
-            }
-
-            getAt(i) {
-                if (opts.debug) {
-                    let item = this._items[i];
-                    //log.debug(item);
-                    return item;
-                }
-                else {
-                    return this._items[i];
-                }
-            }
-
-            //deq() {
-            //    if (opts.debug) {
-            //        let item = this._items.shift();
-            //        log.debug(item);
-            //        return item;
-            //    }
-            //    else {
-            //        return this._items.shift();
-            //    }
-            //}
-        }
-
-        const _sectionKeyword = "section";
-        const _functionKeyword = "function";
-        const type = { none: 0, html: 1, code: 2, expr: 3 };
-        const er = require('./localization/errors').parser;
-
-        return {
-            compile,
-            compileHtml: (jshtml, model) => compileSync({ jshtml, model })
         };
 
-        var _text;
-        var _line, _lineNum, _pos, _padding;
-        var _blocks, _sections;
+        this.__val = function (i) { // getValueAt
+            return args.valuesQueue.getAt(i);
+        };
 
-        // --- Methods --- 
-        function compile(args, done) {
-            log.debug();
+        this.__sec = function (name) { // section
+            if (!section)
+                section = name;
+            else if (section === name)
+                section = null;
+            else
+                throw new Error(`Unexpected section name = '${name}'.`);
+        };
+
+        this.__renderLayout = (done) => {
+            if (!this.layout)
+                return Promise.resolve().then(() => done(null, args.html)), null;
+
+            args.findPartial(this.layout, (err, jsHtml, findPartial) => {
+                if (err) return done(err);
+                let compileOpt = {
+                    jsHtml,
+                    model: args.model,
+                    bodyHtml: args.html,
+                    sections,
+                    findPartial,
+                    findPartialSync: args.findPartialSync
+                };
+                compile(compileOpt, done);
+            });
+        };
+
+        this.body = function () {
+            return args.bodyHtml;
+        };
+
+        this.section = function (name, required) {
+            let sec = sections[name];
+
+            if (sec) {
+                if (sec.rendered)
+                    throw new Error(`The section '${name}' has already been rendered.`); // TODO: InvalidOperationException: RenderSectionAsync invocation in '/Views/Shared/_LayoutYellow.cshtml' is invalid. The section 'Scripts' has already been rendered.
+
+                return sec.html;
+            }
+            else {
+                if (required)
+                    throw new Error(`The layout page cannot find the section '${name}'.`); // TODO: InvalidOperationException: The layout page '/Views/Shared/_Layout.cshtml' cannot find the section 'Test' in the content page '/Views/Home/Index.cshtml'.
+
+                return '';
+            }
+
+            // TODO: throw error that section was not rendered.
+        };
+
+        this.partial = function (name, model) {
+            // if an exception occurs it will be thron directly to to ExpressApp and shown on the users' page (fix later):
+            // https://expressjs.com/en/guide/error-handling.html
+            let p = args.findPartialSync(name);
+            let compileOpt = {
+                jsHtml: p.data,
+                model,
+                findPartialSync: args.findPartialSync
+            };
+            let html = compileSync(compileOpt);
+            args.html += html;
+            return ''; // for the case of call as expression <div>@Html.partial()</div>
+        };
+    }
+
+    class Block {
+        constructor(type, name) {
+            this.type = type;
+            this.name = name;
+            this.text = '';
+        }
+
+        append(ch) {
+            this.text += ch;
+            //this.text += (ch === '"') ? '\\"' : ch;
+        }
+
+        toScript(valuesQueue) {
+            return toScript(this, valuesQueue);
+        }
+    }
+
+    function toScript(block, valuesQueue) {
+        if (block.type === type.section) {
+            let secPoint = `\r\nHtml.__sec("${block.name}");\r\n`;
+            let script = secPoint;
+
+            for (let n = 0; n < block.blocks.length; n++) {
+                let sectionBlock = block.blocks[n];
+                script += toScript(sectionBlock, valuesQueue);
+            }
+
+            script += secPoint;
+            return script;
+        }
+        else {
+            let i;
+
+            switch (block.type) {
+                case type.html:
+                    i = valuesQueue.enq(block.text);
+                    return "Html.__rnd(Html.__val(" + i + "));";
+                case type.expr:
+                    i = valuesQueue.enq(block.text);
+                    return "Html.__rnd(eval(Html.__val(" + i + ")));";
+                case type.code:
+                    return block.text;
+                default:
+                    throw new Error(`Unexpected block type = "${blockType}".`);
+            }
+        }
+
+        throw new Error(`Unexpected code behaviour, block type = "${blockType}".`);
+    }
+
+    class Queue {
+        constructor() {
+            this._items = [];
+        }
+
+        enq(item) {
+            //if (opts.debug) log.debug(item);
+            return this._items.push(item) - 1;
+        }
+
+        getAt(i) {
+            if (opts.debug) {
+                let item = this._items[i];
+                //log.debug(item);
+                return item;
+            }
+            else {
+                return this._items[i];
+            }
+        }
+
+        //deq() {
+        //    if (opts.debug) {
+        //        let item = this._items.shift();
+        //        log.debug(item);
+        //        return item;
+        //    }
+        //    else {
+        //        return this._items.shift();
+        //    }
+        //}
+    }
+
+    const _sectionKeyword = "section";
+    //const _functionKeyword = "function";
+    const type = { none: 0, html: 1, code: 2, expr: 3, section: 4 };
+    const er = require('./localization/errors').parser;
+
+    ////////////////
+    //   PARSER   //
+    ////////////////
+    class Parser {
+        constructor(args, log) {
+            this.args = args;
+            this.log = log;
+        }
+
+        compile(done) {
             // checking arguments..
-            let jshtml = args.jsHtml;
-            let model = args.model;
+            let jshtml = this.args.jsHtml;
+            let model = this.args.model;
             var isString = Object.prototype.toString.call(jshtml) === "[object String]";
             if (!isString) return Promise.resolve().then(() => done(er.jshtmlShouldBeString)), null;
             if (!jshtml.length) return Promise.resolve().then(() => done(null, "")), null; // just an empty string.. nothing to do..
@@ -223,61 +257,55 @@ ${Html._js}`
             //////////////////////////////////////
             // parsing.. 
 
-            _text = jshtml, _line = '', _lineNum = 0, _pos = 0, _padding = '';
-            _sections = _blocks = [];
-            parseHtml(_blocks);
+            this.text = jshtml, this.line = '', this.lineNum = 0, this.pos = 0, this.padding = '';
+            this.inSection = false;
+            this.sections = [], this.blocks = [];
+            this.parseHtml(this.blocks);
             var valuesQueue = new Queue();
-            var js = _blocks.map((b) => toScript(b.text, b.type, valuesQueue)).join("");
+            var js = this.blocks.map(b => b.toScript(valuesQueue)).join("");
             var htmlArgs = {
                 html: '',
                 valuesQueue,
                 js,
                 model,
-                bodyHtml: args.bodyHtml,
-                findPartial: args.findPartial,
-                findPartialSync: args.findPartialSync
+                bodyHtml: this.args.bodyHtml,
+                findPartial: this.args.findPartial,
+                findPartialSync: this.args.findPartialSync,
+                sections: this.args.sections
             };
             var html = new Html(htmlArgs);
-            compilePage(html, model, done);
+            compilePage(html, model, opts.debug, done);
         }
 
-        function compileSync(args) {
-            log.debug();
-            let jshtml = args.jshtml;
-            let model = args.model;
+        compileSync() {
+            let jshtml = this.args.jsHtml;
+            let model = this.args.model;
             // checking arguments..
             var isString = Object.prototype.toString.call(jshtml) === "[object String]";
-            if (!isString) throw er.jshtmlShouldBeString;
+            if (!isString) throw new Error(er.jshtmlShouldBeString);
             if (!jshtml.length) return jshtml; // just an empty string.. nothing to do..
             //////////////////////////////////////
             // parsing.. 
-            _text = jshtml, _line = '', _lineNum = 0, _pos = 0, _padding = '';
-            _sections = _blocks = [];
-            parseHtml(_blocks);
+            this.text = jshtml, this.line = '', this.lineNum = 0, this.pos = 0, this.padding = '';
+            this.inSection = false;
+            this.sections = [], this.blocks = [];
+            this.parseHtml(this.blocks);
             var valuesQueue = new Queue();
-            var js = _blocks.map((b) => toScript(b.text, b.type, valuesQueue)).join("");
-            log.debug("script: \n" + js);
+            var js = this.blocks.map(b => b.toScript(valuesQueue)).join("");
             var htmlArgs = {
                 html: '',
                 valuesQueue,
                 js,
-                findPartialSync: args.findPartialSync,
-                model
+                findPartialSync: this.args.findPartialSync,
+                model,
+                sections: this.args.sections
             };
             var html = new Html(htmlArgs);
-            deleteProperties({ test: 1 });
             compilePageSync(html, model, opts.debug);
             return htmlArgs.html;
         }
 
-        function deleteProperties(obj) {
-                for (var p in obj)
-                    if (Object.prototype.hasOwnProperty.call(obj, p))
-                        delete obj[p];
-        }
-
-        function parseHtml(blocks, outerWaitTag) {
-            log.debug(`[START] blocks = ${blocks.length}.`);
+        parseHtml(blocks, outerWaitTag) {
             const docTypeName = "!DOCTYPE";
             const textQuotes = '\'"';
             var quotes = [];
@@ -289,18 +317,18 @@ ${Html._js}`
             let stop = false;
             var lastCh = '';
 
-            for (var ch = fetchChar(); ch; ch = fetchChar()) {
-                let isSpace = String.isWhiteSpace(ch);
-                let nextCh = pickChar();
+            for (var ch = this.fetchChar(); ch; ch = this.fetchChar()) {
+                let isSpace = Char.isWhiteSpace(ch);
+                let nextCh = this.pickChar();
                 let inQuotes = (quotes.length > 0);
 
                 if (ch === '@') {
                     if (nextCh === '@') { // checking for '@@' that means just text '@'
-                        ch = fetchChar(); // skip the next '@'
-                        nextCh = pickChar();
+                        ch = this.fetchChar(); // skip the next '@'
+                        nextCh = this.pickChar();
                     }
                     else {
-                        parseCode(blocks);
+                        this.parseCode(blocks);
                         block = newBlock(type.html, blocks);
                         continue;
                     }
@@ -345,19 +373,19 @@ ${Html._js}`
 
                                 if (openTag) { // if we have an open tag we must close it before we can go back to the caller method
                                     if (openTag.name.toUpperCase() !== tagName.toUpperCase())
-                                        throw er.missingMatchingStartTag(tag, _lineNum, linePos() - tag.length, _line); // tested by "Invalid-HTML 1+, 2+, 7"
+                                        throw new Error(er.missingMatchingStartTag(tag, this.lineNum, this.linePos() - tag.length, this.line)); // tested by "Invalid-HTML 1+, 2+, 7"
                                     // else they are neitralizing each other..
                                 }
                                 else if (outerWaitTag && outerWaitTag === tagName) {
-                                    stepBack(tag.length);
+                                    this.stepBack(tag.length);
                                     break;
                                 }
                                 else {
-                                    throw er.missingMatchingStartTag(tag, _lineNum, linePos() - tag.length, _line); // tested by "Invalid-HTML 4"
+                                    throw new Error(er.missingMatchingStartTag(tag, this.lineNum, this.linePos() - tag.length, this.line)); // tested by "Invalid-HTML 4"
                                 }
                             }
                             else if (tagKind === tagKinds.open) {
-                                openTags.push({ tag: tag, name: tagName, lineNum: _lineNum, linePos: linePos() - tag.length, line: _line });
+                                openTags.push({ tag: tag, name: tagName, lineNum: this.lineNum, linePos: this.linePos() - tag.length, line: this.line });
                             }
                             else {
                                 // just do nothing
@@ -375,7 +403,7 @@ ${Html._js}`
                     }
                 }
                 else if (!openTags.length && ch === '}' && lastLiteral === '>') { // the close curly bracket can follow only a tag (not just a text)
-                    stepBack();
+                    this.stepBack();
                     stop = true;
                     break; // return back to the callee code-block..
                 }
@@ -387,18 +415,18 @@ ${Html._js}`
                 if (isSpace) {
                     if (ch === '\n') {
                         lineLastLiteral = '';
-                        flushPadding();
+                        this.flushPadding();
                         block.append(ch);
                     }
                     else { // it's a true- space or tab
                         if (lineLastLiteral) // it's not the beginning of the current line
                             block.append(ch);
                         else // it is the beginning of the  line
-                            _padding += ch; // we still don't know whether this line is going to be a code or HTML
+                            this.padding += ch; // we still don't know whether this line is going to be a code or HTML
                     }
                 }
                 else {
-                    flushPadding();
+                    this.flushPadding();
                     block.append(ch);
                     lastLiteral = lineLastLiteral = ch;
                 }
@@ -408,17 +436,14 @@ ${Html._js}`
 
             if (openTags.length) {
                 let openTag = openTags[openTags.length - 1];
-                throw er.missingMatchingEndTag(openTag.tag, openTag.lineNum, openTag.linePos, openTag.line); // tested by "Invalid-HTML 3"
+                throw new Error(er.missingMatchingEndTag(openTag.tag, openTag.lineNum, openTag.linePos, openTag.line)); // tested by "Invalid-HTML 3"
             }
 
             if (!stop)
-                flushPadding();
-
-            log.debug(`[END] blocks = ${blocks.length}.`);
+                this.flushPadding();
         }
 
-        function parseHtmlInsideCode(blocks) {
-            log.debug(`[START] blocks = ${blocks.length}.`);
+        parseHtmlInsideCode(blocks) {
             const docTypeName = "!DOCTYPE";
             const textQuotes = '\'"';
             var quotes = [];
@@ -428,20 +453,20 @@ ${Html._js}`
             var lastCh = '';
             let stop = false;
 
-            for (var ch = fetchChar(); !stop && ch; ch = ch && fetchChar()) {
-                var nextCh = pickChar();
-                let isSpace = String.isWhiteSpace(ch);
+            for (var ch = this.fetchChar(); !stop && ch; ch = ch && this.fetchChar()) {
+                var nextCh = this.pickChar();
+                let isSpace = Char.isWhiteSpace(ch);
 
                 if (ch === '@') {
                     if (String.isWhiteSpace(block.text)) {
                         // In contrast to a base-HTML-block, here it can only start with an HTML-tag.
-                        throw er.unexpectedCharacter(ch, _lineNum, _line.length, _line); // cannot be tested, just for insurance
+                        throw new Error(er.unexpectedCharacter(ch, this.lineNum, this.line.length, this.line)); // cannot be tested, just for insurance
                     }
-                    if (pickChar() === '@') { // checking for '@@' that means just text '@'
-                        ch = fetchChar(); // skip the next '@'
+                    if (this.pickChar() === '@') { // checking for '@@' that means just text '@'
+                        ch = this.fetchChar(); // skip the next '@'
                     }
                     else {
-                        parseCode(blocks);
+                        this.parseCode(blocks);
 
                         if (tag && (tag === '<' || tag === '</'))
                             tag += '@' + blocks[blocks.length - 1].text; // just to be considered as a tag later (for the case of '<@tag>')
@@ -463,13 +488,13 @@ ${Html._js}`
                 }
                 else if (ch === '<') {
                     if (tag)
-                        throw er.unexpectedCharacter(ch, _lineNum, _line.length - 1, _line); // tested by "Invalid-HTML 8"
+                        throw new Error(er.unexpectedCharacter(ch, this.lineNum, this.line.length - 1, this.line)); // tested by "Invalid-HTML 8"
 
                     if (openTagName) { // it should be a close-tag or another nested html-block
                         if (nextCh !== '/') {
                             // it should be the next nested block of HTML which should be parsed with the normal `parseHtml` method.
-                            stepBack(); // step back before `<` literal
-                            parseHtml(blocks, openTagName);
+                            this.stepBack(); // step back before `<` literal
+                            this.parseHtml(blocks, openTagName);
                             block = newBlock(type.html, blocks);
                             tag = lastCh = lineLastLiteral = '';
                             continue;
@@ -484,23 +509,22 @@ ${Html._js}`
                     if (tag) {
                         if (nextCh === '/') { // it can be only considered as html, only as a text-fragment, so parse it as the next level of html..
                             // '<//' or '<a //>', smarter than MS-RAZOR :)
-                            stepBack(tag.length + 1);
-                            parseHtml(blocks, openTagName);
+                            this.stepBack(tag.length + 1);
+                            this.parseHtml(blocks, openTagName);
                             block = newBlock(type.html, blocks);
                             tag = lastCh = lineLastLiteral = '';
                             continue;
                         }
-                            
                         // closing- or self-closing tag ..
                         if (tag === '<' || tag.length > 1) { // '<' or `<a` at least
                             tag += ch;
                         }
                         else {
-                            throw er.unexpectedCharacter(ch, _lineNum, _line.length - 1, _line); // ???
+                            throw new Error(er.unexpectedCharacter(ch, this.lineNum, this.line.length - 1, this.line)); // ???
                         }
                     }
                     else {
-                        throw er.unexpectedCharacter(ch, _lineNum, _pos, _line);
+                        throw er.unexpectedCharacter(ch, this.lineNum, this.pos, this.line);
                     }
                 }
                 else if (ch === '>') {
@@ -512,7 +536,7 @@ ${Html._js}`
                                 let tagName = getTagName(tag);
 
                                 if (openTagName.toUpperCase() !== tagName.toUpperCase())
-                                    throw er.missingMatchingStartTag(tag, _lineNum, linePos() - tag.length, _line);
+                                    throw er.missingMatchingStartTag(tag, this.lineNum, this.linePos() - tag.length, this.line);
 
                                 openTag = openTagName = ''; // open-tag is closed
                             }
@@ -525,28 +549,28 @@ ${Html._js}`
                                 let tagName = getTagName(tag);
 
                                 if (tag[1] === '/') // it's a close-tag, unexpected..
-                                    throw er.missingMatchingStartTag(tag, _lineNum, linePos() - tag.length, _line); // tested by "Invalid-HTML 5"
+                                    throw er.missingMatchingStartTag(tag, this.lineNum, this.linePos() - tag.length, this.line); // tested by "Invalid-HTML 5"
 
                                 openTag = tag;
                                 openTagName = tagName;
-                                openTagPos = linePos() - tag.length;
-                                openTagLineNum = _lineNum;
-                                openTagLine = _line;
+                                openTagPos = this.linePos() - tag.length;
+                                openTagLineNum = this.lineNum;
+                                openTagLine = this.line;
                             }
                             else
-                                throw er.unexpectedCharacter(ch, _lineNum, _pos, _line);
+                                throw er.unexpectedCharacter(ch, this.lineNum, this.pos, this.line);
                         }
 
                         tag = ''; //  reset it & go on..
                     }
                     else {
-                        throw er.unexpectedCharacter(ch, _lineNum, _pos, _line);
+                        throw er.unexpectedCharacter(ch, this.lineNum, this.pos, this.line);
                     }
                 }
                 else if (isSpace) {
                     if (tag) { // within a tag
                         if (lastCh === '<' || lastCh === '/') // '<' or '</' or '<tag/'
-                            throw er.unexpectedCharacter(ch, _lineNum, linePos(), _line);
+                            throw er.unexpectedCharacter(ch, this.lineNum, this.linePos(), this.line);
                         else
                             tag += ch;
                     }
@@ -559,7 +583,7 @@ ${Html._js}`
                     }
                     else {
                         // it should be returned back to code-block
-                        stepBack(); // step back before `<` literal
+                        this.stepBack(); // step back before `<` literal
                         ch = '';
                         stop = true;
                     }
@@ -569,18 +593,18 @@ ${Html._js}`
                     if (isSpace) {
                         if (ch === '\n') {
                             lineLastLiteral = '';
-                            flushPadding();// flash padding buffer in case this whole line contains only whitespaces ..
+                            this.flushPadding();// flash padding buffer in case this whole line contains only whitespaces ..
                             block.append(ch);
                         }
                         else { // it's a true- space or tab
                             if (lineLastLiteral) // it's not the beginning of the current line
                                 block.append(ch);
                             else // it is the beginning of the  line
-                                _padding += ch; // we still don't know whether this line is going to be a code or HTML
+                                this.padding += ch; // we still don't know whether this line is going to be a code or HTML
                         }
                     }
                     else {
-                        flushPadding();
+                        this.flushPadding();
                         block.append(ch);
                         lineLastLiteral = ch;
                     }
@@ -593,28 +617,25 @@ ${Html._js}`
                 throw er.missingMatchingEndTag(openTag, openTagLineNum, openTagPos, openTagLine); // tested by "Invalid-HTML 6"
 
             if (!stop)
-                flushPadding();
-
-            log.debug(`[END] blocks = ${blocks.length}.`);
+                this.flushPadding();
         }
 
-        function parseCode(blocks) {
-            var ch = pickChar();
+        parseCode(blocks) {
+            var ch = this.pickChar();
             if (!ch) throw er.endOfFileFoundAfterAtSign; // TODO: test me.
 
             if (ch === '{') {
-                parseJsBlock(blocks);
+                this.parseJsBlock(blocks);
             }
             else if (canExpressionStartWith(ch)) {
-                parseJsExpression(blocks);
+                this.parseJsExpression(blocks);
             }
             else {
-                throw er.notValidStartOfCodeBlock(ch, _lineNum, _pos);
+                throw er.notValidStartOfCodeBlock(ch, this.lineNum, this.pos);
             }
         }
 
-        function parseJsExpression(blocks) {
-            log.debug(`[START] blocks = ${blocks.length}.`);
+        parseJsExpression(blocks) {
             const startScopes = '([';
             const endScopes = ')]';
             const textQuotes = '\'"`';
@@ -623,23 +644,23 @@ ${Html._js}`
             var wait = null;
             var firstScope = null;
             let firstKeyword = '';
-            flushPadding();// there is no sense to put padding to the expression text since it will be lost while evaluating
+            this.flushPadding();// there is no sense to put padding to the expression text since it will be lost while evaluating
             let block = newBlock(type.expr, blocks);
-            block.text = _padding;
-            _padding = '';
+            block.text = this.padding;
+            this.padding = '';
             var checkForBlockCode = false;
             let scopeCollapsed;
             let inText = false;
 
-            for (var ch = pickChar(); ch; ch = pickChar()) { // pick or fetch ??
+            for (var ch = this.pickChar(); ch; ch = this.pickChar()) { // pick or fetch ??
                 if (checkForBlockCode) {
-                    if (String.isWhiteSpace(ch)) {
-                        _padding += ch;
+                    if (Char.isWhiteSpace(ch)) {
+                        this.padding += ch;
                     }
                     else if (ch === '{') {
-                        flushPadding();
+                        this.flushPadding();
                         block.type = type.code;
-                        return parseJsBlock(blocks, block);
+                        return this.parseJsBlock(blocks, block);
                     }
                     else {
                         break;
@@ -672,7 +693,7 @@ ${Html._js}`
                                 checkForBlockCode = (!wait && ch === firstScope && ch !== ']'); // can continue with `[1,2,3].toString()`
                             }
                             else {
-                                throw er.invalidExpressionChar(ch, _lineNum, _pos, _line);
+                                throw er.invalidExpressionChar(ch, this.lineNum, this.pos, this.line);
                             }
                         }
                         else if (textQuotes.indexOf(ch) !== -1) { // it's some sort of text qoutes
@@ -682,46 +703,38 @@ ${Html._js}`
                         }
                     }
                     else if (block.text && !canExpressionEndWith(ch)) {
-                        if (String.isWhiteSpace(ch)) {
-                            if (firstKeyword)
-                                break;
-
-                            firstKeyword = block.text.trim();
-
-                            if (firstKeyword === _sectionKeyword) {
-                                parseSection();
+                        if (Char.isWhiteSpace(ch)) {
+                            let keyword = block.text.trim();
+                            if (keyword === _sectionKeyword) {
+                                this.blocks.pop();
+                                return this.parseSection();
                             }
-                            else if (firstKeyword !== _functionKeyword) {
-                                firstKeyword = '';
-                                break;
-                            }
+
+                            break;
                         }
                         else if (ch === '.') { // @Model.text
-                            let nextCh = pickNextChar();
+                            let nextCh = this.pickNextChar();
                             if (!nextCh || !canExpressionEndWith(nextCh))
                                 break;
                         }
-                        else if (!firstKeyword) {
+                        else {
                             break;
                         }
                     }
                 }
                 block.append(ch);
                 lastCh = ch;
-                fetchChar();
+                this.fetchChar();
             }
 
             if (wait)
-                throw er.expressionMissingEnd('@' + block.text, wait, _lineNum, _pos);
+                throw er.expressionMissingEnd('@' + block.text, wait, this.lineNum, this.pos);
 
             if (!block.text)
-                throw er.invalidExpressionChar(ch, _lineNum, _pos, _line);
-
-            log.debug(`[END] blocks = ${blocks.length}.`);
+                throw er.invalidExpressionChar(ch, this.lineNum, this.pos, this.line);
         }
 
-        function parseJsBlock(blocks, block) {
-            log.debug(`[START] blocks = ${blocks.length}.`);
+        parseJsBlock(blocks, block) {
             const startScopes = '{([';
             const endScopes = '})]';
             const textQuotes = '\'"`';
@@ -735,7 +748,7 @@ ${Html._js}`
             let hasOperator = !!block;
             block = block || newBlock(type.code, blocks);
 
-            for (var ch = pickChar(); !stop && ch; ch = pickChar()) { // pick or fetch ??
+            for (var ch = this.pickChar(); !stop && ch; ch = this.pickChar()) { // pick or fetch ??
                 skipCh = false;
                 if (inText) {
                     if (textQuotes.indexOf(ch) !== -1) { // it's some sort of text qoutes
@@ -768,7 +781,7 @@ ${Html._js}`
                                 }
                             }
                             else {
-                                throw er.invalidExpressionChar(ch, _lineNum, _pos, _line);
+                                throw er.invalidExpressionChar(ch, this.lineNum, this.pos, this.line);
                             }
                         }
                         else if (textQuotes.indexOf(ch) !== -1) { // it's some sort of text qoutes
@@ -778,7 +791,7 @@ ${Html._js}`
                         }
                         else if (ch === '<') {
                             if (lastLiteral === '' || lastLiteral === '{' || lastLiteral === ';') {
-                                parseHtmlInsideCode(blocks);
+                                this.parseHtmlInsideCode(blocks);
                                 block = newBlock(type.code, blocks);
                                 continue;
                             }
@@ -787,26 +800,26 @@ ${Html._js}`
                 }
 
                 if (skipCh) {
-                    _padding = '';
+                    this.padding = '';
                 }
                 else {
-                    let isSpace = String.isWhiteSpace(ch);
+                    let isSpace = Char.isWhiteSpace(ch);
 
                     if (isSpace) {
                         if (ch === '\n') {
                             lineLastLiteral = '';
-                            flushPadding(); // flash padding buffer in case this whole line contains only whitespaces ..
+                            this.flushPadding(); // flash padding buffer in case this whole line contains only whitespaces ..
                             block.append(ch);
                         }
                         else { // it's a true- space or tab
                             if (lineLastLiteral) // it's not the beginning of the current line
                                 block.append(ch);
                             else // it is the beginning of the  line
-                                _padding += ch; // we still don't know whether this line is going to be a code or HTML
+                                this.padding += ch; // we still don't know whether this line is going to be a code or HTML
                         }
                     }
                     else {
-                        flushPadding();
+                        this.flushPadding();
                         block.append(ch);
                         lastLiteral = lineLastLiteral = ch;
                     }
@@ -814,135 +827,114 @@ ${Html._js}`
                     lastCh = ch;
                 }
 
-                fetchChar();
+                this.fetchChar();
             }
 
             if (wait)
-                throw er.jsCodeBlockkMissingClosingChar(_lineNum, _pos, '@' + block.text);
+                throw er.jsCodeBlockkMissingClosingChar(this.lineNum, this.pos, '@' + block.text);
 
             if (stop) {
                 // skip all spaces until a new line
-                while (String.isWhiteSpace(pickChar())) {
-                    ch = fetchChar();
+                while (Char.isWhiteSpace(this.pickChar())) {
+                    ch = this.fetchChar();
                     if (ch === '\n') break; // a `\n` the last to skip
                 }
             }
             else {
-                flushPadding();
+                this.flushPadding();
             }
-
-            log.debug(`[END] blocks = ${blocks.length}.`);
         }
 
-        function parseSection() {
-            _pos += _sectionKeyword.length;
+        parseSection() {
+            if (this.inSection)
+                throw new Error(er.sectionsCannotBeNested(this.lineNum, this.line.length, this.line));
+
+            this.inSection = true;
             let spaceCount = 0;
 
-            for (var ch = pickChar(); ch && String.isWhiteSpace(ch); ch = pickChar()) {
-                fetchChar();
+            for (var ch = this.pickChar(); ch && Char.isWhiteSpace(ch); ch = this.pickChar()) {
+                this.fetchChar();
                 spaceCount++;
             }
 
-            if (spaceCount < 1) throw er.whitespaceExpectedAfter("@" + _sectionKeyword, _lineNum, _pos);
+            if (spaceCount < 1) throw er.whitespaceExpectedAfter("@" + _sectionKeyword, this.lineNum, this.line.length);
 
+            let sectionLine = this.lineNum, sectionPos = this.line.length;
             let sectionName = '';
+            // the section name is expected to be placed before '{' symbol or whitespace
+            for (ch = this.pickChar(); ch && !Char.isWhiteSpace(ch) && ch !== '{'; ch = this.pickChar())
+                sectionName += this.fetchChar();
 
-            for (ch = pickChar(); ch && !String.isWhiteSpace(ch) && ch !== '{'; ch = pickChar())
-                sectionName += fetchChar();
-
+            // validation of the section name ..
             if (sectionName.length === 0)
-                throw er.sectionNameExpectedAfter("@" + _sectionKeyword, _lineNum, _pos);
+                throw er.sectionNameExpectedAfter("@" + _sectionKeyword, this.lineNum, this.line.length);
 
             if (!canSectionStartWith(sectionName[0]))
-                throw er.sectionNameCannotStartWith(sectionName[0], _lineNum, _pos);
+                throw er.sectionNameCannotStartWith(sectionName[0], this.lineNum, this.line.length);
 
             for (var i = 1; i < sectionName.length; i++) {
                 let c = sectionName[i];
                 if (!canSectionContain(c))
-                    throw er.sectionNameCannotInclude(sectionName[0], _lineNum, _pos);
+                    throw er.sectionNameCannotInclude(sectionName[0], this.lineNum, this.line.length);
             }
-
-            ch = skipUntil(c => String.isWhiteSpace(ch));
+            // skip all following whitespaces ..
+            ch = this.skipWhile(c => Char.isWhiteSpace(c));
 
             if (ch !== '{')
-                throw er.unexpectedLiteralFollowingTheSection(ch, _lineNum, _pos);
-        }
+                throw er.unexpectedLiteralFollowingTheSection(ch, this.lineNum, this.line.length);
 
-        function canSectionStartWith(ch) {
-            return ch === '_' || Char.isLetter(ch);
-        }
+            // check if the section name is unique ..
+            let section = this.sections.find(s => sectionName === s);
 
-        function canSectionContain(ch) {
-            return ch === '_' || Char.isLetter(ch) || Char.isDigit(ch);
+            if (section)
+                throw new Error(er.sectionIsAlreadyDefined(sectionName, this.lineNum, this.line.length));
+
+            this.sections.push(sectionName);
+            let sectionBlocks = [];
+            this.parseHtmlInsideCode(sectionBlocks);
+
+            // skip all following whitespaces ..
+            ch = this.skipWhile(c => Char.isWhiteSpace(c));
+
+            if (ch !== '}')
+                throw new Error(er.sectionBlockIsMissingClosingBrace(sectionName, sectionLine, sectionPos));
+
+            var block = newBlock(type.section, this.blocks, sectionName);
+            block.blocks = sectionBlocks;
+            this.inSection = false;
         }
 
         //////////////////////////////////////
 
-        function flushPadding() {
-            if (!_padding) return;
-            let block = _blocks[_blocks.length - 1]
-            block.text += _padding;
-            _padding = '';
+        flushPadding() {
+            if (!this.padding) return;
+            let block = this.blocks[this.blocks.length - 1];
+            block.text += this.padding;
+            this.padding = '';
         }
 
-        function getTagName(tag) {
-            if (!tag || tag.length < 2) throw er.invalidHtmlTag(tag);
-            var tagName = '';
-            for (var i = 1; i < tag.length; i++) { // skip '<' & '>'
-                var ch = tag[i];
-
-                if (ch === '/') continue; // skip '/' for '</div>'
-                if (ch === '>') break;
-
-                if (String.isWhiteSpace(ch)) {
-                    if (tagName)
-                        break;
-                    else
-                        throw er.invalidHtmlTag(tag);
-                }
-
-                tagName += ch;
-            }
-            return tagName;
-        }
-
-        function canExpressionStartWith(ch) {
-            return ch === '_' || ch === '$' || ch === '(' || ch === '[' || Char.isLetter(ch);
-        }
-
-        function canExpressionEndWith(ch) {
-
-            return ch === '_' || ch === '$' || Char.isLetter(ch) || Char.isDigit(ch);
-        }
-
-        function newBlock(type, blocks) {
-            var block = new Block(type);
-            blocks.push(block);
-            return block;
-        }
-
-        function pickChar() {
-            if (_pos < _text.length)
-                return _text[_pos];
+        pickChar() {
+            if (this.pos < this.text.length)
+                return this.text[this.pos];
 
             return '';
         }
 
-        function pickNextChar() {
-            if (_pos < _text.length - 1)
-                return _text[_pos + 1];
+        pickNextChar() {
+            if (this.pos < this.text.length - 1)
+                return this.text[this.pos + 1];
 
             return '';
         }
 
-        function fetchChar() {
-            if (_pos < _text.length) {
-                var ch = _text[_pos++];
+        fetchChar() {
+            if (this.pos < this.text.length) {
+                var ch = this.text[this.pos++];
 
                 if (ch === '\n')
-                    _line = '',  _lineNum++;
+                    this.line = '', this.lineNum++;
                 else
-                    _line += ch;
+                    this.line += ch;
 
                 return ch;
             }
@@ -950,63 +942,118 @@ ${Html._js}`
             return '';
         }
 
-        function stepBack(count) {
+        stepBack(count) {
             if (typeof count === 'undefined') count = 1;
 
-            if (count > _line.length)
-                throw `stepBack(${count}) is out of range.`;
+            if (count > this.line.length)
+                throw `this.stepBack(${count}) is out of range.`;
 
-            _pos -= count;
-            let cut = _line.length - count;
+            this.pos -= count;
+            let cut = this.line.length - count;
 
             if (cut === 0)
-                _line = ''; 
+                this.line = '';
             else
-                _line = _line.substr(0, cut);
+                this.line = this.line.substr(0, cut);
 
             // adjust blocks..
-            if (count > 1 && _blocks.length) {
-                let block = _blocks[_blocks.length - 1];
+            if (count > 1 && this.blocks.length) {
+                let block = this.blocks[this.blocks.length - 1];
                 cut = block.text.length - count + 1; // block's text doesn't have the very last character
                 if (cut === 0)
-                    _blocks.pop(); // remove the current block if it's empty
+                    this.blocks.pop(); // remove the current block if it's empty
                 else
                     block.text = block.text.substr(0, cut);
             }
         }
 
-        function linePos() {
-            return _line.length;
+        linePos() {
+            return this.line.length;
         }
 
-        function skipUntil(check) {
-            let c = fetchChar();
-            while (c && !check(c)) c = fetchChar();
-            if (!c) throw er.unexpectedEndOfFile(_line);
+        skipWhile(check) {
+            let c = this.fetchChar();
+            while (c && check(c)) c = this.fetchChar();
+            //if (!c) throw new Error(er.unexpectedEndOfFile(this.line));
             return c;
         }
 
-        function nextNonSpace() {
+        nextNonSpace() {
             var ch;
             do {
-                ch = _nextChar();
+                ch = this.nextChar();
             } while (ch && ch.trim().length === 0);
             return ch;
         }
 
-        function startsWith(str) {
-            return _text.startsWithIgnoreCase(_pos, str);
+        startsWith(str) {
+            return this.text.startsWithIgnoreCase(this.pos, str);
         }
 
-        function take(len) {
-            let str = _text.substr(_pos, len);
-            _pos += len;
+        take(len) {
+            let str = this.text.substr(this.pos, len);
+            this.pos += len;
             return str;
         }
+    }
+
+    // class Parser helpers:
+    function canSectionStartWith(ch) {
+        return ch === '_' || Char.isLetter(ch);
+    }
+
+    function canSectionContain(ch) {
+        return ch === '_' || Char.isLetter(ch) || Char.isDigit(ch);
+    }
+
+    function canExpressionStartWith(ch) {
+        return ch === '_' || ch === '$' || ch === '(' || ch === '[' || Char.isLetter(ch);
+    }
+
+    function canExpressionEndWith(ch) {
+
+        return ch === '_' || ch === '$' || Char.isLetter(ch) || Char.isDigit(ch);
+    }
+
+    function newBlock(type, blocks, name) {
+        var block = new Block(type, name);
+        blocks.push(block);
+        return block;
+    }
+
+    function getTagName(tag) {
+        if (!tag || tag.length < 2) throw er.invalidHtmlTag(tag);
+        var tagName = '';
+        for (var i = 1; i < tag.length; i++) { // skip '<' & '>'
+            var ch = tag[i];
+
+            if (ch === '/') continue; // skip '/' for '</div>'
+            if (ch === '>') break;
+
+            if (Char.isWhiteSpace(ch)) {
+                if (tagName)
+                    break;
+                else
+                    throw er.invalidHtmlTag(tag);
+            }
+
+            tagName += ch;
+        }
+        return tagName;
+    }
+
+    ////////////////
+    //   EXPORTS  //
+    ////////////////
+    var compile = (args, done) => new Parser(args).compile(done);
+    var compileSync = args => new Parser(args).compileSync();
+
+    // Module/Exports..
+    return {
+        compile,
+        compileSync
     };
-})();
 
-
-
+}; // module.export
 
 

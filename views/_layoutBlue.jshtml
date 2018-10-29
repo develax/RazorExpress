@@ -9,3 +9,6 @@
     @Html.body()
 </div>
 
+<div>
+    @Html.section('Test')
+</div>

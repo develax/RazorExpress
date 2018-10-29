@@ -40,6 +40,9 @@ var errors = {
         whitespaceExpectedAfter(keyword, line, pos) {
             return `A whitespace expected after the "${keyword}" keyword at ${line} pos ${pos}.`;
         },
+        tagNameExpected(line, pos) {
+            return `Tag name expected at ${line} pos ${pos}.`;
+        },
         sectionNameExpectedAfter(keyword, line, pos) {
             return `A section name expected after the "${keyword}" keyword at ${line} pos ${pos}.`;
         },
@@ -52,8 +55,14 @@ var errors = {
         unexpectedLiteralFollowingTheSection(ch, line, pos) {
             return `Unexpected literal '${ch}' following the 'section' directive at ${line} pos ${pos}. Expected '{'.`;
         },
-        tagNameExpected(line, pos) {
-            return `Tag name expected at ${line} pos ${pos}.`;
+        sectionIsAlreadyDefined(sectionName, line, pos) {
+            return `Section 'sectionName' is already defined.`;
+        },
+        sectionBlockIsMissingClosingBrace(sectionName) {
+            return `The section block 'sectionName' is missing a closing "}" character.`;
+        },
+        sectionsCannotBeNested(line, pos, text) {
+            return `Section blocks cannot be nested at ${line} pos ${pos} after "${text}" <--`;
         }
     }
 };

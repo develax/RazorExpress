@@ -166,13 +166,22 @@
             expected: "\n<div>\n    123\n</div>\n"
         },
         {
-            name: "Code 19",
+            name: "Code 19  (invalid)",
             template: `
-@function getValue() {
+@function getValue () {
     return 123;
 }
 <div>@getValue()</div>`,
-            expected: "\n<div>123</div>"
+            error: "Unexpected end of input"
+        },
+        {
+            name: "Code 20",
+            template: `
+@{
+    <span>X<span/>
+}`,
+            error: "Unexpected end of input"
+            // `unexpected character '/' at line 3 pos 17: '    <span>X<span/' <--`
         }
     ];
     module.exports = cases;

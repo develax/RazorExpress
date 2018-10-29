@@ -5,10 +5,10 @@
 
     describe("INVALID INPUT ARGUMENTS", () => {
         it("should throw an exception if argument is not a string", () => {
-            expect(parser.compileHtml).to.throw(er.rawArgumentShouldBeString);
+            expect(() => parser.compileSync({})).to.throw(er.rawArgumentShouldBeString);
         });
         it("should return an empty string if the argument was an empty string", () => {
-            expect(parser.compileHtml('')).to.be.empty;
+            expect(parser.compileSync({ jsHtml: '' })).to.be.empty;
         });
     });
 
@@ -19,7 +19,7 @@
             for (let i = 0; i < cases.length; i++) {
                 let c = cases[i];
                 it(c.name, () => {
-                    let result = parser.compileHtml(c.template);
+                    let result = parser.compileSync({ jsHtml: c.template });
                     expect(result).to.equal(c.expected);
                 });
             }
@@ -31,7 +31,7 @@
             for (let i = 0; i < cases.length; i++) {
                 let c = cases[i];
                 it(c.name, () => {
-                    let result = () => parser.compileHtml(c.template);
+                    let result = () => parser.compileSync({ jsHtml: c.template });
                     expect(result).to.throw(c.error);
                 });
             }
@@ -45,7 +45,7 @@
             for (let i = 0; i < cases.length; i++) {
                 let c = cases[i];
                 it(c.name, () => {
-                    let result = parser.compileHtml(c.template, c.model);
+                    let result = parser.compileSync({ jsHtml: c.template, model: c.model });
                     expect(c.expected).to.equal(result);
                 });
             }
@@ -57,7 +57,7 @@
             for (let i = 0; i < cases.length; i++) {
                 let c = cases[i];
                 it(c.name, () => {
-                    let result = () => parser.compileHtml(c.template);
+                    let result = () => parser.compileSync({ jsHtml: c.template });
                     expect(result).to.throw(c.error);
                 });
             }
@@ -71,8 +71,14 @@
             for (let i = 0; i < cases.length; i++) {
                 let c = cases[i];
                 it(c.name, () => {
-                    let result = parser.compileHtml(c.template, c.model);
-                    expect(c.expected).to.equal(result);
+                    if (c.expected) {
+                        let result = parser.compileSync({ jsHtml: c.template, model: c.model });
+                        expect(c.expected).to.equal(result);
+                    }
+                    else {
+                        let result = () => parser.compileSync({ jsHtml: c.template });
+                        expect(result).to.throw(c.error);
+                    }
                 });
             }
         });
@@ -85,12 +91,12 @@
             for (let i = 0; i < cases.length; i++) {
                 let c = cases[i];
                 it(c.name, () => {
-                    let result = parser.compileHtml(c.template, c.model);
+                    let result = parser.compileSync({ jsHtml: c.template, model: c.model });
                     expect(c.expected).to.equal(result);
                 });
             }
         });
     });
- 
+
 })();
 

@@ -10,3 +10,6 @@
     <div>Start value: @start</div>
 </div>
 
+@section Test{
+    <div style="background-color: greenyellow">SECTION TEST</div>
+}

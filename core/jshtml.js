@@ -14,7 +14,7 @@
     require('./utils');
     const fs = require('fs');
     const path = require('path');
-    const parser = require('./parser')();
+    const parserInit = require('./parser');
     const er = require('./localization/errors').parser;
     //require('./core/utils');
     //const fs = require('fs');
@@ -23,6 +23,7 @@
     //const er = require('./core/localization/errors').parser;
 
     function renderFile(filepath, options, done) {
+        let parser = parserInit();
         filepath = path.normalize(filepath).toLowerCase();
         let fileName = path.fileName(filepath);
         let viewsPath = path.normalize(options.settings.views).toLowerCase();
