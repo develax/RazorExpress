@@ -26,6 +26,11 @@
             expected: '<span > /\ some text </span >'
         },
         {
+            name: "HTML 5.1",
+            template: '<span > \/ some text </span >',
+            expected: '<span > \/ some text </span >'
+        },
+        {
             name: "HTML 6",
             template: '<span title="hello">/\\ some text</span>',
             expected: '<span title="hello">/\\ some text</span>'

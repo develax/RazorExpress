@@ -16,8 +16,8 @@ var errors = {
         expressionMissingEnd(expr, ch, line, pos) {
             return `The explicit expression "${expr}" is missing a closing "${ch}" character at line ${line} pos ${pos}.`;
         },
-        jsCodeBlockkMissingClosingChar(line, pos, codeFirstLine) {
-            return `The code block is missing a closing "}" character. Make sure you have a matching "}" character for all the "{" characters within this block, and that none of the "}" characters are being interpreted as markup. The block starts at line ${line} pos ${pos} with text: "${codeFirstLine}"`;
+        jsCodeBlockkMissingClosingChar(line, codeFirstLine) {
+            return `The code block is missing a closing "}" character. Make sure you have a matching "}" character for all the "{" characters within this block, and that none of the "}" characters are being interpreted as markup. The block starts at line ${line + 1} with text: "${codeFirstLine}"`;
         },
         invalidHtmlChar(ch, lineNum, posNum, afterText, expected) {
             return `"${ch}" is not a valid HTML character at line ${lineNum} pos ${posNum}` + (afterText ? ` after "${afterText}" < --` : expected ? ` (expected char = "${expected}")` : '.');
@@ -38,22 +38,22 @@ var errors = {
             return `The file "${viewName}" is not available.`;
         },
         whitespaceExpectedAfter(keyword, line, pos) {
-            return `A whitespace expected after the "${keyword}" keyword at ${line} pos ${pos}.`;
+            return `A whitespace expected after the "${keyword}" keyword at line${line} pos ${pos}.`;
         },
-        tagNameExpected(line, pos) {
-            return `Tag name expected at ${line} pos ${pos}.`;
+        tagNameExpected(line, pos, html) {
+            return `Tag name expected at line ${line + 1} pos ${pos + 1}: '${html}' <--`;
         },
         sectionNameExpectedAfter(keyword, line, pos) {
-            return `A section name expected after the "${keyword}" keyword at ${line} pos ${pos}.`;
+            return `A section name expected after the "${keyword}" keyword at line${line} pos ${pos}.`;
         },
         sectionNameCannotStartWith(ch, line, pos) {
-            return `A section name cannot start with '${ch}' at ${line} pos ${pos}.`;
+            return `A section name cannot start with '${ch}' at line${line} pos ${pos}.`;
         },
         sectionNameCannotInclude(ch, line, pos) {
-            return `A section name cannot include '${ch}' at ${line} pos ${pos}.`;
+            return `A section name cannot include '${ch}' at line${line} pos ${pos}.`;
         },
         unexpectedLiteralFollowingTheSection(ch, line, pos) {
-            return `Unexpected literal '${ch}' following the 'section' directive at ${line} pos ${pos}. Expected '{'.`;
+            return `Unexpected literal '${ch}' following the 'section' directive at line${line} pos ${pos}. Expected '{'.`;
         },
         sectionIsAlreadyDefined(sectionName, line, pos) {
             return `Section 'sectionName' is already defined.`;
@@ -62,7 +62,7 @@ var errors = {
             return `The section block 'sectionName' is missing a closing "}" character.`;
         },
         sectionsCannotBeNested(line, pos, text) {
-            return `Section blocks cannot be nested at ${line} pos ${pos} after "${text}" <--`;
+            return `Section blocks cannot be nested at line ${line} pos ${pos} after "${text}" <--`;
         }
     }
 };

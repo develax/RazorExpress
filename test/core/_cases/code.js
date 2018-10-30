@@ -180,8 +180,130 @@
 @{
     <span>X<span/>
 }`,
-            error: "Unexpected end of input"
-            // `unexpected character '/' at line 3 pos 17: '    <span>X<span/' <--`
+            error: "'<span>' tag at line 3 pos 5 is missing mathing end tag: '    <span>' <--"
+        },
+        {
+            name: "Code 21",
+            template: `
+@{
+    <span>/X</span>
+}`,
+            expected: "\n    <span>/X</span>\n"
+        },
+        {
+            name: "Code 22",
+            template: `
+@{
+    <span>X</div>
+}`,
+            error: "'</div>' tag at line 3 pos 12 is missing mathing start tag: '    <span>X</div>' <--"
+        },
+        {
+            name: "Code 23",
+            template: `
+@{
+    <span><img/></span>
+}`,
+            expected: "\n    <span><img/></span>\n"
+        },
+        {
+            name: "Code 24",
+            template: `
+@{
+    <span>><</span>
+}`,
+            expected: "\n    <span>><</span>\n"
+        },
+        {
+            name: "Code 25",
+            template: `
+@{
+    <span><></span>
+}`,
+            expected: "\n    <span><></span>\n"
+        },
+        {
+            name: "Code 26",
+            template: `
+@{
+    <img/>
+}`,
+            expected: "\n    <img/>\n"
+        },
+        {
+            name: "Code 27",
+            template: `
+@{
+    <span><//span></span>
+}`,
+            expected: "\n    <span><//span></span>\n"
+        },
+        {
+            name: "Code 28",
+            template: `@{<>}`,
+            error: "Tag name expected at line 1 pos 4: '@{<' <--"
+        },
+        {
+            name: "Code 29",
+            template: `@{<}`,
+            error: 'The code block is missing a closing "}" character. Make sure you have a matching "}" character for all the "{" characters within this block, and that none of the "}" characters are being interpreted as markup. The block starts at line 1 with text: "@{"'
+        },
+        {
+            name: "Code 30",
+            template: `
+@for(var i = 0; i < 10; i++){
+    <
+}`,
+            error: "Tag name expected at line 3 pos 6: '    <' <--"
+        },
+        {
+            name: "Code 31",
+            template: `
+@{
+    <span>< /span>
+}`,
+            error: `'<span>' tag at line 3 pos 5 is missing mathing end tag: '    <span>' <--`
+        },
+        {
+            name: "Code 31.1",
+            template: `
+@{
+    <span>< span>
+}`,
+            error: `'<span>' tag at line 3 pos 5 is missing mathing end tag: '    <span>' <--`
+        },
+        {
+            name: "Code 32",
+            template: `
+@{
+    <span>< /span></span>
+}`,
+            expected: "\n    <span>< /span></span>\n"
+        },
+        {
+            name: "Code 33",
+            template: `
+@{
+    < span></span>
+}`,
+            error: "Tag name expected at line 3 pos 6: '    <' <--"
+        },
+        {
+            name: "Code 34",
+            template: `
+@{
+    <span></ span>
+}`,
+            error: "Tag name expected at line 3 pos 13: '    <span></' <--"
+        },
+        {
+            name: "Code 35",
+            template: `
+@{ 
+    <a title="@Model">text</a>
+}`,
+            expected: '\n    <a title="123">text</a>\n',
+            model: 123
         }
     ];
     module.exports = cases;

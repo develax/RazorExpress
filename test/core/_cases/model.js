@@ -85,8 +85,20 @@
         },
         {
             name: "Model 16",
-            template: '<a title="\'@Model\'">text</a>',
+            template: '<a title="@Model">text</a>',
+            expected: '<a title="123">text</a>',
+            model: 123
+        },
+        {
+            name: "Model 16.1",
+            template: `<a title="'@Model'">text</a>`,
             expected: '<a title="\'123\'">text</a>',
+            model: 123
+        },
+        {
+            name: "Model 16.2",
+            template: '<a title="val=@Model">text</a>',
+            expected: '<a title="val=123">text</a>',
             model: 123
         },
         {

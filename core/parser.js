@@ -381,7 +381,7 @@ module.exports = function (opts) {
                                     break;
                                 }
                                 else {
-                                    throw new Error(er.missingMatchingStartTag(tag, this.lineNum, this.linePos() - tag.length, this.line)); // tested by "Invalid-HTML 4"
+                                    throw new Error(er.missingMatchingStartTag(tag, this.lineNum, this.linePos() - tag.length, this.line)); // tested by "Invalid-HTML 4", "Code 22"
                                 }
                             }
                             else if (tagKind === tagKinds.open) {
@@ -453,19 +453,20 @@ module.exports = function (opts) {
             var lastCh = '';
             let stop = false;
 
-            for (var ch = this.fetchChar(); !stop && ch; ch = ch && this.fetchChar()) {
-                var nextCh = this.pickChar();
+            for (var ch = this.pickChar(); !stop && ch; ch = ch && this.pickChar()) {
+                var nextCh = this.pickNextChar();
                 let isSpace = Char.isWhiteSpace(ch);
 
                 if (ch === '@') {
                     if (String.isWhiteSpace(block.text)) {
                         // In contrast to a base-HTML-block, here it can only start with an HTML-tag.
-                        throw new Error(er.unexpectedCharacter(ch, this.lineNum, this.line.length, this.line)); // cannot be tested, just for insurance
+                        throw new Error(er.unexpectedCharacter(ch, this.lineNum, this.linePos(), this.line)); // cannot be tested, just for insurance
                     }
-                    if (this.pickChar() === '@') { // checking for '@@' that means just text '@'
+                    if (this.pickNextChar() === '@') { // checking for '@@' that means just text '@'
                         ch = this.fetchChar(); // skip the next '@'
                     }
                     else {
+                        this.fetchChar(); // skip current '@'
                         this.parseCode(blocks);
 
                         if (tag && (tag === '<' || tag === '</'))
@@ -488,43 +489,32 @@ module.exports = function (opts) {
                 }
                 else if (ch === '<') {
                     if (tag)
-                        throw new Error(er.unexpectedCharacter(ch, this.lineNum, this.line.length - 1, this.line)); // tested by "Invalid-HTML 8"
+                        throw new Error(er.unexpectedCharacter(ch, this.lineNum, this.line.length, this.line + ch)); // tested by "Invalid-HTML 8"
 
                     if (openTagName) { // it should be a close-tag or another nested html-block
-                        if (nextCh !== '/') {
-                            // it should be the next nested block of HTML which should be parsed with the normal `parseHtml` method.
-                            this.stepBack(); // step back before `<` literal
-                            this.parseHtml(blocks, openTagName);
-                            block = newBlock(type.html, blocks);
-                            tag = lastCh = lineLastLiteral = '';
+                        if (nextCh !== '/') { // it should be the next nested block of HTML which should be parsed with the normal `parseHtml` method.
+                            processInnerHtml.call(this);
                             continue;
                         }
                     }
                     // ELSE it must be the begining an open-tag or a self-close, however it will be a new one on the same deep-level
-                    if (ch)
-                        tag = ch;
+                    tag = ch;
                 }
                 else if (ch === '/') {
                     // So, it must be..
                     if (tag) {
                         if (nextCh === '/') { // it can be only considered as html, only as a text-fragment, so parse it as the next level of html..
                             // '<//' or '<a //>', smarter than MS-RAZOR :)
-                            this.stepBack(tag.length + 1);
-                            this.parseHtml(blocks, openTagName);
-                            block = newBlock(type.html, blocks);
-                            tag = lastCh = lineLastLiteral = '';
+                            processInnerHtml.call(this);
                             continue;
                         }
                         // closing- or self-closing tag ..
-                        if (tag === '<' || tag.length > 1) { // '<' or `<a` at least
-                            tag += ch;
-                        }
-                        else {
-                            throw new Error(er.unexpectedCharacter(ch, this.lineNum, this.line.length - 1, this.line)); // ???
-                        }
+                        // '<' or `<a` at least
+                        tag += ch;
                     }
                     else {
-                        throw er.unexpectedCharacter(ch, this.lineNum, this.pos, this.line);
+                        processInnerHtml.call(this);
+                        continue;
                     }
                 }
                 else if (ch === '>') {
@@ -536,54 +526,53 @@ module.exports = function (opts) {
                                 let tagName = getTagName(tag);
 
                                 if (openTagName.toUpperCase() !== tagName.toUpperCase())
-                                    throw er.missingMatchingStartTag(tag, this.lineNum, this.linePos() - tag.length, this.line);
+                                    throw new Error(er.missingMatchingStartTag(tag, this.lineNum, this.linePos() - tag.length + 1, this.line)); // tested by "Code 22"
 
                                 openTag = openTagName = ''; // open-tag is closed
                             }
                         }
                         else {
-                            if (tag[tag.length - 1] === '/') { // it's a self-close tag..
-                                // nothing to do
+                            if (tag[tag.length - 2] === '/') {
+                                // it's a self-close tag... nothing to do
                             }
-                            else if (tag.length > 1) { // it's an open-tag, at least `<a`
+                            else if (tag.length > 2) { // it's an open-tag, at least `<a>`
                                 let tagName = getTagName(tag);
 
                                 if (tag[1] === '/') // it's a close-tag, unexpected..
-                                    throw er.missingMatchingStartTag(tag, this.lineNum, this.linePos() - tag.length, this.line); // tested by "Invalid-HTML 5"
+                                    throw new Error(er.missingMatchingStartTag(tag, this.lineNum, this.linePos() - tag.length + 1, this.line + ch)); // tested by "Invalid-HTML 5"
 
                                 openTag = tag;
                                 openTagName = tagName;
-                                openTagPos = this.linePos() - tag.length;
+                                openTagPos = this.linePos() - tag.length + 1;
                                 openTagLineNum = this.lineNum;
-                                openTagLine = this.line;
+                                openTagLine = this.line + ch;
                             }
                             else
-                                throw er.unexpectedCharacter(ch, this.lineNum, this.pos, this.line);
+                                throw new Error(er.tagNameExpected(this.lineNum, this.linePos(), this.line)); // tested by "Code 28"
                         }
 
                         tag = ''; //  reset it & go on..
-                    }
-                    else {
-                        throw er.unexpectedCharacter(ch, this.lineNum, this.pos, this.line);
                     }
                 }
                 else if (isSpace) {
                     if (tag) { // within a tag
                         if (lastCh === '<' || lastCh === '/') // '<' or '</' or '<tag/'
-                            throw er.unexpectedCharacter(ch, this.lineNum, this.linePos(), this.line);
+                            throw new Error(er.tagNameExpected(this.lineNum, this.linePos(), this.line)); // tests: "Code 33", "Code 34"
                         else
                             tag += ch;
                     }
                 }
                 else { // any other character
-                    if (tag)
+                    if (tag) {
                         tag += ch;
-                    else if (openTagName) {
-                        // do nothing
+                    }
+                    else if (openTagName) { // even if it is '}' it will be considered as a plain text
+                        processInnerHtml.call(this);
+                        continue;
                     }
                     else {
                         // it should be returned back to code-block
-                        this.stepBack(); // step back before `<` literal
+                        //this.stepBack(); // step back before `<` literal
                         ch = '';
                         stop = true;
                     }
@@ -611,13 +600,24 @@ module.exports = function (opts) {
 
                     lastCh = ch[ch.length - 1];
                 }
+
+                !stop && this.fetchChar();
             }
 
             if (openTagName)
-                throw er.missingMatchingEndTag(openTag, openTagLineNum, openTagPos, openTagLine); // tested by "Invalid-HTML 6"
+                throw new Error(er.missingMatchingEndTag(openTag, openTagLineNum, openTagPos, openTagLine)); // tested by "Invalid-HTML 6", "Code 20", "Code 31"
 
             if (!stop)
                 this.flushPadding();
+
+            function processInnerHtml() {
+                if (tag.length > 1)
+                    this.stepBack(tag.length - 1);
+
+                this.parseHtml(blocks, openTagName);
+                block = newBlock(type.html, blocks);
+                tag = lastCh = lineLastLiteral = '';
+            }
         }
 
         parseCode(blocks) {
@@ -791,6 +791,8 @@ module.exports = function (opts) {
                         }
                         else if (ch === '<') {
                             if (lastLiteral === '' || lastLiteral === '{' || lastLiteral === ';') {
+                                if (!block.text.length || String.isWhiteSpace(block.text))
+                                    this.blocks.pop();
                                 this.parseHtmlInsideCode(blocks);
                                 block = newBlock(type.code, blocks);
                                 continue;
@@ -831,7 +833,7 @@ module.exports = function (opts) {
             }
 
             if (wait)
-                throw er.jsCodeBlockkMissingClosingChar(this.lineNum, this.pos, '@' + block.text);
+                throw er.jsCodeBlockkMissingClosingChar(this.lineNum, '@' + (hasOperator ? block.text : '{'));
 
             if (stop) {
                 // skip all spaces until a new line
@@ -943,6 +945,7 @@ module.exports = function (opts) {
         }
 
         stepBack(count) {
+            if (count === 0) throw new Error('`count` cannot be 0.');
             if (typeof count === 'undefined') count = 1;
 
             if (count > this.line.length)
@@ -957,7 +960,7 @@ module.exports = function (opts) {
                 this.line = this.line.substr(0, cut);
 
             // adjust blocks..
-            if (count > 1 && this.blocks.length) {
+            if (this.blocks.length) {
                 let block = this.blocks[this.blocks.length - 1];
                 cut = block.text.length - count + 1; // block's text doesn't have the very last character
                 if (cut === 0)
