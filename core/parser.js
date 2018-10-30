@@ -317,17 +317,18 @@ module.exports = function (opts) {
             let stop = false;
             var lastCh = '';
 
-            for (var ch = this.fetchChar(); ch; ch = this.fetchChar()) {
+            for (var ch = this.pickChar(); ch; ch = this.pickChar()) {
                 let isSpace = Char.isWhiteSpace(ch);
-                let nextCh = this.pickChar();
+                let nextCh = this.pickNextChar();
                 let inQuotes = (quotes.length > 0);
 
                 if (ch === '@') {
                     if (nextCh === '@') { // checking for '@@' that means just text '@'
                         ch = this.fetchChar(); // skip the next '@'
-                        nextCh = this.pickChar();
+                        nextCh = this.pickNextChar();
                     }
                     else {
+                        this.fetchChar();
                         this.parseCode(blocks);
                         block = newBlock(type.html, blocks);
                         continue;
@@ -373,19 +374,19 @@ module.exports = function (opts) {
 
                                 if (openTag) { // if we have an open tag we must close it before we can go back to the caller method
                                     if (openTag.name.toUpperCase() !== tagName.toUpperCase())
-                                        throw new Error(er.missingMatchingStartTag(tag, this.lineNum, this.linePos() - tag.length, this.line)); // tested by "Invalid-HTML 1+, 2+, 7"
+                                        throw new Error(er.missingMatchingStartTag(tag, this.lineNum, this.linePos() - tag.length + 1, this.line + ch)); // tested by "Invalid-HTML 1+, 2+, 7"
                                     // else they are neitralizing each other..
                                 }
                                 else if (outerWaitTag && outerWaitTag === tagName) {
-                                    this.stepBack(tag.length);
+                                    this.stepBack(tag.length - 1);
                                     break;
                                 }
                                 else {
-                                    throw new Error(er.missingMatchingStartTag(tag, this.lineNum, this.linePos() - tag.length, this.line)); // tested by "Invalid-HTML 4", "Code 22"
+                                    throw new Error(er.missingMatchingStartTag(tag, this.lineNum, this.linePos() - tag.length + 1, this.line + ch)); // tested by "Invalid-HTML 4", "Code 22"
                                 }
                             }
                             else if (tagKind === tagKinds.open) {
-                                openTags.push({ tag: tag, name: tagName, lineNum: this.lineNum, linePos: this.linePos() - tag.length, line: this.line });
+                                openTags.push({ tag: tag, name: tagName, lineNum: this.lineNum, linePos: this.linePos() - tag.length + 1, line: this.line + ch });
                             }
                             else {
                                 // just do nothing
@@ -403,7 +404,7 @@ module.exports = function (opts) {
                     }
                 }
                 else if (!openTags.length && ch === '}' && lastLiteral === '>') { // the close curly bracket can follow only a tag (not just a text)
-                    this.stepBack();
+                    this.stepBack(0);
                     stop = true;
                     break; // return back to the callee code-block..
                 }
@@ -432,6 +433,7 @@ module.exports = function (opts) {
                 }
 
                 lastCh = ch;
+                this.fetchChar();
             }
 
             if (openTags.length) {
@@ -611,9 +613,7 @@ module.exports = function (opts) {
                 this.flushPadding();
 
             function processInnerHtml() {
-                if (tag.length > 1)
-                    this.stepBack(tag.length - 1);
-
+                this.stepBack(tag.length);
                 this.parseHtml(blocks, openTagName);
                 block = newBlock(type.html, blocks);
                 tag = lastCh = lineLastLiteral = '';
@@ -945,24 +945,29 @@ module.exports = function (opts) {
         }
 
         stepBack(count) {
-            if (count === 0) throw new Error('`count` cannot be 0.');
-            if (typeof count === 'undefined') count = 1;
+            if (typeof count === 'undefined') throw new Error('`count` is `undefined`.');
+            if (typeof count < 0) throw new Error('`count` cannot be less than 0.');
 
             if (count > this.line.length)
                 throw `this.stepBack(${count}) is out of range.`;
 
-            this.pos -= count;
-            let cut = this.line.length - count;
+            var cut;
 
-            if (cut === 0)
-                this.line = '';
-            else
-                this.line = this.line.substr(0, cut);
+            if (count > 0) {
+                this.pos -= count;
+                cut = this.line.length - count;
+
+                if (cut === 0)
+                    this.line = '';
+                else
+                    this.line = this.line.substr(0, cut);
+            }
 
             // adjust blocks..
             if (this.blocks.length) {
                 let block = this.blocks[this.blocks.length - 1];
-                cut = block.text.length - count + 1; // block's text doesn't have the very last character
+                cut = block.text.length - count; // block's text doesn't have the very last character
+
                 if (cut === 0)
                     this.blocks.pop(); // remove the current block if it's empty
                 else
