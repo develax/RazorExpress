@@ -833,7 +833,7 @@ module.exports = function (opts) {
             }
 
             if (wait)
-                throw er.jsCodeBlockkMissingClosingChar(this.lineNum, '@' + (hasOperator ? block.text : '{'));
+                throw new Error(er.jsCodeBlockkMissingClosingChar(this.lineNum, '@' + (hasOperator ? block.text : '{'))); // tests: "Code 29"
 
             if (stop) {
                 // skip all spaces until a new line
@@ -948,7 +948,9 @@ module.exports = function (opts) {
             if (typeof count === 'undefined') throw new Error('`count` is `undefined`.');
             if (typeof count < 0) throw new Error('`count` cannot be less than 0.');
 
-            if (count > this.line.length)
+            let block = this.blocks[this.blocks.length - 1];
+
+            if (count > this.line.length || block.text.length < count)
                 throw `this.stepBack(${count}) is out of range.`;
 
             var cut;
@@ -964,8 +966,10 @@ module.exports = function (opts) {
             }
 
             // adjust blocks..
-            if (this.blocks.length) {
-                let block = this.blocks[this.blocks.length - 1];
+            if (!block.text.length) {
+                this.blocks.pop();
+            }
+            else if (count > 0) {
                 cut = block.text.length - count; // block's text doesn't have the very last character
 
                 if (cut === 0)
