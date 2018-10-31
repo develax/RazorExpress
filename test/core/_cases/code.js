@@ -304,6 +304,11 @@
 }`,
             expected: '\n    <a title="123">text</a>\n',
             model: 123
+        },
+        {
+            name: "Code 36",
+            template: '@{ <div style="background-color: greenyellow">SECTION TEST</div> }',
+            expected: ' <div style="background-color: greenyellow">SECTION TEST</div> '
         }
     ];
     module.exports = cases;

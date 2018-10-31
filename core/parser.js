@@ -378,7 +378,7 @@ module.exports = function (opts) {
                                     // else they are neitralizing each other..
                                 }
                                 else if (outerWaitTag && outerWaitTag === tagName) {
-                                    this.stepBack(tag.length - 1);
+                                    this.stepBack(blocks, tag.length - 1);
                                     break;
                                 }
                                 else {
@@ -404,7 +404,7 @@ module.exports = function (opts) {
                     }
                 }
                 else if (!openTags.length && ch === '}' && lastLiteral === '>') { // the close curly bracket can follow only a tag (not just a text)
-                    this.stepBack(0);
+                    this.stepBack(blocks, 0);
                     stop = true;
                     break; // return back to the callee code-block..
                 }
@@ -613,7 +613,7 @@ module.exports = function (opts) {
                 this.flushPadding();
 
             function processInnerHtml() {
-                this.stepBack(tag.length);
+                this.stepBack(blocks, tag.length);
                 this.parseHtml(blocks, openTagName);
                 block = newBlock(type.html, blocks);
                 tag = lastCh = lineLastLiteral = '';
@@ -944,11 +944,11 @@ module.exports = function (opts) {
             return '';
         }
 
-        stepBack(count) {
+        stepBack(blocks, count) {
             if (typeof count === 'undefined') throw new Error('`count` is `undefined`.');
             if (typeof count < 0) throw new Error('`count` cannot be less than 0.');
 
-            let block = this.blocks[this.blocks.length - 1];
+            let block = blocks[blocks.length - 1];
 
             if (count > this.line.length || block.text.length < count)
                 throw `this.stepBack(${count}) is out of range.`;
@@ -973,7 +973,7 @@ module.exports = function (opts) {
                 cut = block.text.length - count; // block's text doesn't have the very last character
 
                 if (cut === 0)
-                    this.blocks.pop(); // remove the current block if it's empty
+                    blocks.pop(); // remove the current block if it's empty
                 else
                     block.text = block.text.substr(0, cut);
             }
