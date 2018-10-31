@@ -159,6 +159,21 @@
     <div><img//></div>
 }`,
             expected: "\n    <div><img//></div>\n"
+        },
+        {
+            name: "HTML 26",
+            template: '<div><!--<img/>--></div>',
+            expected: '<div><!--<img/>--></div>'
+        },
+        {
+            name: "HTML 27",
+            template: '<div><!--<span>--></div>',
+            expected: '<div><!--<span>--></div>'
+        },
+        {
+            name: "HTML 28",
+            template: '<!--<span>-->',
+            expected: '<!--<span>-->'
         }
     ];
 

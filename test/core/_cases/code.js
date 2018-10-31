@@ -309,6 +309,17 @@
             name: "Code 36",
             template: '@{ <div style="background-color: greenyellow">SECTION TEST</div> }',
             expected: ' <div style="background-color: greenyellow">SECTION TEST</div> '
+        },
+        {
+            name: "Code 37",
+            template: '@{ <div><!--<span>--></div> }',
+            expected: ' <div><!--<span>--></div> '
+        }
+        ,
+        {
+            name: "Code 38",
+            template: '@{ <!--<span>--> }',
+            expected: ' <!--<span>--> '
         }
     ];
     module.exports = cases;

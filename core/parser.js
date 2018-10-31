@@ -314,7 +314,7 @@ module.exports = function (opts) {
             let openTagLineNum, openTagPos, openTagLine;
             var tag = '', lineLastLiteral = '', lastLiteral = '';
             var block = newBlock(type.html, blocks);
-            let stop = false;
+            let stop = false, inComments = false;
             var lastCh = '';
 
             for (var ch = this.pickChar(); ch; ch = this.pickChar()) {
@@ -322,7 +322,21 @@ module.exports = function (opts) {
                 let nextCh = this.pickNextChar();
                 let inQuotes = (quotes.length > 0);
 
-                if (ch === '@') {
+                if (inComments) {
+                    if (!tag) {
+                        if (ch === '-')
+                            tag = ch;
+                    }
+                    else if (tag.length === 1) {
+                        if (ch === '-')
+                            tag += ch;
+                    }
+                    else if (ch === '>') {
+                        tag = '';
+                        inComments = false;
+                    }
+                }
+                else if (ch === '@') {
                     if (nextCh === '@') { // checking for '@@' that means just text '@'
                         ch = this.fetchChar(); // skip the next '@'
                         nextCh = this.pickNextChar();
@@ -345,6 +359,15 @@ module.exports = function (opts) {
                 else if (textQuotes.indexOf(ch) !== -1) { // it could be opening text qoutes
                     quotes.push(ch);
                     inQuotes = true;
+                }
+                else if (ch === '-') {
+                    if (tag && tag === '<!-') {
+                        tag = '';
+                        inComments = true;
+                    }
+                    else {
+                        tag += ch;
+                    }
                 }
                 else if (ch === '<') {
                     tag = ch; // if '<' occurs more than once, all the previous ones are considered as a plain text by default
@@ -453,13 +476,27 @@ module.exports = function (opts) {
             let openTagLineNum, openTagPos, openTagLine;
             var block = newBlock(type.html, blocks);
             var lastCh = '';
-            let stop = false;
+            let stop = false, inComments = false;
 
             for (var ch = this.pickChar(); !stop && ch; ch = ch && this.pickChar()) {
                 var nextCh = this.pickNextChar();
                 let isSpace = Char.isWhiteSpace(ch);
 
-                if (ch === '@') {
+                if (inComments) {
+                    if (!tag) {
+                        if (ch === '-')
+                            tag = ch;
+                    }
+                    else if (tag.length === 1) {
+                        if (ch === '-')
+                            tag += ch;
+                    }
+                    else if (ch === '>') {
+                        tag = '';
+                        inComments = false;
+                    }
+                }
+                else if (ch === '@') {
                     if (String.isWhiteSpace(block.text)) {
                         // In contrast to a base-HTML-block, here it can only start with an HTML-tag.
                         throw new Error(er.unexpectedCharacter(ch, this.lineNum, this.linePos(), this.line)); // cannot be tested, just for insurance
@@ -488,6 +525,15 @@ module.exports = function (opts) {
                 }
                 else if (textQuotes.indexOf(ch) !== -1) { // Open Quotes..
                     quotes.push(ch);
+                }
+                else if (ch === '-') {
+                    if (tag && tag === '<!-') {
+                        tag = '';
+                        inComments = true;
+                    }
+                    else {
+                        tag += ch;
+                    }
                 }
                 else if (ch === '<') {
                     if (tag)
