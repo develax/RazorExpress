@@ -499,7 +499,7 @@ module.exports = function (opts) {
                 else if (ch === '@') {
                     if (String.isWhiteSpace(block.text)) {
                         // In contrast to a base-HTML-block, here it can only start with an HTML-tag.
-                        throw new Error(er.unexpectedCharacter(ch, this.lineNum, this.linePos(), this.line)); // cannot be tested, just for insurance
+                        throw new Error(er.unexpectedCharacter(ch, this.lineNum, this.linePos(), this.line)); // Tests: "Section 1".
                     }
                     if (this.pickNextChar() === '@') { // checking for '@@' that means just text '@'
                         ch = this.fetchChar(); // skip the next '@'
@@ -668,7 +668,9 @@ module.exports = function (opts) {
 
         parseCode(blocks) {
             var ch = this.pickChar();
-            if (!ch) throw er.endOfFileFoundAfterAtSign; // TODO: test me.
+
+            if (!ch)
+                throw Error(er.endOfFileFoundAfterAtSign(this.lineNum, this.linePos())); // tests: "Code 39"
 
             if (ch === '{') {
                 this.parseJsBlock(blocks);
@@ -677,7 +679,7 @@ module.exports = function (opts) {
                 this.parseJsExpression(blocks);
             }
             else {
-                throw er.notValidStartOfCodeBlock(ch, this.lineNum, this.pos);
+                throw new Error(er.notValidStartOfCodeBlock(ch, this.lineNum, this.linePos())); // tests: "Code 40"
             }
         }
 
@@ -736,10 +738,10 @@ module.exports = function (opts) {
                         if (endScopes.indexOf(ch) !== -1) {
                             if (wait === ch) {
                                 wait = waits.pop(); // collasping scope..
-                                checkForBlockCode = (!wait && ch === firstScope && ch !== ']'); // can continue with `[1,2,3].toString()`
+                                checkForBlockCode = (!wait && ch === firstScope && ch !== ']'); // can continue with "[1,2,3].toString()"
                             }
                             else {
-                                throw er.invalidExpressionChar(ch, this.lineNum, this.pos, this.line);
+                                throw new Error(er.invalidExpressionChar(ch, this.lineNum, this.pos, this.line)); // Tests: "Code 41".
                             }
                         }
                         else if (textQuotes.indexOf(ch) !== -1) { // it's some sort of text qoutes
@@ -749,14 +751,11 @@ module.exports = function (opts) {
                         }
                     }
                     else if (block.text && !canExpressionEndWith(ch)) {
-                        if (Char.isWhiteSpace(ch)) {
-                            let keyword = block.text.trim();
-                            if (keyword === _sectionKeyword) {
-                                this.blocks.pop();
-                                return this.parseSection();
-                            }
-
-                            break;
+                        if (Char.isWhiteSpace(ch) || ch === '{') {
+                            if (checkForSection.call(this))
+                                return;
+                            else
+                                break;
                         }
                         else if (ch === '.') { // @Model.text
                             let nextCh = this.pickNextChar();
@@ -774,10 +773,22 @@ module.exports = function (opts) {
             }
 
             if (wait)
-                throw er.expressionMissingEnd('@' + block.text, wait, this.lineNum, this.pos);
+                throw new Error(er.expressionMissingEnd('@' + block.text, wait, this.lineNum, this.linePos())); // Tests: "Code 42".
 
             if (!block.text)
-                throw er.invalidExpressionChar(ch, this.lineNum, this.pos, this.line);
+                throw new Error(er.invalidExpressionChar(ch, this.lineNum, this.linePos(), this.line)); // Seems to be impossible.
+
+            function checkForSection() {
+                let keyword = block.text.trim();
+
+                if (keyword === _sectionKeyword) {
+                    this.blocks.pop();
+                    this.parseSection();
+                    return true;
+                }
+
+                return false;
+            }
         }
 
         parseJsBlock(blocks, block) {
@@ -827,7 +838,7 @@ module.exports = function (opts) {
                                 }
                             }
                             else {
-                                throw er.invalidExpressionChar(ch, this.lineNum, this.pos, this.line);
+                                throw new Error(er.invalidExpressionChar(ch, this.lineNum, this.linePos(), this.line)); // Tests: "Code 43".
                             }
                         }
                         else if (textQuotes.indexOf(ch) !== -1) { // it's some sort of text qoutes
@@ -894,8 +905,10 @@ module.exports = function (opts) {
         }
 
         parseSection() {
+            let sectionStartPos = this.linePos() - _sectionKeyword.length - 1; // -1 for '@'
+
             if (this.inSection)
-                throw new Error(er.sectionsCannotBeNested(this.lineNum, this.line.length, this.line));
+                throw new Error(er.sectionsCannotBeNested(this.lineNum, sectionStartPos)); // Tests: "Section 2".
 
             this.inSection = true;
             let spaceCount = 0;
@@ -905,37 +918,39 @@ module.exports = function (opts) {
                 spaceCount++;
             }
 
-            if (spaceCount < 1) throw er.whitespaceExpectedAfter("@" + _sectionKeyword, this.lineNum, this.line.length);
+            if (spaceCount < 1)
+                throw new Error(er.whiteSpaceExpectedAfter("@" + _sectionKeyword, this.lineNum, this.linePos())); // unreachable due to previous function check 
 
-            let sectionLine = this.lineNum, sectionPos = this.line.length;
+            let sectionLine = this.lineNum, sectionNamePos = this.linePos();
             let sectionName = '';
+
             // the section name is expected to be placed before '{' symbol or whitespace
             for (ch = this.pickChar(); ch && !Char.isWhiteSpace(ch) && ch !== '{'; ch = this.pickChar())
                 sectionName += this.fetchChar();
 
             // validation of the section name ..
             if (sectionName.length === 0)
-                throw er.sectionNameExpectedAfter("@" + _sectionKeyword, this.lineNum, this.line.length);
+                throw new Error(er.sectionNameExpectedAfter("@" + _sectionKeyword, this.lineNum, this.linePos())); // Tests: "Section 3".
 
             if (!canSectionStartWith(sectionName[0]))
-                throw er.sectionNameCannotStartWith(sectionName[0], this.lineNum, this.line.length);
+                throw er.sectionNameCannotStartWith(sectionName[0], this.lineNum, this.linePos() - sectionName.length); // Tests: "Section 5".
 
             for (var i = 1; i < sectionName.length; i++) {
                 let c = sectionName[i];
                 if (!canSectionContain(c))
-                    throw er.sectionNameCannotInclude(sectionName[0], this.lineNum, this.line.length);
+                    throw new Error(er.sectionNameCannotInclude(c, this.lineNum, this.linePos() - sectionName.length + i)); // Tests: "Section 6".
             }
             // skip all following whitespaces ..
             ch = this.skipWhile(c => Char.isWhiteSpace(c));
 
             if (ch !== '{')
-                throw er.unexpectedLiteralFollowingTheSection(ch, this.lineNum, this.line.length);
+                throw new Error(er.unexpectedLiteralFollowingTheSection(ch, this.lineNum, this.linePos() - 1)); // Tests: "Section 7".
 
             // check if the section name is unique ..
             let section = this.sections.find(s => sectionName === s);
 
             if (section)
-                throw new Error(er.sectionIsAlreadyDefined(sectionName, this.lineNum, this.line.length));
+                throw new Error(er.sectionIsAlreadyDefined(sectionName, this.lineNum, sectionNamePos)); // Tests: "Section 8".
 
             this.sections.push(sectionName);
             let sectionBlocks = [];
@@ -945,7 +960,7 @@ module.exports = function (opts) {
             ch = this.skipWhile(c => Char.isWhiteSpace(c));
 
             if (ch !== '}')
-                throw new Error(er.sectionBlockIsMissingClosingBrace(sectionName, sectionLine, sectionPos));
+                throw new Error(er.sectionBlockIsMissingClosingBrace(sectionName, sectionLine, sectionStartPos)); // Tests: "Section 9".
 
             var block = newBlock(type.section, this.blocks, sectionName);
             block.blocks = sectionBlocks;
@@ -991,8 +1006,11 @@ module.exports = function (opts) {
         }
 
         stepBack(blocks, count) {
-            if (typeof count === 'undefined') throw new Error('`count` is `undefined`.');
-            if (typeof count < 0) throw new Error('`count` cannot be less than 0.');
+            if (typeof count === 'undefined')
+                throw new Error('`count` is `undefined`.');
+
+            if (typeof count < 0)
+                throw new Error('`count` cannot be less than 0.');
 
             let block = blocks[blocks.length - 1];
 

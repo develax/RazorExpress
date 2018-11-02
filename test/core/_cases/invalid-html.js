@@ -82,7 +82,7 @@
 @{
     <<div></div>
 }`,
-            error: "unexpected character '<' at line 3 pos 6: '    <<' <--"
+            error: "unexpected character '<' at line 3 pos 6 after '    <<' <--"
         },
         {
             name: "Invalid-HTML 9",
