@@ -323,18 +323,18 @@ module.exports = function (opts) {
                 let inQuotes = (quotes.length > 0);
 
                 if (inComments) {
-                    if (!tag) {
-                        if (ch === '-')
-                            tag = ch;
-                    }
-                    else if (tag.length === 1) {
-                        if (ch === '-')
+                    if (ch === '-') {
+                        if (!tag || tag === '-')
                             tag += ch;
+                        else
+                            tag = '';
                     }
                     else if (ch === '>') {
+                        if (tag === '--')
+                            inComments = false;
+
                         tag = '';
-                        inComments = false;
-                    }
+                    }   
                 }
                 else if (ch === '@') {
                     if (nextCh === '@') { // checking for '@@' that means just text '@'
@@ -361,12 +361,17 @@ module.exports = function (opts) {
                     inQuotes = true;
                 }
                 else if (ch === '-') {
-                    if (tag && tag === '<!-') {
-                        tag = '';
-                        inComments = true;
+                    if (tag.length > 1) { // at least '<!'
+                        if (lastCh === '!') {
+                            tag += ch;
+                        }
+                        else if (tag.startsWith("!-", 1)) {
+                            tag = '';
+                            inComments = true;
+                        }
                     }
                     else {
-                        tag += ch;
+                        tag = '';
                     }
                 }
                 else if (ch === '<') {
