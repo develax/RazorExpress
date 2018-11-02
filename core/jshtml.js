@@ -25,7 +25,7 @@
     function renderFile(filepath, options, done) {
         let parser = parserInit();
         filepath = path.normalize(filepath).toLowerCase();
-        let fileName = path.fileName(filepath);
+        //let fileName = path.fileName(filepath);
         let viewsPath = path.normalize(options.settings.views).toLowerCase();
 
         if (!filepath.startsWith(viewsPath))
@@ -35,21 +35,27 @@
             filepath += '.' + viewExt(options);
 
         fs.readFile(filepath, (err, data) => {
-            if (err) return done(err);
+            if (err)
+                return done(err);
+
             let currentDir = path.dirname(filepath);
             let viewsDir = path.normalize(options.settings.views).toLowerCase();
 
             readViewStarts(currentDir, viewsDir, null, (err, buff) => {
-                if (err) return done(err);
+                if (err)
+                    return done(err);
 
                 let compileArgs = {
+                    filepath,
                     jsHtml: buff.toString() + data.toString(),
                     model: options,
                     findPartial: getFindPartialFunc(currentDir, viewsDir, options),
                     findPartialSync: getFindPartialSyncFunc(currentDir, viewsDir, options)
                 };
+
                 parser.compile(compileArgs, (err, html) => {
-                    if (err) return done(err);
+                    if (err)
+                        return done(err);
                     done(null, html);
                 });
             });

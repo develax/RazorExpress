@@ -174,6 +174,49 @@
             name: "HTML 28",
             template: '<!--<span>-->',
             expected: '<!--<span>-->'
+        },
+        {
+            name: "HTML 29",
+            template: `
+<script type="text/javascript">
+    var longText = "..your long text...";
+    document.querySelector('#set_text').onclick = e => load('');
+    var chunkSize = 100000;
+    var start = -chunkSize;
+    function load(text) {
+        var node = document.createTextNode(text);
+        document.querySelector('pre').appendChild(node);
+
+        if (start + chunkSize >= longText.length) {
+            alert("Completed");
+            return;
+        }
+
+        start += chunkSize;
+        chunkSize = Math.min(chunkSize, longText.length - start);
+        setTimeout(load, 0, longText.substr(start, chunkSize));
+    }
+</script>`,
+            expected: `
+<script type="text/javascript">
+    var longText = "..your long text...";
+    document.querySelector('#set_text').onclick = e => load('');
+    var chunkSize = 100000;
+    var start = -chunkSize;
+    function load(text) {
+        var node = document.createTextNode(text);
+        document.querySelector('pre').appendChild(node);
+
+        if (start + chunkSize >= longText.length) {
+            alert("Completed");
+            return;
+        }
+
+        start += chunkSize;
+        chunkSize = Math.min(chunkSize, longText.length - start);
+        setTimeout(load, 0, longText.substr(start, chunkSize));
+    }
+</script>`
         }
     ];
 
