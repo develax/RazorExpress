@@ -358,7 +358,7 @@
     }
 }
 </div>`,
-            error: "unexpected character '@' at line 4 pos 5 after '    ' <--"
+            error: "Section blocks cannot be nested at line 4 pos 5."
         },
         {
             name: "Section 2",
@@ -371,7 +371,7 @@
     </script>
 }
 </div>`,
-            error: 'Section blocks cannot be nested, it starts at line 5 pos 9.'
+            error: 'Section blocks cannot be nested at line 5 pos 9.'
         },
         {
             name: "Section 3",

@@ -49,6 +49,9 @@ module.exports = function (opts) {
     if (sandbox)
         vm.createContext(sandbox);
 
+    ////////////////////
+    ///   Html class
+    ////////////////////
     function Html(args) {
         // Non-user section.
         this._vm = vm;
@@ -90,7 +93,7 @@ module.exports = function (opts) {
             else if (section === name)
                 section = null;
             else
-                throw new Error(`Unexpected section name = '${name}'.`);
+                throw new Error(`Unexpected section name = '${name}'.`); // Cannot be tested via user-inputs.
         };
 
         this.__renderLayout = (done) => {
@@ -168,15 +171,15 @@ module.exports = function (opts) {
 
     function toScript(block, valuesQueue) {
         if (block.type === type.section) {
-            let secPoint = `\r\nHtml.__sec("${block.name}");\r\n`;
-            let script = secPoint;
+            let secMarker = `\r\nHtml.__sec("${block.name}");\r\n`;
+            let script = secMarker;
 
             for (let n = 0; n < block.blocks.length; n++) {
                 let sectionBlock = block.blocks[n];
                 script += toScript(sectionBlock, valuesQueue);
             }
 
-            script += secPoint;
+            script += secMarker;
             return script;
         }
         else {
@@ -431,7 +434,7 @@ module.exports = function (opts) {
                             tag += ch;
                     }
                 }
-                else if (!openTags.length && ch === '}' && lastLiteral === '>') { // the close curly bracket can follow only a tag (not just a text)
+                else if (!openTags.length && ch === '}' && (lastLiteral === '>' || !block.text)) { // the close curly bracket can follow only a tag (not just a text)
                     this.stepBack(blocks, 0);
                     stop = true;
                     break; // return back to the callee code-block..
@@ -959,7 +962,8 @@ module.exports = function (opts) {
 
             this.sections.push(sectionName);
             let sectionBlocks = [];
-            this.parseHtmlInsideCode(sectionBlocks);
+            this.parseHtml(sectionBlocks, );
+            //this.parseJsBlock(sectionBlocks); // it's different from ASP.NET MVC Razor which doesn't allo section to start from code (only from HTML)
 
             // skip all following whitespaces ..
             ch = this.skipWhile(c => Char.isWhiteSpace(c));
