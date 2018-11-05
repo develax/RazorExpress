@@ -7,7 +7,10 @@ var errors = {
             return `End-of-file was found after the "@" character at line ${lineNum + 1} pos ${posNum + 1}. "@" must be followed by a valid code block. If you want to output an "@", escape it using the sequence: "@@"`;
         },
         unexpectedCharacter: function (ch, lineNum, posNum, line) {
-            return `unexpected character '${ch}' at line ${lineNum + 1} pos ${posNum + 1} after '${line}' <--`;
+            return `unexpected '${ch}' character at line ${lineNum + 1} pos ${posNum + 1} after '${line}' <--`;
+        },
+        unexpectedAtCharacter: function (lineNum, posNum) {
+            return `unexpected '@' character at line ${lineNum + 1} pos ${posNum + 1}. Once inside the body of a code block (@if {}, @{}, etc.) or a section (@section{}) you do not need to use "@{" to switch to code.`
         },
         notValidStartOfCodeBlock(ch, lineNum, posNum) {
             return `"${ch}" is not valid at the start of a code block at line ${lineNum + 1} pos ${posNum + 1}. Only identifiers, keywords, "(" and "{" are valid.`;
@@ -15,11 +18,14 @@ var errors = {
         unexpectedEndOfFile(text) {
             return `Unexpected end of file after "${text}" <--`;
         },
+        characterExpected(ch, line, pos) {
+            return `'${ch}' character is expected at line ${line + 1} pos ${pos + 1}.`;
+        },
         expressionMissingEnd(expr, ch, line, pos) {
             return `The explicit expression "${expr}" is missing a closing character "${ch}" at line ${line + 1} pos ${pos + 1}.`;
         },
         jsCodeBlockkMissingClosingChar(line, codeFirstLine) {
-            return `The code block is missing a closing "}" character. Make sure you have a matching "}" character for all the "{" characters within this block, and that none of the "}" characters are being interpreted as markup. The block starts at line ${line + 1} with text: "${codeFirstLine}"`;
+            return `The code or section block is missing a closing "}" character. Make sure you have a matching "}" character for all the "{" characters within this block, and that none of the "}" characters are being interpreted as markup. The block starts at line ${line + 1} with text: "${codeFirstLine}"`;
         },
         invalidHtmlChar(ch, lineNum, posNum, afterText, expected) {
             return `"${ch}" is not a valid HTML character at line ${lineNum} pos ${posNum}` + (afterText ? ` after "${afterText}" < --` : expected ? ` (expected char = "${expected}")` : '.');
@@ -64,7 +70,7 @@ var errors = {
             return `The section block '${sectionName}' is missing a closing "}" character.`;
         },
         sectionsCannotBeNested(line, pos) {
-            return `Section blocks cannot be nested, it starts at line ${line + 1} pos ${pos + 1}.`;
+            return `Section blocks cannot be nested at line ${line + 1} pos ${pos + 1}.`;
         }
     }
 };

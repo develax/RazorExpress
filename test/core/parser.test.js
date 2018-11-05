@@ -1,6 +1,9 @@
 ﻿(function () {
+    console.clear();
+    console.log("STARTED: parser.test.js");
+
     var expect = require('chai').expect;
-    const parser = require('../../core/parser')({ debug: true });
+    const parser = require('../../core/parser')({ debug: false });
     const er = require('../../core/localization/errors').parser;
 
     describe("INVALID INPUT ARGUMENTS", () => {
@@ -67,6 +70,26 @@
     describe("CODE-BLOCKS CASES", () => {
         describe("VALID", () => {
             let cases = require('./_cases/code');
+
+            for (let i = 0; i < cases.length; i++) {
+                let c = cases[i];
+                it(c.name, () => {
+                    if (c.expected) {
+                        let result = parser.compileSync({ jsHtml: c.template, model: c.model });
+                        expect(c.expected).to.equal(result);
+                    }
+                    else {
+                        let result = () => parser.compileSync({ jsHtml: c.template });
+                        expect(result).to.throw(c.error);
+                    }
+                });
+            }
+        });
+    });
+
+    describe("SECTIONS CASES", () => {
+        describe("VALID", () => {
+            let cases = require('./_cases/section');
 
             for (let i = 0; i < cases.length; i++) {
                 let c = cases[i];

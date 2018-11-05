@@ -1,15 +1,24 @@
 ﻿(function () {
     module.exports = function (opts) {
         opts = opts || {};
+        var exp = {};
 
-        return {
-            debug: (text) => {
-                if (opts.off) return;
-                let funcName = callerName();
-                text = text || '';
-                console.debug(`[${funcName}]: ${text}`);
-            }
-        };
+        if (opts.on) {
+            exp.debug = debug;
+        }
+        else {
+            exp.debug = noop;
+        }
+
+        return exp;
+
+        function debug(text) {
+            let funcName = callerName();
+            text = text || '';
+            console.debug(`[${funcName}]: ${text}`);
+        }
+
+        function noop() {}
     };
 
     // helpers:
