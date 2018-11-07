@@ -347,6 +347,33 @@
     <span></span>
 )`,
             error: 'Invalid ")" symbol in expression at line 4 pos 1 after "" <--'
+        },
+        {
+            name: "Code 44",
+            template: `@{ var regex = /}<div>/g; }`,
+            expected: ''
+        },
+        {
+            name: "Code 45",
+            template: `
+@{ 
+    var paragraph = 'The }<div> quick brown fox.';
+    var regex = /}<div>/g;
+    var found = paragraph.match(regex);
+}
+<div>@Html.raw(found)</div>
+`,
+            expected: '\n<div>}<div></div>\n'
+        },
+        {
+            name: "Code 46",
+            template: `
+@{ 
+    var paragraph = 'The }<div> quick brown fox.';
+}
+<div>@Html.raw(paragraph.match(/}<div>/g))</div>
+`,
+            expected: '\n<div>}<div></div>\n'
         }
     ];
     module.exports = cases;

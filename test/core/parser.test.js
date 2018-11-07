@@ -3,7 +3,7 @@
     console.log("STARTED: parser.test.js");
 
     var expect = require('chai').expect;
-    const parser = require('../../core/parser')({ debug: false });
+    const parser = require('../../core/parser')({ debug: false, env: "dev" });
     const er = new require('../../core/localization/errors');
 
 

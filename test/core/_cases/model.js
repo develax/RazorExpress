@@ -26,12 +26,17 @@
         {
             name: "Model 5",
             template: '<span>@("\'Hello World!\'")</span>',
+            expected: "<span>&#39;Hello World!&#39;</span>"
+        },
+        {
+            name: "Model 5.1",
+            template: '<span>@Html.raw("\'Hello World!\'")</span>',
             expected: "<span>'Hello World!'</span>"
         },
         {
             name: "Model 6",
             template: '<span>@("\'(<div>@</div>)\'")</span>',
-            expected: "<span>'(<div>@</div>)'</span>"
+            expected: "<span>&#39;(&lt;div&gt;@&lt;/div&gt;)&#39;</span>"
         },
         {
             name: "Model 7",
@@ -63,12 +68,12 @@
         {
             name: "Model 12",
             template: "<span>@Model</span>",
-            expected: "<span>undefined</span>"
+            expected: "<span></span>"
         },
         {
             name: "Model 13",
             template: '<span>@Model.val</span>',
-            expected: "<span>undefined</span>",
+            expected: "<span></span>",
             model: {  }
         },
         {

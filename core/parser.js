@@ -42,8 +42,9 @@ module.exports = function (opts) {
     const log = require('./logger')({ on: opts.debug });
     log.debug(`Parse debug mode is '${!!opts.debug}'.`);
 
-    const vm = opts.debug ? require('vm') : null;
-    const sandbox = opts.debug ? Object.create(null) : null;
+    const htmlEncode = require('js-htmlencode');
+    const vm = opts.debug || opts.env === "dev" ? require('vm') : null;
+    const sandbox = opts.debug || opts.env === "dev" ? Object.create(null) : null;
 
     if (sandbox)
         vm.createContext(sandbox);
@@ -62,25 +63,13 @@ module.exports = function (opts) {
     delete Html._js;
     delete Html._vm;
     delete Html._sandbox;
-    ${args.js};
+    ${args.js}
 }).call();`;
         // User section.
         this.layout = null;
         // Private
         let section = null;
         let sections = args.sections || {};
-
-        this.__rnd = function (val) { // render
-            if (section) {
-                if (!sections[section])
-                    sections[section] = { html: '' };
-
-                sections[section].html += val;
-            }
-            else {
-                args.html += val;
-            }
-        };
 
         this.__val = function (i) { // getValueAt
             return args.valuesQueue.getAt(i);
@@ -112,6 +101,30 @@ module.exports = function (opts) {
                 };
                 compile(compileOpt, done);
             });
+        };
+
+        this.raw = function (val) { // render
+            if (typeof val === 'undefined' || val === '') // 'undefined' can be passed when `Html.raw()` is used by user in the view, in this case it will be wrapped into `Html.ecnode()` anyway an it will call `Html.raw` passing 'undefined' to it.
+                return;
+
+            if (section) {
+                if (!sections[section])
+                    sections[section] = { html: '' };
+
+                sections[section].html += val;
+            }
+            else {
+                args.html += val;
+            }
+        };
+
+        this.encode = function (val) {
+            if (!val || typeof val === "number" || val instanceof Number)
+                this.raw(val); // not to do excessive work
+            else if (typeof val === "string" || val instanceof String)
+                this.raw(htmlEncode(val));
+            else
+                this.raw(htmlEncode(val.toString()));
         };
 
         this.body = function () {
@@ -157,7 +170,8 @@ module.exports = function (opts) {
     class Block {
         constructor(type, name) {
             this.type = type;
-            this.name = name;
+            if (name)
+                this.name = name;
             this.text = '';
         }
 
@@ -190,10 +204,10 @@ module.exports = function (opts) {
             switch (block.type) {
                 case type.html:
                     i = valuesQueue.enq(block.text);
-                    return "Html.__rnd(Html.__val(" + i + "));";
+                    return "Html.raw(Html.__val(" + i + "));";
                 case type.expr:
                     i = valuesQueue.enq(block.text);
-                    return "Html.__rnd(eval(Html.__val(" + i + ")));";
+                    return "Html.encode(eval(Html.__val(" + i + ")));";
                 case type.code:
                     return block.text;
                 default:
@@ -271,7 +285,7 @@ module.exports = function (opts) {
                 return Promise.resolve().then(() => done(exc)), null;
             }
 
-            compilePage(html, model, opts.debug, done);
+            compilePage(html, model, opts.debug || opts.env === "dev", done);
         }
 
         compileSync() {
@@ -288,7 +302,7 @@ module.exports = function (opts) {
             log.debug(`HTML = \`${jshtml}\``);
             var htmlArgs = {};
             var html = this.getHtml(jshtml, model, htmlArgs);
-            compilePageSync(html, model, opts.debug);
+            compilePageSync(html, model, opts.debug || opts.env === "dev");
             return htmlArgs.html;
         }
 
@@ -299,7 +313,8 @@ module.exports = function (opts) {
             this.blocks = [];
             this.parseHtml(this.blocks);
             var valuesQueue = new Queue();
-            var js = this.blocks.map(b => b.toScript(valuesQueue)).join("");
+            var scripts = this.blocks.map(b => b.toScript(valuesQueue));
+            var js = scripts.join("");
             Object.assign(htmlArgs, {
                 html: '',
                 valuesQueue,
@@ -811,7 +826,7 @@ module.exports = function (opts) {
             log.debug();
             const startScopes = '{([';
             const endScopes = '})]';
-            const textQuotes = '\'"`';
+            const textQuotes = '\'"`/';
             var lastCh = '', lastLiteral = '', lineLastLiteral = '';
             var waits = [];
             var wait = null;
