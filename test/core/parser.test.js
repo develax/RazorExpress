@@ -4,7 +4,8 @@
 
     var expect = require('chai').expect;
     const parser = require('../../core/parser')({ debug: false });
-    const er = require('../../core/localization/errors').parser;
+    const er = new require('../../core/localization/errors');
+
 
     describe("INVALID INPUT ARGUMENTS", () => {
         it("should throw an exception if argument is not a string", () => {
@@ -74,7 +75,7 @@
             for (let i = 0; i < cases.length; i++) {
                 let c = cases[i];
                 it(c.name, () => {
-                    if (c.expected) {
+                    if (typeof c.expected !== 'undefined') {
                         let result = parser.compileSync({ jsHtml: c.template, model: c.model });
                         expect(c.expected).to.equal(result);
                     }

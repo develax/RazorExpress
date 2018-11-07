@@ -1,3 +1,1 @@
-﻿var enErrors = require("./errors.en");
-
-module.exports = enErrors;
+﻿module.exports = require("./errors.en");

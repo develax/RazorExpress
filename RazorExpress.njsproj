@@ -8,6 +8,8 @@
     <JavaScriptTestRoot>test\</JavaScriptTestRoot>
     <SaveNodeJsSettingsInProjectFile>True</SaveNodeJsSettingsInProjectFile>
     <JavaScriptTestFramework>mocha</JavaScriptTestFramework>
+    <Environment>NODE_ENV=dev
+</Environment>
   </PropertyGroup>
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
@@ -36,6 +38,9 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="core\localization\errors.js">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="core\localization\ParserError.js">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="core\logger.js">
@@ -70,6 +75,9 @@
     <Compile Include="test\core\_cases\model.js">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="test\core\_cases\section.js">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="test\server.test.js" />
     <Content Include=".gitignore">
       <SubType>Code</SubType>
@@ -95,6 +103,15 @@
     <Content Include="views\home\_viewStart.jshtml">
       <SubType>Code</SubType>
     </Content>
+    <Content Include="views\sections\index.jshtml">
+      <SubType>Code</SubType>
+    </Content>
+    <Content Include="views\sections\_layout.jshtml">
+      <SubType>Code</SubType>
+    </Content>
+    <Content Include="views\sections\_parts.jshtml">
+      <SubType>Code</SubType>
+    </Content>
     <Content Include="views\_layout.jshtml">
       <SubType>Code</SubType>
     </Content>
@@ -116,6 +133,7 @@
     <Folder Include="test\core\_cases\" />
     <Folder Include="views\" />
     <Folder Include="views\home\" />
+    <Folder Include="views\sections\" />
   </ItemGroup>
   <!-- Do not delete the following Import Project.  While this appears to do nothing it is a marker for setting TypeScript properties before our import that depends on them. -->
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\TypeScript\Microsoft.TypeScript.targets" Condition="False" />

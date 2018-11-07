@@ -240,7 +240,7 @@ module.exports = function (opts) {
     const _sectionKeyword = "section";
     //const _functionKeyword = "function";
     const type = { none: 0, html: 1, code: 2, expr: 3, section: 4 };
-    const er = require('./localization/errors').parser;
+    const ErrorsProcessor  = require('./localization/errors');
 
     ////////////////
     //   PARSER   //
@@ -248,6 +248,48 @@ module.exports = function (opts) {
     class Parser {
         constructor(args) {
             this.args = args;
+            this.er = new ErrorsProcessor({ jshtml: args.jsHtml });
+        }
+
+        compile(done) {
+            let jshtml = this.args.jsHtml;
+            let model = this.args.model;
+            var isString = Object.prototype.toString.call(jshtml) === "[object String]";
+
+            if (!isString)
+                return Promise.resolve().then(() => done(this.er.jshtmlShouldBeString)), null;
+
+            if (!jshtml.length)
+                return Promise.resolve().then(() => done(null, "")), null; // just an empty string.. nothing to do..
+
+            log.debug(`HTML = \`${jshtml}\``);
+
+            try {
+                var html = this.getHtml(jshtml, model, {});
+            }
+            catch (exc) {
+                return Promise.resolve().then(() => done(exc)), null;
+            }
+
+            compilePage(html, model, opts.debug, done);
+        }
+
+        compileSync() {
+            let jshtml = this.args.jsHtml;
+            let model = this.args.model;
+            var isString = Object.prototype.toString.call(jshtml) === "[object String]";
+
+            if (!isString)
+                throw new Error(this.er.jshtmlShouldBeString);
+
+            if (!jshtml.length)
+                return jshtml; // just an empty string.. nothing to do..
+
+            log.debug(`HTML = \`${jshtml}\``);
+            var htmlArgs = {};
+            var html = this.getHtml(jshtml, model, htmlArgs);
+            compilePageSync(html, model, opts.debug);
+            return htmlArgs.html;
         }
 
         getHtml(jshtml, model, htmlArgs) {
@@ -271,40 +313,6 @@ module.exports = function (opts) {
             });
             var html = new Html(htmlArgs);
             return html;
-        }
-
-        compile(done) {
-            let jshtml = this.args.jsHtml;
-            let model = this.args.model;
-            var isString = Object.prototype.toString.call(jshtml) === "[object String]";
-
-            if (!isString)
-                return Promise.resolve().then(() => done(er.jshtmlShouldBeString)), null;
-
-            if (!jshtml.length)
-                return Promise.resolve().then(() => done(null, "")), null; // just an empty string.. nothing to do..
-
-            log.debug(`HTML = \`${jshtml}\``);
-            var html = this.getHtml(jshtml, model, {});
-            compilePage(html, model, opts.debug, done);
-        }
-
-        compileSync() {
-            let jshtml = this.args.jsHtml;
-            let model = this.args.model;
-            var isString = Object.prototype.toString.call(jshtml) === "[object String]";
-
-            if (!isString)
-                throw new Error(er.jshtmlShouldBeString);
-
-            if (!jshtml.length)
-                return jshtml; // just an empty string.. nothing to do..
-
-            log.debug(`HTML = \`${jshtml}\``);
-            var htmlArgs = {};
-            var html = this.getHtml(jshtml, model, htmlArgs);
-            compilePageSync(html, model, opts.debug);
-            return htmlArgs.html;
         }
 
         parseHtml(blocks, outerWaitTag) {
@@ -405,7 +413,7 @@ module.exports = function (opts) {
 
                                 if (openTag) { // if we have an open tag we must close it before we can go back to the caller method
                                     if (openTag.name.toUpperCase() !== tagName.toUpperCase())
-                                        throw new Error(er.missingMatchingStartTag(tag, this.lineNum, this.linePos() - tag.length + 1, this.line + ch)); // tested by "Invalid-HTML 1+, 2+, 7"
+                                        throw this.er.missingMatchingStartTag(tag, this.lineNum, this.linePos() - tag.length + 1, this.line + ch); // tested by "Invalid-HTML 1+, 2+, 7"
                                     // else they are neitralizing each other..
                                 }
                                 else if (outerWaitTag && outerWaitTag === tagName) {
@@ -413,7 +421,7 @@ module.exports = function (opts) {
                                     break;
                                 }
                                 else {
-                                    throw new Error(er.missingMatchingStartTag(tag, this.lineNum, this.linePos() - tag.length + 1, this.line + ch)); // tested by "Invalid-HTML 4", "Code 22"
+                                    throw this.er.missingMatchingStartTag(tag, this.lineNum, this.linePos() - tag.length + 1, this.line + ch); // tested by "Invalid-HTML 4", "Code 22"
                                 }
                             }
                             else if (tagKind === tagKinds.open) {
@@ -469,7 +477,7 @@ module.exports = function (opts) {
 
             if (openTags.length) {
                 let openTag = openTags[openTags.length - 1];
-                throw new Error(er.missingMatchingEndTag(openTag.tag, openTag.lineNum, openTag.linePos, openTag.line)); // tested by "Invalid-HTML 3"
+                throw this.er.missingMatchingEndTag(openTag.tag, openTag.lineNum, openTag.linePos, openTag.line); // tested by "Invalid-HTML 3"
             }
 
             if (!stop)
@@ -507,7 +515,7 @@ module.exports = function (opts) {
                 else if (ch === '@') {
                     if (String.isWhiteSpace(block.text)) {
                         // In contrast to a base-HTML-block, here it can only start with an HTML-tag.
-                        throw new Error(er.unexpectedCharacter(ch, this.lineNum, this.linePos(), this.line)); // Tests: "Section 1".
+                        throw this.er.unexpectedCharacter(ch, this.lineNum, this.linePos(), this.line); // Tests: "Section 1".
                     }
                     if (this.pickNextChar() === '@') { // checking for '@@' that means just text '@'
                         ch = this.fetchChar(); // skip the next '@'
@@ -545,7 +553,7 @@ module.exports = function (opts) {
                 }
                 else if (ch === '<') {
                     if (tag)
-                        throw new Error(er.unexpectedCharacter(ch, this.lineNum, this.line.length, this.line + ch)); // tested by "Invalid-HTML 8"
+                        throw this.er.unexpectedCharacter(ch, this.lineNum, this.line.length, this.line + ch); // tested by "Invalid-HTML 8"
 
                     if (openTagName) { // it should be a close-tag or another nested html-block
                         if (nextCh !== '/') { // it should be the next nested block of HTML which should be parsed with the normal `parseHtml` method.
@@ -582,7 +590,7 @@ module.exports = function (opts) {
                                 let tagName = getTagName(tag);
 
                                 if (openTagName.toUpperCase() !== tagName.toUpperCase())
-                                    throw new Error(er.missingMatchingStartTag(tag, this.lineNum, this.linePos() - tag.length + 1, this.line)); // tested by "Code 22"
+                                    throw this.er.missingMatchingStartTag(tag, this.lineNum, this.linePos() - tag.length + 1, this.line); // tested by "Code 22"
 
                                 openTag = openTagName = ''; // open-tag is closed
                             }
@@ -595,7 +603,7 @@ module.exports = function (opts) {
                                 let tagName = getTagName(tag);
 
                                 if (tag[1] === '/') // it's a close-tag, unexpected..
-                                    throw new Error(er.missingMatchingStartTag(tag, this.lineNum, this.linePos() - tag.length + 1, this.line + ch)); // tested by "Invalid-HTML 5"
+                                    throw this.er.missingMatchingStartTag(tag, this.lineNum, this.linePos() - tag.length + 1, this.line + ch); // tested by "Invalid-HTML 5"
 
                                 openTag = tag;
                                 openTagName = tagName;
@@ -604,7 +612,7 @@ module.exports = function (opts) {
                                 openTagLine = this.line + ch;
                             }
                             else
-                                throw new Error(er.tagNameExpected(this.lineNum, this.linePos(), this.line)); // tested by "Code 28"
+                                throw this.er.tagNameExpected(this.lineNum, this.linePos(), this.line); // tested by "Code 28"
                         }
 
                         tag = ''; //  reset it & go on..
@@ -613,7 +621,7 @@ module.exports = function (opts) {
                 else if (isSpace) {
                     if (tag) { // within a tag
                         if (lastCh === '<' || lastCh === '/') // '<' or '</' or '<tag/'
-                            throw new Error(er.tagNameExpected(this.lineNum, this.linePos(), this.line)); // tests: "Code 33", "Code 34"
+                            throw this.er.tagNameExpected(this.lineNum, this.linePos(), this.line); // tests: "Code 33", "Code 34"
                         else
                             tag += ch;
                     }
@@ -661,7 +669,7 @@ module.exports = function (opts) {
             }
 
             if (openTagName)
-                throw new Error(er.missingMatchingEndTag(openTag, openTagLineNum, openTagPos, openTagLine)); // tested by "Invalid-HTML 6", "Code 20", "Code 31"
+                throw this.er.missingMatchingEndTag(openTag, openTagLineNum, openTagPos, openTagLine); // tested by "Invalid-HTML 6", "Code 20", "Code 31"
 
             if (!stop)
                 this.flushPadding(blocks);
@@ -679,7 +687,7 @@ module.exports = function (opts) {
             var ch = this.pickChar();
 
             if (!ch)
-                throw Error(er.endOfFileFoundAfterAtSign(this.lineNum, this.linePos())); // tests: "Code 39"
+                throw Error(this.er.endOfFileFoundAfterAtSign(this.lineNum, this.linePos())); // tests: "Code 39"
 
             if (ch === '{') {
                 this.parseJsBlock(blocks);
@@ -688,7 +696,7 @@ module.exports = function (opts) {
                 this.parseJsExpression(blocks);
             }
             else {
-                throw new Error(er.notValidStartOfCodeBlock(ch, this.lineNum, this.linePos())); // tests: "Code 40"
+                throw this.er.notValidStartOfCodeBlock(ch, this.lineNum, this.linePos()); // tests: "Code 40"
             }
         }
 
@@ -749,7 +757,7 @@ module.exports = function (opts) {
                                 checkForBlockCode = (!wait && ch === firstScope && ch !== ']'); // can continue with "[1,2,3].toString()"
                             }
                             else {
-                                throw new Error(er.invalidExpressionChar(ch, this.lineNum, this.pos, this.line)); // Tests: "Code 41".
+                                throw this.er.invalidExpressionChar(ch, this.lineNum, this.pos, this.line); // Tests: "Code 41".
                             }
                         }
                         else if (textQuotes.indexOf(ch) !== -1) { // it's some sort of text qoutes
@@ -781,10 +789,10 @@ module.exports = function (opts) {
             }
 
             if (wait)
-                throw new Error(er.expressionMissingEnd('@' + block.text, wait, this.lineNum, this.linePos())); // Tests: "Code 42".
+                throw this.er.expressionMissingEnd('@' + block.text, wait, this.lineNum, this.linePos()); // Tests: "Code 42".
 
             if (!block.text)
-                throw new Error(er.invalidExpressionChar(ch, this.lineNum, this.linePos(), this.line)); // Seems to be impossible.
+                throw this.er.invalidExpressionChar(ch, this.lineNum, this.linePos(), this.line); // Seems to be impossible.
 
             function checkForSection() {
                 let keyword = block.text.trim();
@@ -821,7 +829,7 @@ module.exports = function (opts) {
                     if (trackFirstLine)
                         firstLine += ch;
                 }
-                
+
                 skipCh = false;
 
                 if (inText) {
@@ -834,7 +842,7 @@ module.exports = function (opts) {
                 }
                 else { // if not (inText)
                     if (!firstScope && ch !== '{')
-                        throw new Error(er.characterExpected('{', this.lineNum, this.linePos()));
+                        throw this.er.characterExpected('{', this.lineNum, this.linePos());
 
                     let pos = startScopes.indexOf(ch);
                     // IF it's a start-scope literal
@@ -858,7 +866,7 @@ module.exports = function (opts) {
                                 }
                             }
                             else {
-                                throw new Error(er.invalidExpressionChar(ch, this.lineNum, this.linePos(), this.line)); // Tests: "Code 43".
+                                throw this.er.invalidExpressionChar(ch, this.lineNum, this.linePos(), this.line); // Tests: "Code 43".
                             }
                         }
                         else if (textQuotes.indexOf(ch) !== -1) { // it's some sort of text qoutes
@@ -867,7 +875,7 @@ module.exports = function (opts) {
                             inText = true; // put on waits-stack
                         }
                         else if (ch === '@' && (!lastLiteral || Char.isWhiteSpace(lastLiteral))) {
-                            throw new Error(er.unexpectedAtCharacter(this.lineNum, this.linePos(), this.line));
+                            throw this.er.unexpectedAtCharacter(this.lineNum, this.linePos(), this.line);
                         }
                         else if (ch === '<') {
                             if (lastLiteral === '' || lastLiteral === '{' || lastLiteral === ';') {
@@ -912,7 +920,7 @@ module.exports = function (opts) {
             }
 
             if (wait)
-                throw new Error(er.jsCodeBlockkMissingClosingChar(firstLineNum, firstLine)); // tests: "Code 29"
+                throw this.er.jsCodeBlockMissingClosingChar(firstLineNum, firstLine); // tests: "Code 29"
 
             if (stop) {
                 // skip all spaces until a new line
@@ -931,7 +939,7 @@ module.exports = function (opts) {
             let sectionStartPos = this.linePos() - _sectionKeyword.length - 1; // -1 for '@'
 
             if (this.inSection)
-                throw new Error(er.sectionsCannotBeNested(this.lineNum, sectionStartPos)); // Tests: "Section 2".
+                throw this.er.sectionsCannotBeNested(this.lineNum, sectionStartPos); // Tests: "Section 2".
 
             this.inSection = true;
             let spaceCount = 0;
@@ -942,7 +950,7 @@ module.exports = function (opts) {
             }
 
             if (spaceCount < 1)
-                throw new Error(er.whiteSpaceExpectedAfter("@" + _sectionKeyword, this.lineNum, this.linePos())); // unreachable due to previous function check 
+                throw this.er.whiteSpaceExpectedAfter("@" + _sectionKeyword, this.lineNum, this.linePos()); // unreachable due to previous function check 
 
             let sectionLine = this.lineNum, sectionNamePos = this.linePos();
             let sectionName = '';
@@ -953,28 +961,28 @@ module.exports = function (opts) {
 
             // validation of the section name ..
             if (sectionName.length === 0)
-                throw new Error(er.sectionNameExpectedAfter("@" + _sectionKeyword, this.lineNum, this.linePos())); // Tests: "Section 3".
+                throw this.er.sectionNameExpectedAfter("@" + _sectionKeyword, this.lineNum, this.linePos()); // Tests: "Section 3".
 
             if (!canSectionStartWith(sectionName[0]))
-                throw er.sectionNameCannotStartWith(sectionName[0], this.lineNum, this.linePos() - sectionName.length); // Tests: "Section 5".
+                throw this.er.sectionNameCannotStartWith(sectionName[0], this.lineNum, this.linePos() - sectionName.length); // Tests: "Section 5".
 
             for (var i = 1; i < sectionName.length; i++) {
                 let c = sectionName[i];
                 if (!canSectionContain(c))
-                    throw new Error(er.sectionNameCannotInclude(c, this.lineNum, this.linePos() - sectionName.length + i)); // Tests: "Section 6".
+                    throw this.er.sectionNameCannotInclude(c, this.lineNum, this.linePos() - sectionName.length + i); // Tests: "Section 6".
             }
 
             // check if the section name is unique ..
             let section = this.args.parsedSections[sectionName]; //.find(s => sectionName === s);
 
             if (section)
-                throw new Error(er.sectionIsAlreadyDefined(sectionName, this.lineNum, sectionNamePos)); // Tests: "Section 8".
+                throw this.er.sectionIsAlreadyDefined(sectionName, this.lineNum, sectionNamePos); // Tests: "Section 8".
 
             this.args.parsedSections[sectionName] = { filepath: this.args.filepath };
             // skip all following whitespaces ..
             ch = this.skipWhile(c => Char.isWhiteSpace(c));
             if (ch !== '{')
-                throw new Error(er.unexpectedLiteralFollowingTheSection(ch, this.lineNum, this.linePos())); // Tests: "Section 7".
+                throw this.er.unexpectedLiteralFollowingTheSection(ch, this.lineNum, this.linePos()); // Tests: "Section 7".
 
             let sectionBlocks = [];
 
@@ -983,7 +991,7 @@ module.exports = function (opts) {
             // skip all following whitespaces ..
             //ch = this.skipWhile(c => Char.isWhiteSpace(c));
             //if (ch !== '}')
-            //    throw new Error(er.sectionBlockIsMissingClosingBrace(sectionName, sectionLine, sectionStartPos)); // Tests: "Section 9".
+            //    throw this.er.sectionBlockIsMissingClosingBrace(sectionName, sectionLine, sectionStartPos); // Tests: "Section 9".
 
             var block = newBlock(type.section, this.blocks, sectionName);
             block.blocks = sectionBlocks;
@@ -1076,7 +1084,6 @@ module.exports = function (opts) {
                 this.fetchChar();
                 c = this.pickChar();
             }
-            //if (!c) throw new Error(er.unexpectedEndOfFile(this.line));
             return c;
         }
 
@@ -1124,7 +1131,7 @@ module.exports = function (opts) {
     }
 
     function getTagName(tag) {
-        if (!tag || tag.length < 2) throw er.invalidHtmlTag(tag);
+        if (!tag || tag.length < 2) throw this.er.invalidHtmlTag(tag);
         var tagName = '';
         for (var i = 1; i < tag.length; i++) { // skip '<' & '>'
             var ch = tag[i];
@@ -1136,7 +1143,7 @@ module.exports = function (opts) {
                 if (tagName)
                     break;
                 else
-                    throw er.invalidHtmlTag(tag);
+                    throw this.er.invalidHtmlTag(tag);
             }
 
             tagName += ch;

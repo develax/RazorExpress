@@ -13,6 +13,7 @@
   "dependencies": {
     "express": "^4.16.3",
     "jquery": "^3.3.1",
+    "js-htmlencode": "^0.3.0",
     "jsdom": "^12.2.0"
   },
   "devDependencies": {

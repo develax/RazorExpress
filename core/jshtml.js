@@ -23,7 +23,7 @@
     //const er = require('./core/localization/errors').parser;
 
     function renderFile(filepath, options, done) {
-        let parser = parserInit();
+        let parser = parserInit({ mode: "dev" });
         filepath = path.normalize(filepath).toLowerCase();
         //let fileName = path.fileName(filepath);
         let viewsPath = path.normalize(options.settings.views).toLowerCase();
