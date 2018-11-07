@@ -53,6 +53,16 @@ module.exports = function (opts) {
     ///   Html class
     ////////////////////
     function Html(args) {
+        class HtmlString {
+            constructor(html) {
+                this.html = html;
+            }
+
+            toString() {
+                return this.html;
+            }
+        }
+
         // Non-user section.
         this._vm = vm;
         this._sandbox = sandbox;
@@ -119,7 +129,7 @@ module.exports = function (opts) {
         };
 
         this.encode = function (val) {
-            if (!val || typeof val === "number" || val instanceof Number)
+            if (!val || typeof val === "number" || val instanceof Number || val instanceof HtmlString)
                 this.raw(val); // not to do excessive work
             else if (typeof val === "string" || val instanceof String)
                 this.raw(htmlEncode(val));
@@ -128,7 +138,7 @@ module.exports = function (opts) {
         };
 
         this.body = function () {
-            return args.bodyHtml;
+            return new HtmlString(args.bodyHtml);
         };
 
         this.section = function (name, required) {
@@ -138,7 +148,7 @@ module.exports = function (opts) {
                 if (sec.rendered)
                     throw new Error(`The section '${name}' has already been rendered.`); // TODO: InvalidOperationException: RenderSectionAsync invocation in '/Views/Shared/_LayoutYellow.cshtml' is invalid. The section 'Scripts' has already been rendered.
 
-                return sec.html;
+                return new HtmlString(sec.html);
             }
             else {
                 if (required)
