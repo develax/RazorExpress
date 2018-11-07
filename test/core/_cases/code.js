@@ -374,6 +374,16 @@
 <div>@Html.raw(paragraph.match(/}<div>/g))</div>
 `,
             expected: '\n<div>}<div></div>\n'
+        },
+        {
+            name: "Code 47",
+            template: `
+@{ 
+    var paragraph = 'The )<div> quick brown fox.';
+}
+<div>@Html.raw(paragraph.match(/\\)<div>/g))</div>
+`,
+            expected: '\n<div>)<div></div>\n'
         }
     ];
     module.exports = cases;

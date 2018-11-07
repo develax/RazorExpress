@@ -729,7 +729,7 @@ module.exports = function (opts) {
             log.debug();
             const startScopes = '([';
             const endScopes = ')]';
-            const textQuotes = '\'"`';
+            const textQuotes = '\'"`/';
             var waits = [];
             var wait = null;
             var firstScope = null;
@@ -785,7 +785,7 @@ module.exports = function (opts) {
                                 throw this.er.invalidExpressionChar(ch, this.lineNum, this.pos, this.line); // Tests: "Code 41".
                             }
                         }
-                        else if (textQuotes.indexOf(ch) !== -1) { // it's some sort of text qoutes
+                        else if (textQuotes.indexOf(ch) !== -1 && (ch !== '/' || lastCh !== '<')) { // it's some sort of text qoutes (exclude the case when ch='/' and it's a tag start '</')
                             wait && waits.push(wait);
                             wait = ch;
                             inText = true; // put on waits-stack
