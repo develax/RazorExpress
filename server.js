@@ -6,6 +6,10 @@ require("./core/jshtml").initEngine(app);
 
 const ParserError = require('./core/localization/ParserError');
 
+app.use(function (req, res, next) {
+    res.locals.req = req;
+    next();
+});
 
 app.get('/', (rq, rs) => {
     rs.render("./home/index", { message: "This is my first NodeJS Express View engine!" });
@@ -20,7 +24,11 @@ app.get('/hidden', (rq, rs) => {
 });
 
 app.get('/sections', (rq, rs) => {
-    rs.render("./sections/index", { title: "This is a TITLE", content: 'This is CONTENT.', footer: "This is FOOTER" });
+    rs.render("./sections/index", { header: "This is a HEADER", content: 'This is CONTENT.', footer: "This is FOOTER" });
+});
+
+app.get('/sections/errors/requiredSectionNotFound', (rq, rs) => {
+    rs.render("./sections/errors/requiredSectionNotFound", { });
 });
 
 process.on('unhandledRejection', error => {
@@ -28,6 +36,8 @@ process.on('unhandledRejection', error => {
 });
 
 module.exports = app;
+
+
 
 app.use(appErrorHandler);
 
@@ -42,7 +52,10 @@ function appErrorHandler(err, req, res, next) {
         res.status(500);
         res.send(errorHtml);
     }
-    //return next(err);
+    else {
+        return next(err);
+    }
+        
     
     //res.status(500);
     //res.render('error', { error: err });

@@ -1,0 +1,12 @@
+﻿
+@section Header{
+    <h1>
+        @Model.header
+    </h1>
+}
+
+@section Content{
+    <p>
+        @Model.content
+    </p>
+}

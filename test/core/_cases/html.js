@@ -217,6 +217,11 @@
         setTimeout(load, 0, longText.substr(start, chunkSize));
     }
 </script>`
+        },
+        {
+            name: "HTML 30",
+            template: '<span><img></span>',
+            expected: '<span><img></span>'
         }
     ];
 

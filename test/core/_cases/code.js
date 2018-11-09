@@ -384,6 +384,37 @@
 <div>@Html.raw(paragraph.match(/\\)<div>/g))</div>
 `,
             expected: '\n<div>)<div></div>\n'
+        },
+        {
+            name: "Code 48",
+            template: `
+<div>
+@Html.raw("H")
+@Html.raw("C")
+</div>
+`,
+            expected: '\n<div>\nH\nC\n</div>\n'
+        },
+        {
+            name: "Code 49",
+            template: `
+<div>test</div>
+@section Footer{
+    <footer>
+        <p>&copy; 2018</p>
+    </footer>
+}`,
+            expected: '\n<div>test</div>\n'
+        },
+        {
+            name: "Code 50",
+            template: `@{<span><img></span>}`,
+            expected: '<span><img></span>'
+        },
+        {
+            name: "Code 51",
+            template: `@{<img>}`,
+            expected: '<img>'
         }
     ];
     module.exports = cases;

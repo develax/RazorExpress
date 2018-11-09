@@ -1,0 +1,15 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <base href="@Model.req.originalUrl" />
+</head>
+<body style="background-color: blue;">
+    <div class="container body-content">
+        @Html.body()
+        <hr />
+        @Html.section('Footer')
+    </div>
+</body>
+</html>

@@ -1,0 +1,19 @@
+﻿@{
+    Html.layout = "_layout";
+    Html.partial("_parts");
+}
+
+<div style="background-color: white">
+    @Html.section("Header")
+    @Html.section("Content")
+</div>
+<div style="background-color: yellow">
+    <a href="/sections/errors/requiredSectionNotFound">Required section not found.</a>
+</div>
+
+@section Footer{
+    <footer>
+        <p>&copy; 2018 - @Model.footer</p>
+    </footer>
+}
+

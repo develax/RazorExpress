@@ -19,7 +19,7 @@ function compilePageSync(Html, Model, debug) {
             eval(code);
         }
         catch (exc) {
-            throw new Error(exc.message); // cut the useless stacktrace
+            throw new Error(exc.message); // cut a useless stacktrace
         }
     }
 
@@ -264,7 +264,8 @@ module.exports = function (opts) {
     const _sectionKeyword = "section";
     //const _functionKeyword = "function";
     const type = { none: 0, html: 1, code: 2, expr: 3, section: 4 };
-    const ErrorsProcessor  = require('./localization/errors');
+    const ErrorsProcessor = require('./localization/errors');
+    const voidTags = "area|base|br|col|embed|hr|img|input|link|meta|param|source|track|wbr".toUpperCase().split("|").map(s => s.trim());
 
     ////////////////
     //   PARSER   //
@@ -431,7 +432,15 @@ module.exports = function (opts) {
                         else {
                             tag += ch;
                             let tagName = getTagName(tag);
-                            let tagKind = tag.startsWith("</") ? tagKinds.close : tag.endsWith("/>") ? tagKinds.selfclose : tagKinds.open;
+                            let tagKind = tag.startsWith("</")
+                                ?
+                                tagKinds.close
+                                :
+                                tag.endsWith("/>") || voidTags.includes(tagName.toUpperCase())
+                                    ?
+                                    tagKinds.selfclose
+                                    :
+                                    tagKinds.open;
 
                             if (tagKind === tagKinds.close) {
                                 let openTag = openTags.pop();
@@ -621,12 +630,12 @@ module.exports = function (opts) {
                             }
                         }
                         else {
-                            if (tag[tag.length - 2] === '/') {
+                            let tagName = getTagName(tag);
+
+                            if (tag[tag.length - 2] === '/' || voidTags.includes(tagName.toUpperCase())) {
                                 // it's a self-close tag... nothing to do
                             }
                             else if (tag.length > 2) { // it's an open-tag, at least `<a>`
-                                let tagName = getTagName(tag);
-
                                 if (tag[1] === '/') // it's a close-tag, unexpected..
                                     throw this.er.missingMatchingStartTag(tag, this.lineNum, this.linePos() - tag.length + 1, this.line + ch); // tested by "Invalid-HTML 5"
 
@@ -1087,7 +1096,7 @@ module.exports = function (opts) {
 
             // adjust blocks..
             if (!block.text.length || block.type === type.code && String.isWhiteSpace(block.text)) {
-                this.blocks.pop();
+                blocks.pop();
             }
             else if (count > 0) {
                 cut = block.text.length - count; // block's text doesn't have the very last character
