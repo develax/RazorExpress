@@ -15,7 +15,7 @@
     const fs = require('fs');
     const path = require('path');
     const parserInit = require('./parser');
-    const er = require('./localization/errors').parser;
+    const er = require('./errors/errors').parser;
     //require('./core/utils');
     //const fs = require('fs');
     //const path = require('path');
@@ -46,11 +46,11 @@
                     return done(err);
 
                 let compileArgs = {
-                    filepath,
+                    filePath: filepath,
                     jsHtml: buff.toString() + data.toString(),
                     model: options,
-                    findPartial: getFindPartialFunc(currentDir, viewsDir, options),
-                    findPartialSync: getFindPartialSyncFunc(currentDir, viewsDir, options)
+                    findPartial: getFindPartialFunc(viewsDir, options),
+                    findPartialSync: getFindPartialSyncFunc(viewsDir, options)
                 };
 
                 parser.compile(compileArgs, (err, html) => {
@@ -78,8 +78,7 @@
 
             try {
                 let data = fs.readFileSync(partialName);
-                startDir = path.dirname(partialName);
-                return { data: data.toString(), findPartialSync: getFindPartialSyncFunc(startDir, viewsDir, opt) };
+                return successResult(data.toString(), partialName);
             }
             catch (err) {
                 if (err.code === 'ENOENT')
@@ -93,7 +92,7 @@
 
         try {
             let data = fs.readFileSync(filePath);
-            return { data: data.toString(), findPartialSync: getFindPartialSyncFunc(startDir, viewsDir, opt) };
+            return successResult(data.toString(), filePath);
         }
         catch (err) {
             if (err.code === 'ENOENT') { // the file doesn't exist, lets see a dir up..
@@ -107,6 +106,10 @@
             else {
                 throw err;
             }
+        }
+
+        function successResult(data, filePath) {
+            return { data, filePath };
         }
     }
 
@@ -150,8 +153,7 @@
                     if (err.code === 'ENOENT') return done(errorMessage);
                     return done(err);
                 }
-                startDir = path.dirname(partialName);
-                done(null, data.toString(), getFindPartialFunc(startDir, viewsDir, opt));
+                onSuccess(data.toString(), partialName);
             });
 
             return;
@@ -171,16 +173,26 @@
                 }
                 return done(err);
             }
-            return done(null, data.toString(), getFindPartialFunc(startDir, viewsDir, opt));
+            return onSuccess(data.toString(), filePath);
         });
+
+        function onSuccess(data, filePath) {
+            done(null, { data, filePath });
+        }
     }
 
-    function getFindPartialFunc(currentDir, viewsDir, options) {
-        return (layoutName, done) => findPartial(currentDir, viewsDir, layoutName, options, done);
+    function getFindPartialFunc(viewsDir, options) {
+        return (layoutName, filePath, done) => {
+            var startDir = path.dirname(filePath);
+            findPartial(startDir, viewsDir, layoutName, options, done);
+        };
     }
 
-    function getFindPartialSyncFunc(currentDir, viewsDir, options) {
-        return (layoutName) => findPartialSync(currentDir, viewsDir, layoutName, options);
+    function getFindPartialSyncFunc(viewsDir, options) {
+        return (layoutName, filePath) => {
+            var startDir = path.dirname(filePath);
+            return findPartialSync(startDir, viewsDir, layoutName, options);
+        };
     }
 
     function viewExt(options) {

@@ -4,7 +4,7 @@
 
     var expect = require('chai').expect;
     const parser = require('../../core/parser')({ debug: false, env: "dev" });
-    const er = new require('../../core/localization/errors');
+    const er = new require('../../core/errors/errors');
 
 
     describe("INVALID INPUT ARGUMENTS", () => {

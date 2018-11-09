@@ -4,16 +4,16 @@ const app = require('express')();
 
 require("./core/jshtml").initEngine(app);
 
-const ParserError = require('./core/localization/ParserError');
+const ParserError = require('./core/errors/ParserError');
 
 app.use(function (req, res, next) {
     res.locals.req = req;
     next();
 });
 
-app.get('/', (rq, rs) => {
-    rs.render("./home/index", { message: "This is my first NodeJS Express View engine!" });
-});
+//app.get('/', (rq, rs) => {
+//    rs.render("./home/index", { message: "This is my first NodeJS Express View engine!" });
+//});
 
 app.get('/invalid', (rq, rs) => {
     rs.render("./home/invalid", { message: "This is my first NodeJS Express View engine!" });
@@ -23,7 +23,7 @@ app.get('/hidden', (rq, rs) => {
     rs.render("./home/hidden", { message: "This is my first NodeJS Express View engine!" });
 });
 
-app.get('/sections', (rq, rs) => {
+app.get('/', (rq, rs) => {
     rs.render("./sections/index", { header: "This is a HEADER", content: 'This is CONTENT.', footer: "This is FOOTER" });
 });
 

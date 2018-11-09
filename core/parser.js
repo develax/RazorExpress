@@ -42,6 +42,7 @@ module.exports = function (opts) {
     const log = require('./logger')({ on: opts.debug });
     log.debug(`Parse debug mode is '${!!opts.debug}'.`);
 
+    const HtmlString = require('./HtmlString');
     const htmlEncode = require('js-htmlencode');
     const vm = opts.debug || opts.env === "dev" ? require('vm') : null;
     const sandbox = opts.debug || opts.env === "dev" ? Object.create(null) : null;
@@ -53,16 +54,7 @@ module.exports = function (opts) {
     ///   Html class
     ////////////////////
     function Html(args) {
-        class HtmlString {
-            constructor(html) {
-                this.html = html;
-            }
-
-            toString() {
-                return this.html;
-            }
-        }
-
+        
         // Non-user section.
         this._vm = vm;
         this._sandbox = sandbox;
@@ -85,6 +77,27 @@ module.exports = function (opts) {
             return args.valuesQueue.getAt(i);
         };
 
+        this.__renderLayout = (done) => {
+            if (!this.layout) // if the layout is not defined..
+                return Promise.resolve().then(() => done(null, args.html)), null;
+
+            // looking for the `Layout`..
+            args.findPartial(this.layout, args.filePath, (err, { data, filePath }) => {
+                if (err) return done(err);
+                let compileOpt = {
+                    jsHtml: data,
+                    filePath,
+                    model: args.model,
+                    bodyHtml: args.html,
+                    findPartial: args.findPartial,
+                    findPartialSync: args.findPartialSync,
+                    sections,
+                    parsedSections: args.parsedSections
+                };
+                compile(compileOpt, done);
+            });
+        };
+
         this.__sec = function (name) { // section
             if (!section)
                 section = name;
@@ -92,25 +105,6 @@ module.exports = function (opts) {
                 section = null;
             else
                 throw new Error(`Unexpected section name = '${name}'.`); // Cannot be tested via user-inputs.
-        };
-
-        this.__renderLayout = (done) => {
-            if (!this.layout)
-                return Promise.resolve().then(() => done(null, args.html)), null;
-
-            args.findPartial(this.layout, (err, jsHtml, findPartial) => {
-                if (err) return done(err);
-                let compileOpt = {
-                    jsHtml,
-                    model: args.model,
-                    bodyHtml: args.html,
-                    sections,
-                    findPartial,
-                    findPartialSync: args.findPartialSync,
-                    parsedSections: args.parsedSections
-                };
-                compile(compileOpt, done);
-            });
         };
 
         this.raw = function (val) { // render
@@ -145,9 +139,13 @@ module.exports = function (opts) {
             let sec = sections[name];
 
             if (sec) {
-                if (sec.rendered)
-                    throw new Error(`The section '${name}' has already been rendered.`); // TODO: InvalidOperationException: RenderSectionAsync invocation in '/Views/Shared/_LayoutYellow.cshtml' is invalid. The section 'Scripts' has already been rendered.
+                if (sec.renderedBy)
+                    throw new Error(`The section '${name}' has already been rendered by '${sec.renderedBy}'.`); // TODO: InvalidOperationException: RenderSectionAsync invocation in '/Views/Shared/_LayoutYellow.cshtml' is invalid. The section 'Scripts' has already been rendered.
 
+                if (!args.filePath)
+                    throw new Error("'args.filePath' is not set.");
+
+                sec.renderedBy = args.filePath;
                 return new HtmlString(sec.html);
             }
             else {
@@ -160,15 +158,17 @@ module.exports = function (opts) {
             // TODO: throw error that section was not rendered.
         };
 
-        this.partial = function (name, model) {
+        this.partial = function (viewName, viewModel) {
             // if an exception occurs it will be thron directly to to ExpressApp and shown on the users' page (fix later):
             // https://expressjs.com/en/guide/error-handling.html
-            let p = args.findPartialSync(name);
+            let { data, filePath } = args.findPartialSync(viewName, args.filePath);
             let compileOpt = {
-                jsHtml: p.data,
-                sections,
-                model: model || args.model, // if is not set explicitly, set default (parent) model
+                jsHtml: data,
+                filePath,
+                model: viewModel || args.model, // if is not set explicitly, set default (parent) model
+                findPartial: args.findPartial,
                 findPartialSync: args.findPartialSync,
+                sections,
                 parsedSections: args.parsedSections
             };
             let html = compileSync(compileOpt);
@@ -264,7 +264,7 @@ module.exports = function (opts) {
     const _sectionKeyword = "section";
     //const _functionKeyword = "function";
     const type = { none: 0, html: 1, code: 2, expr: 3, section: 4 };
-    const ErrorsProcessor = require('./localization/errors');
+    const ErrorsProcessor = require('./errors/errors');
     const voidTags = "area|base|br|col|embed|hr|img|input|link|meta|param|source|track|wbr".toUpperCase().split("|").map(s => s.trim());
 
     ////////////////
@@ -277,47 +277,38 @@ module.exports = function (opts) {
         }
 
         compile(done) {
-            let jshtml = this.args.jsHtml;
-            let model = this.args.model;
-            var isString = Object.prototype.toString.call(jshtml) === "[object String]";
-
-            if (!isString)
-                return Promise.resolve().then(() => done(this.er.jshtmlShouldBeString)), null;
-
-            if (!jshtml.length)
-                return Promise.resolve().then(() => done(null, "")), null; // just an empty string.. nothing to do..
-
-            log.debug(`HTML = \`${jshtml}\``);
+            log.debug();
 
             try {
-                var html = this.getHtml(jshtml, model, {});
+                var html = this.getHtml({}, done);
             }
             catch (exc) {
                 return Promise.resolve().then(() => done(exc)), null;
             }
 
-            compilePage(html, model, opts.debug || opts.env === "dev", done);
+            compilePage(html, this.args.model, opts.debug || opts.env === "dev", done);
         }
 
         compileSync() {
-            let jshtml = this.args.jsHtml;
-            let model = this.args.model;
-            var isString = Object.prototype.toString.call(jshtml) === "[object String]";
-
-            if (!isString)
-                throw new Error(this.er.jshtmlShouldBeString);
-
-            if (!jshtml.length)
-                return jshtml; // just an empty string.. nothing to do..
-
-            log.debug(`HTML = \`${jshtml}\``);
+            log.debug();
             var htmlArgs = {};
-            var html = this.getHtml(jshtml, model, htmlArgs);
-            compilePageSync(html, model, opts.debug || opts.env === "dev");
+            var html = this.getHtml(htmlArgs);
+            compilePageSync(html, this.args.model, opts.debug || opts.env === "dev");
             return htmlArgs.html;
         }
 
-        getHtml(jshtml, model, htmlArgs) {
+        getHtml(htmlArgs, done) {
+            let jshtml = this.args.jsHtml;
+            var isString = Object.prototype.toString.call(jshtml) === "[object String]";
+
+            if (!isString) {
+                if (done)
+                    return Promise.resolve().then(() => done(this.er.jshtmlShouldBeString)), null;
+                else
+                    throw new Error(this.er.jshtmlShouldBeString);
+            }
+
+            log.debug(`HTML = \`${jshtml}\``);
             this.text = jshtml, this.line = '', this.lineNum = 0, this.pos = 0, this.padding = '';
             this.inSection = false;
             this.args.parsedSections = this.args.parsedSections || {};
@@ -326,17 +317,20 @@ module.exports = function (opts) {
             var valuesQueue = new Queue();
             var scripts = this.blocks.map(b => b.toScript(valuesQueue));
             var js = scripts.join("");
+
             Object.assign(htmlArgs, {
                 html: '',
                 valuesQueue,
                 js,
-                model,
-                bodyHtml: this.args.bodyHtml,
-                findPartial: this.args.findPartial,
-                findPartialSync: this.args.findPartialSync,
-                sections: this.args.sections,
-                parsedSections: this.args.parsedSections
+                //bodyHtml: this.args.bodyHtml,
+                //filePath: this.args.filePath,
+                //findPartial: this.args.findPartial,
+                //findPartialSync: this.args.findPartialSync,
+                //sections: this.args.sections,
+                //parsedSections: this.args.parsedSections
             });
+
+            Object.assign(htmlArgs, this.args);
             var html = new Html(htmlArgs);
             return html;
         }
@@ -1012,7 +1006,7 @@ module.exports = function (opts) {
             if (section)
                 throw this.er.sectionIsAlreadyDefined(sectionName, this.lineNum, sectionNamePos); // Tests: "Section 8".
 
-            this.args.parsedSections[sectionName] = { filepath: this.args.filepath };
+            this.args.parsedSections[sectionName] = { filePath: this.args.filePath };
             // skip all following whitespaces ..
             ch = this.skipWhile(c => Char.isWhiteSpace(c));
             if (ch !== '{')

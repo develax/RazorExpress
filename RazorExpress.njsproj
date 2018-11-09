@@ -34,13 +34,10 @@
     <DebugSymbols>true</DebugSymbols>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="core\localization\errors.en.js">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="core\localization\errors.js">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="core\localization\ParserError.js">
+    <Compile Include="core\errors\errors.en.js" />
+    <Compile Include="core\errors\errors.js" />
+    <Compile Include="core\errors\ParserError.js" />
+    <Compile Include="core\HtmlString.js">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="core\logger.js">
@@ -130,7 +127,7 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="core\" />
-    <Folder Include="core\localization\" />
+    <Folder Include="core\errors\" />
     <Folder Include="test\" />
     <Folder Include="test\core\" />
     <Folder Include="test\core\_cases\" />

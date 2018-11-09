@@ -1,6 +1,4 @@
 ﻿(function () {
-    const er = require('../../../core/localization/errors').parser;
-
     var cases = [
         {
             name: "Invalid-HTML 1",
