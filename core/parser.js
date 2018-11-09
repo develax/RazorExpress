@@ -82,11 +82,11 @@ module.exports = function (opts) {
                 return Promise.resolve().then(() => done(null, args.html)), null;
 
             // looking for the `Layout`..
-            args.findPartial(this.layout, args.filePath, (err, { data, filePath }) => {
+            args.findPartial(this.layout, args.filePath, (err, result) => {
                 if (err) return done(err);
                 let compileOpt = {
-                    jsHtml: data,
-                    filePath,
+                    jsHtml: result.data,
+                    filePath: result.filePath,
                     model: args.model,
                     bodyHtml: args.html,
                     findPartial: args.findPartial,

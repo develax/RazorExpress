@@ -1,6 +1,6 @@
 ﻿@{
 	var title = 'My "Razor-Expess" Engine';
-    //Html.layout = "_layoutBlue";
+    //Html.layout = "_layoutBlue123";
 }
 
 <div style="background-color: white">

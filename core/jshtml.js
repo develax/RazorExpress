@@ -62,57 +62,6 @@
         });
     }
 
-    function findPartialSync(startDir, viewsDir, partialName, opt) {
-        let errorMessage = `"${partialName}" couldn't be found.`;
-        partialName = path.normalize(partialName).toLowerCase();
-
-        if (!partialName || !partialName.length)
-            Promise.resolve().then(() => done("Invalid layout name."));
-
-        if (!path.extname(partialName))
-            partialName += '.' + viewExt(opt);
-
-        if (partialName[0] === path.sep || partialName[0] === '.') { // it's full (in linux) or relative path
-            if (!partialName.startsWith(viewsDir))
-                partialName = path.join(viewsDir, partialName);
-
-            try {
-                let data = fs.readFileSync(partialName);
-                return successResult(data.toString(), partialName);
-            }
-            catch (err) {
-                if (err.code === 'ENOENT')
-                    throw errorMessage;
-                throw err;
-            }
-        }
-
-        // it's just a layout name without any path, start search from the current dir..
-        let filePath = path.join(startDir, partialName);
-
-        try {
-            let data = fs.readFileSync(filePath);
-            return successResult(data.toString(), filePath);
-        }
-        catch (err) {
-            if (err.code === 'ENOENT') { // the file doesn't exist, lets see a dir up..
-                startDir = (startDir === viewsDir) ? null : path.cutLastSegment(startDir);
-
-                if (!startDir)
-                    throw errorMessage;
-                else
-                    return findPartialSync(startDir, viewsDir, partialName, opt);
-            }
-            else {
-                throw err;
-            }
-        }
-
-        function successResult(data, filePath) {
-            return { data, filePath };
-        }
-    }
-
     function readViewStarts(startDir, viewsDir, buffer, done) {
         const fileName = "_viewStart.jshtml";
         const filePath = path.join(startDir, fileName);
@@ -134,8 +83,7 @@
         });
     }
 
-    function findPartial(startDir, viewsDir, partialName, opt, done) {
-        const errorMessage = `"${partialName}" couldn't be found.`;
+    function findPartialSync(startDir, viewsDir, partialName, opt, searchedLocations) {
         partialName = path.normalize(partialName).toLowerCase();
 
         if (!partialName || !partialName.length)
@@ -148,9 +96,67 @@
             if (!partialName.startsWith(viewsDir))
                 partialName = path.join(viewsDir, partialName);
 
+            try {
+                searchedLocations.push(partialName);
+                let data = fs.readFileSync(partialName);
+                return successResult(data.toString(), partialName);
+            }
+            catch (err) {
+                if (err.code === 'ENOENT')
+                    throw Error(notFoundMessage());
+                throw err;
+            }
+        }
+
+        // it's just a layout name without any path, start search from the current dir..
+        let filePath = path.join(startDir, partialName);
+
+        try {
+            searchedLocations.push(filePath);
+            let data = fs.readFileSync(filePath);
+            return successResult(data.toString(), filePath);
+        }
+        catch (err) {
+            if (err.code === 'ENOENT') { // the file doesn't exist, lets see a dir up..
+                startDir = (startDir === viewsDir) ? null : path.cutLastSegment(startDir);
+
+                if (!startDir)
+                    throw new Error(notFoundMessage());
+                else
+                    return findPartialSync(startDir, viewsDir, partialName, opt, searchedLocations);
+            }
+            else {
+                throw err;
+            }
+        }
+
+        function successResult(data, filePath) {
+            return { data, filePath };
+        }
+
+        function notFoundMessage() {
+            return partialViewNotFoundMessage(partialName, searchedLocations);
+        }
+    }
+
+    function findPartial(startDir, viewsDir, partialName, opt, searchedLocations, done) {
+        partialName = path.normalize(partialName).toLowerCase();
+
+        if (!partialName || !partialName.length)
+            Promise.resolve().then(() => done("Invalid layout name."));
+
+        if (!path.extname(partialName))
+            partialName += '.' + viewExt(opt);
+
+        if (partialName[0] === path.sep || partialName[0] === '.') { // it's full (in linux) or relative path
+            if (!partialName.startsWith(viewsDir))
+                partialName = path.join(viewsDir, partialName);
+
+            searchedLocations.push(partialName);
             fs.readFile(partialName, (err, data) => {
                 if (err) {
-                    if (err.code === 'ENOENT') return done(errorMessage);
+                    if (err.code === 'ENOENT')
+                        return done(notFoundMessage());
                     return done(err);
                 }
                 onSuccess(data.toString(), partialName);
@@ -161,15 +167,16 @@
 
         // it's just a layout name without any path, start search from the current dir..
         let filePath = path.join(startDir, partialName);
+        searchedLocations.push(filePath);
         fs.readFile(filePath, (err, data) => {
             if (err) {
                 if (err.code === 'ENOENT') { // the file doesn't exist, lets see a dir up..
                     startDir = (startDir === viewsDir) ? null : path.cutLastSegment(startDir);
 
                     if (!startDir)
-                        return done(errorMessage);
+                        return done(notFoundMessage());
                     else
-                        return findPartial(startDir, viewsDir, partialName, opt, done);
+                        return findPartial(startDir, viewsDir, partialName, opt, searchedLocations, done);
                 }
                 return done(err);
             }
@@ -179,19 +186,28 @@
         function onSuccess(data, filePath) {
             done(null, { data, filePath });
         }
+
+        function notFoundMessage() {
+            return partialViewNotFoundMessage(partialName, searchedLocations);
+        }
+    }
+
+    function partialViewNotFoundMessage(partialName, searchedLocations) {
+        let errorMessage = `The partial view "${partialName}" was not found from:\n${searchedLocations.shift()}\n\nThe following locations were searched:\n${searchedLocations.join("\n")}\n\n`;
+        return errorMessage;
     }
 
     function getFindPartialFunc(viewsDir, options) {
         return (layoutName, filePath, done) => {
             var startDir = path.dirname(filePath);
-            findPartial(startDir, viewsDir, layoutName, options, done);
+            findPartial(startDir, viewsDir, layoutName, options, [filePath], done);
         };
     }
 
     function getFindPartialSyncFunc(viewsDir, options) {
         return (layoutName, filePath) => {
             var startDir = path.dirname(filePath);
-            return findPartialSync(startDir, viewsDir, layoutName, options);
+            return findPartialSync(startDir, viewsDir, layoutName, options, [filePath]);
         };
     }
 
