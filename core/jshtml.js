@@ -1,6 +1,7 @@
 ﻿(function () {
     'use strict';
     const ext = "jshtml", viewStartName = '_viewStart';
+    const _eol_ = require('os').EOL;
 
     module.exports = {
         initEngine: function (expressApp, opt) {
@@ -8,6 +9,8 @@
             //expressApp.set('views', './views'); // specify the views directory
             expressApp.set('view engine', ext);
         },
+        // https://expressjs.com/en/guide/using-template-engines.html
+        // https://www.npmjs.com/package/hbs
         __express: renderFile
     };
 
@@ -23,7 +26,8 @@
     //const er = require('./core/localization/errors').parser;
 
     function renderFile(filepath, options, done) {
-        let parser = parserInit({ mode: "dev" });
+        let env = options.settings.env;
+        let parser = parserInit({ mode: env });
         filepath = path.normalize(filepath).toLowerCase();
         //let fileName = path.fileName(filepath);
         let viewsPath = path.normalize(options.settings.views).toLowerCase();
@@ -40,14 +44,15 @@
 
             let currentDir = path.dirname(filepath);
             let viewsDir = path.normalize(options.settings.views).toLowerCase();
+            let jsHtml = addFileNameIfDev(data, filepath, env);
 
-            readViewStarts(currentDir, viewsDir, null, (err, buff) => {
+            readViewStarts(currentDir, viewsDir, null, env, (err, viewStartsJsHtml) => {
                 if (err)
                     return done(err);
-
+ 
                 let compileArgs = {
                     filePath: filepath,
-                    jsHtml: buff.toString() + data.toString(),
+                    jsHtml: viewStartsJsHtml + jsHtml,
                     model: options,
                     findPartial: getFindPartialFunc(viewsDir, options),
                     findPartialSync: getFindPartialSyncFunc(viewsDir, options)
@@ -62,7 +67,7 @@
         });
     }
 
-    function readViewStarts(startDir, viewsDir, buffer, done) {
+    function readViewStarts(startDir, viewsDir, buffer, env, done) {
         const fileName = "_viewStart.jshtml";
         const filePath = path.join(startDir, fileName);
 
@@ -71,13 +76,14 @@
                 if (err.code !== 'ENOENT') return done(err);
             }
             else {
-                buffer = (buffer) ? Buffer.concat([data, buffer], data.length + buffer.length) : data; // the `concat` order is important here!
+                let dataStr = addFileNameIfDev(data, filePath, env);
+                buffer = (buffer) ? dataStr + buffer : dataStr; // the `concat` order is important here!
             }
 
             startDir = (startDir === viewsDir) ? null : path.cutLastSegment(startDir);
 
             if (startDir)
-                return readViewStarts(startDir, viewsDir, buffer, done);
+                return readViewStarts(startDir, viewsDir, buffer, env, done);
 
             return done(null, buffer);
         });
@@ -87,7 +93,7 @@
         partialName = path.normalize(partialName).toLowerCase();
 
         if (!partialName || !partialName.length)
-            Promise.resolve().then(() => done("Invalid layout name."));
+            Promise.resolve().then(() => done("Layout name is not set."));
 
         if (!path.extname(partialName))
             partialName += '.' + viewExt(opt);
@@ -99,7 +105,8 @@
             try {
                 searchedLocations.push(partialName);
                 let data = fs.readFileSync(partialName);
-                return successResult(data.toString(), partialName);
+                let dataStr = addFileNameIfDev(data, partialName, opt.settings.env);
+                return successResult(dataStr, partialName);
             }
             catch (err) {
                 if (err.code === 'ENOENT')
@@ -114,7 +121,8 @@
         try {
             searchedLocations.push(filePath);
             let data = fs.readFileSync(filePath);
-            return successResult(data.toString(), filePath);
+            let dataStr = addFileNameIfDev(data, filePath, opt.settings.env);
+            return successResult(dataStr, filePath);
         }
         catch (err) {
             if (err.code === 'ENOENT') { // the file doesn't exist, lets see a dir up..
@@ -159,7 +167,8 @@
                         return done(notFoundMessage());
                     return done(err);
                 }
-                onSuccess(data.toString(), partialName);
+                let dataStr = addFileNameIfDev(data, partialName, opt.settings.env);
+                onSuccess(dataStr, partialName);
             });
 
             return;
@@ -180,7 +189,8 @@
                 }
                 return done(err);
             }
-            return onSuccess(data.toString(), filePath);
+            let dataStr = addFileNameIfDev(data, filePath, opt.settings.env);
+            return onSuccess(dataStr, filePath);
         });
 
         function onSuccess(data, filePath) {
@@ -213,6 +223,17 @@
 
     function viewExt(options) {
         return options.settings['view engine'] || ext;
+    }
+
+    function addFileNameIfDev(data, filename, env) {
+        if (env === 'dev')
+            return wrapInHtmlComment(filename) + _eol_ + data.toString();
+
+        return data.toString();
+    }
+
+    function wrapInHtmlComment(text) {
+        return `<!-- ${text} -->`;
     }
 
 })();

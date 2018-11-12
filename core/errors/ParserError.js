@@ -13,7 +13,7 @@ module.exports = class ParserError extends Error {
         Error.captureStackTrace(this, this.constructor);
     }
 
-    getFormatted() {
+    getHtml() {
         if (!this.data.jshtml)
             return;
 
@@ -22,11 +22,12 @@ module.exports = class ParserError extends Error {
 
         for (let i = 0; i < lines.length; i++) {
             let line = lines[i];
-
-            if (i === 0)
-                stack += `<span style="font-weight: bold;">${line}</span>`;
+            let encodedLine = htmlEncode(line);
+            
+            if (line.startsWith("ParserError:"))
+                stack += `<span style="font-weight: bold; color: #580a0a;">${encodedLine}</span>`;
             else
-                stack += line;
+                stack += encodedLine;
 
             stack += '<br/>';
         }
@@ -37,7 +38,7 @@ module.exports = class ParserError extends Error {
 
         for (let i = 0; i < lines.length; i++) {
             let line = lines[i];
-            let highlight, htmlLine;
+            let highlight, htmlLine, comment;
 
             if (this.data.line === i) {
                 highlight = "class='highlight'";
@@ -50,8 +51,15 @@ module.exports = class ParserError extends Error {
                     htmlLine = `<span>${start}</span><span class='highlight'>${one}</span><span>${end}</span>`;
                 }
             }
+            else {
+                let trim = line.trim();
 
-            code += `<li ${highlight}><span>`;
+                if (trim.length > 6 && trim.startsWith("<!--") && trim.endsWith("-->"))
+                    comment = "class='comment'";
+                    //htmlLine = `<span class="comment">${htmlEncode(trim)}</span>`;
+            }
+
+            code += `<li ${comment || highlight}><span>`;
             code += htmlLine ? htmlLine : htmlEncode(line);
             code += "</span></li>";
         }
@@ -63,7 +71,7 @@ module.exports = class ParserError extends Error {
 <html>
 <head>
     <style type="text/css" scoped>
-        h1{
+        h1, h2, h3{
             font-weight: normal;
         }
         body { 
@@ -85,13 +93,19 @@ module.exports = class ParserError extends Error {
             background-color: #f8f9b3; 
         }
         ol li span {
-            color: darkslategray;
+            color: #196684;//darkslategray;
         }
         ol li.highlight span {
             color: black;
         }
         ol li span.highlight {
             border: solid 1px red;
+        }
+        ol li.comment {
+            color: lightgray;
+        }
+        ol li.comment span {
+            color: darkgray;
         }
     </style>
 </head>
@@ -101,6 +115,7 @@ module.exports = class ParserError extends Error {
     </h1>
     <div class="stack">${stack}</div>
     <hr />
+    <h2>Page markup</h2>
     <div class="code">
         ${code}
     <div>

@@ -121,6 +121,16 @@ class ParserErrorProcessor {
         var message = `Section blocks cannot be nested at line ${line + 1} pos ${pos + 1}.`;
         return new ParserError(message, this.jshtml, line, pos);
     }
+
+    sectionIsNotFound(sectionName, filePath) {
+        var message = `The view '${filePath}' requires the section '${sectionName}' which cannot be found.`;
+        return new ParserError(message, this.jshtml);
+    }
+
+    sectionBeenRendered(sectionName, renderedBy, attemptedBy) {
+        var message = `The section '${sectionName}' has already been rendered by '${renderedBy}'. There is an atempt to rendered it again by '${attemptedBy}'.`;
+        return new ParserError(message, this.jshtml);
+    }
 }
 
 ParserErrorProcessor.jshtmlShouldBeString = '[jshtml] argument should be a string';

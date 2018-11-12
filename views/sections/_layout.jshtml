@@ -10,6 +10,7 @@
         @Html.body()
         <hr />
         @Html.section('Footer')
+        @Html.section("Div")
     </div>
 </body>
 </html>

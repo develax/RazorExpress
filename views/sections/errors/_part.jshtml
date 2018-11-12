@@ -1,0 +1,4 @@
+﻿<h2 style="background-color: red;">The Partial View</h2>
+@section Div{
+    <div style="background-color: greenyellow;">This is a greeb section.</div>
+}

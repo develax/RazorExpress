@@ -106,6 +106,19 @@
     </script>
 `,
             error: 'The code or section block is missing a closing "}" character. Make sure you have a matching "}" character for all the "{" characters within this block, and that none of the "}" characters are being interpreted as markup. The block starts at line 2 with text: "@section Scripts {"'
+        },
+        {
+            name: "Section 11",
+            template: `
+@section Header{
+    <h1>
+        @Model.header
+    </h1>
+}
+@Html.section("Header")
+`,
+            model: { header: "test" },
+            expected: '\n    <h1>\n        test\n    </h1>\n\n'
         }
     ];
     module.exports = cases;

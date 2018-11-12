@@ -9,6 +9,9 @@
 </div>
 <div style="background-color: yellow">
     <a href="/sections/errors/requiredSectionNotFound">Required section not found.</a>
+    <br />
+    <a href="/sections/errors/sectionBeenRendered">Section has been rendered.</a>
+    <div>
 </div>
 
 @section Footer{

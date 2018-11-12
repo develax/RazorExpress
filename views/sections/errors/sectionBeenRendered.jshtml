@@ -1,0 +1,5 @@
+﻿<div style="background-color: orange;">
+    The page.
+</div>
+@Html.partial("_part")
+@Html.section("Div")

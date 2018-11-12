@@ -19,7 +19,8 @@ function compilePageSync(Html, Model, debug) {
             eval(code);
         }
         catch (exc) {
-            throw new Error(exc.message); // cut a useless stacktrace
+            throw exc;  
+            //throw new Error(exc.message); // cut a useless stacktrace
         }
     }
 
@@ -44,20 +45,20 @@ module.exports = function (opts) {
 
     const HtmlString = require('./HtmlString');
     const htmlEncode = require('js-htmlencode');
-    const vm = opts.debug || opts.env === "dev" ? require('vm') : null;
-    const sandbox = opts.debug || opts.env === "dev" ? Object.create(null) : null;
-
-    if (sandbox)
-        vm.createContext(sandbox);
+    const vm = isDebugMode(opts) ? require('vm') : null;
 
     ////////////////////
     ///   Html class
     ////////////////////
     function Html(args) {
-        
         // Non-user section.
         this._vm = vm;
-        this._sandbox = sandbox;
+
+        if (isDebugMode(opts)) {
+            this._sandbox = Object.create(null);
+            vm.createContext(this._sandbox);
+        }
+
         // function (process,...){...}() prevents [this] to exist for the 'vm.runInNewContext()' method
         this._js = `
 (function (process, window, global, module, compilePage, compilePageSync, code, undefined) { 
@@ -136,21 +137,21 @@ module.exports = function (opts) {
         };
 
         this.section = function (name, required) {
+            if (!args.filePath)
+                throw new Error("'args.filePath' is not set.");
+
             let sec = sections[name];
 
             if (sec) {
                 if (sec.renderedBy)
-                    throw new Error(`The section '${name}' has already been rendered by '${sec.renderedBy}'.`); // TODO: InvalidOperationException: RenderSectionAsync invocation in '/Views/Shared/_LayoutYellow.cshtml' is invalid. The section 'Scripts' has already been rendered.
-
-                if (!args.filePath)
-                    throw new Error("'args.filePath' is not set.");
+                    throw args.er.sectionBeenRendered(name, sec.renderedBy, args.filePath);
 
                 sec.renderedBy = args.filePath;
                 return new HtmlString(sec.html);
             }
             else {
                 if (required)
-                    throw new Error(`The layout page cannot find the section '${name}'.`); // TODO: InvalidOperationException: The layout page '/Views/Shared/_Layout.cshtml' cannot find the section 'Test' in the content page '/Views/Home/Index.cshtml'.
+                    throw args.er.sectionIsNotFound(name, args.filePath);
 
                 return '';
             }
@@ -197,7 +198,7 @@ module.exports = function (opts) {
 
     function toScript(block, valuesQueue) {
         if (block.type === type.section) {
-            let secMarker = `\r\nHtml.__sec("${block.name}");\r\n`;
+            let secMarker = `\r\nHtml.__sec("${block.name}");`;
             let script = secMarker;
 
             for (let n = 0; n < block.blocks.length; n++) {
@@ -214,10 +215,10 @@ module.exports = function (opts) {
             switch (block.type) {
                 case type.html:
                     i = valuesQueue.enq(block.text);
-                    return "Html.raw(Html.__val(" + i + "));";
+                    return "\r\nHtml.raw(Html.__val(" + i + "));";
                 case type.expr:
                     i = valuesQueue.enq(block.text);
-                    return "Html.encode(eval(Html.__val(" + i + ")));";
+                    return "\r\nHtml.encode(eval(Html.__val(" + i + ")));";
                 case type.code:
                     return block.text;
                 default:
@@ -286,14 +287,14 @@ module.exports = function (opts) {
                 return Promise.resolve().then(() => done(exc)), null;
             }
 
-            compilePage(html, this.args.model, opts.debug || opts.env === "dev", done);
+            compilePage(html, this.args.model, isDebugMode(opts), done);
         }
 
         compileSync() {
             log.debug();
             var htmlArgs = {};
             var html = this.getHtml(htmlArgs);
-            compilePageSync(html, this.args.model, opts.debug || opts.env === "dev");
+            compilePageSync(html, this.args.model, isDebugMode(opts));
             return htmlArgs.html;
         }
 
@@ -322,6 +323,7 @@ module.exports = function (opts) {
                 html: '',
                 valuesQueue,
                 js,
+                er: this.er
                 //bodyHtml: this.args.bodyHtml,
                 //filePath: this.args.filePath,
                 //findPartial: this.args.findPartial,
@@ -980,7 +982,8 @@ module.exports = function (opts) {
             if (spaceCount < 1)
                 throw this.er.whiteSpaceExpectedAfter("@" + _sectionKeyword, this.lineNum, this.linePos()); // unreachable due to previous function check 
 
-            let sectionLine = this.lineNum, sectionNamePos = this.linePos();
+            //let sectionLine = this.lineNum; 
+            let sectionNamePos = this.linePos();
             let sectionName = '';
 
             // the section name is expected to be placed before '{' symbol or whitespace
@@ -1177,6 +1180,10 @@ module.exports = function (opts) {
             tagName += ch;
         }
         return tagName;
+    }
+
+    function isDebugMode(opts) {
+        return opts.debug || opts.mode === "dev";
     }
 
     ////////////////

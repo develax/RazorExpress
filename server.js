@@ -11,9 +11,9 @@ app.use(function (req, res, next) {
     next();
 });
 
-app.get('/', (rq, rs) => {
-    rs.render("./home/index", { message: "This is my first NodeJS Express View engine!" });
-});
+//app.get('/', (rq, rs) => {
+//    rs.render("./home/index", { message: "This is my first NodeJS Express View engine!" });
+//});
 
 app.get('/invalid', (rq, rs) => {
     rs.render("./home/invalid", { message: "This is my first NodeJS Express View engine!" });
@@ -23,12 +23,16 @@ app.get('/hidden', (rq, rs) => {
     rs.render("./home/hidden", { message: "This is my first NodeJS Express View engine!" });
 });
 
-//app.get('/', (rq, rs) => {
-//    rs.render("./sections/index", { header: "This is a HEADER", content: 'This is CONTENT.', footer: "This is FOOTER" });
-//});
+app.get('/', (rq, rs) => {
+    rs.render("./sections/index", { header: "This is a HEADER", content: 'This is CONTENT.', footer: "This is FOOTER" });
+});
 
 app.get('/sections/errors/requiredSectionNotFound', (rq, rs) => {
     rs.render("./sections/errors/requiredSectionNotFound", { });
+});
+
+app.get('/sections/errors/sectionBeenRendered', (rq, rs) => {
+    rs.render("./sections/errors/sectionBeenRendered", {});
 });
 
 process.on('unhandledRejection', error => {
@@ -48,7 +52,7 @@ function appErrorHandler(err, req, res, next) {
     var env = app.get('env');
 
     if (env !== "production" && err instanceof ParserError) {
-        var errorHtml = err.getFormatted();
+        var errorHtml = err.getHtml();
         res.status(500);
         res.send(errorHtml);
     }

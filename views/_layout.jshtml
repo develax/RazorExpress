@@ -17,7 +17,7 @@
         @Html.body()
         <hr />
         <footer>
-            @Html.partial("_text", Model.message)
+            <!--@Html.partial("_text", Model.message)-->
             <p>&copy; 2018 - @footer</p>
         </footer>
     </div>

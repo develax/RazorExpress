@@ -6,7 +6,6 @@
     const parser = require('../../core/parser')({ debug: false, env: "dev" });
     const er = new require('../../core/errors/errors');
 
-
     describe("INVALID INPUT ARGUMENTS", () => {
         it("should throw an exception if argument is not a string", () => {
             expect(() => parser.compileSync({})).to.throw(er.rawArgumentShouldBeString);
@@ -96,7 +95,7 @@
                 let c = cases[i];
                 it(c.name, () => {
                     if (c.expected) {
-                        let result = parser.compileSync({ jsHtml: c.template, model: c.model });
+                        let result = parser.compileSync({ jsHtml: c.template, model: c.model, filePath: c.name });
                         expect(c.expected).to.equal(result);
                     }
                     else {

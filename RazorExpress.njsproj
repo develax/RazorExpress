@@ -103,6 +103,12 @@
     <Content Include="views\sections\errors\requiredSectionNotFound.jshtml">
       <SubType>Code</SubType>
     </Content>
+    <Content Include="views\sections\errors\sectionBeenRendered.jshtml">
+      <SubType>Code</SubType>
+    </Content>
+    <Content Include="views\sections\errors\_part.jshtml">
+      <SubType>Code</SubType>
+    </Content>
     <Content Include="views\sections\index.jshtml">
       <SubType>Code</SubType>
     </Content>
