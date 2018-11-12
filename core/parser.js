@@ -382,6 +382,7 @@ module.exports = function (opts) {
                     }
                 }
                 else if (inQuotes) {
+                    if (tag) tag += ch;
                     if (textQuotes.indexOf(ch) !== -1) { // it could be closing text qoutes
                         if (quotes.length && quotes[quotes.length - 1] === ch) {
                             quotes.pop(); // collasping quotes..
@@ -392,6 +393,7 @@ module.exports = function (opts) {
                 else if (textQuotes.indexOf(ch) !== -1) { // it could be opening text qoutes
                     quotes.push(ch);
                     inQuotes = true;
+                    if (tag) tag += ch;
                 }
                 else if (ch === '-') {
                     if (tag.length > 1) { // at least '<!'
@@ -562,6 +564,7 @@ module.exports = function (opts) {
                     }
                 }
                 else if (quotes.length) { // In Quotes..
+                    if (tag) tag += ch;
                     // if in ".." (it's possible only inside the first tag or between tags)
                     if (textQuotes.indexOf(ch) !== -1) { // it could be the closing text qoutes
                         if (quotes[quotes.length - 1] === ch) {
@@ -570,6 +573,7 @@ module.exports = function (opts) {
                     }
                 }
                 else if (textQuotes.indexOf(ch) !== -1) { // Open Quotes..
+                    if (tag) tag += ch;
                     quotes.push(ch);
                 }
                 else if (ch === '-') {

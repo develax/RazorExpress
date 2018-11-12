@@ -415,6 +415,17 @@
             name: "Code 51",
             template: `@{<img>}`,
             expected: '<img>'
+        },
+        {
+            name: "Code 52",
+            template: `
+@{
+    <div style="background-color: yellow">
+        <div>
+    </div>
+}
+`,
+            error: `'<div style="background-color: yellow">' tag at line 3 pos 5 is missing mathing end tag: '    <div style="background-color: yellow">' <--`
         }
     ];
     module.exports = cases;

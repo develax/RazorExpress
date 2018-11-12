@@ -91,6 +91,15 @@
     }
 </div>`,
             error: "unexpected '@' character at line 4 pos 9."
+        },
+        {
+            name: "Invalid-HTML 10",
+            template: `
+<div style="background-color: yellow">
+    <div>
+</div>
+`,
+            error: `'<div style="background-color: yellow">' tag at line 2 pos 1 is missing mathing end tag: '<div style="background-color: yellow">' <--`
         }
     ];
 
