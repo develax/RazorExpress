@@ -47,7 +47,7 @@ module.exports = class ParserError extends Error {
 
                 if (typeof pos !== 'undefined' && pos < line.length) {
                     let start = htmlEncode(line.substring(0, pos));
-                    let one = htmlEncode(line.substring(pos, pos + len + 1));
+                    let one = htmlEncode(line.substring(pos, pos + len));
                     let end = htmlEncode(line.substring(pos + len + 1));
                     htmlLine = `<span>${start}</span><span class='highlight'>${one}</span><span>${end}</span>`;
                 }

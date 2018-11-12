@@ -54,7 +54,7 @@ class ParserErrorProcessor {
 
     missingMatchingStartTag(tag, line, pos, html) {
         var message = `'${tag}' tag at line ${line + 1} pos ${pos + 1} is missing mathing start tag: '${html}' <--`;
-        return new ParserError(message, this.jshtml, line, pos);
+        return new ParserError(message, this.jshtml, line, pos, tag.length);
     }
 
     missingMatchingEndTag(tag, line, pos, html) {
