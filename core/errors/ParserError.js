@@ -6,10 +6,10 @@
 /////////////////////////////////////////////////////////////////////////
 
 module.exports = class ParserError extends Error {
-    constructor(message, jshtml, line, pos) {
+    constructor(message, jshtml, line, pos, len) {
         super(message);
         this.name = this.constructor.name;
-        this.data = { message, jshtml, line, pos };
+        this.data = { message, jshtml, line, pos, len };
         Error.captureStackTrace(this, this.constructor);
     }
 
@@ -43,11 +43,12 @@ module.exports = class ParserError extends Error {
             if (this.data.line === i) {
                 highlight = "class='highlight'";
                 let pos = this.data.pos;
+                let len = this.data.len || 1;
 
                 if (typeof pos !== 'undefined' && pos < line.length) {
                     let start = htmlEncode(line.substring(0, pos));
-                    let one = htmlEncode(line[pos]);
-                    let end = htmlEncode(line.substring(pos + 1));
+                    let one = htmlEncode(line.substring(pos, pos + len + 1));
+                    let end = htmlEncode(line.substring(pos + len + 1));
                     htmlLine = `<span>${start}</span><span class='highlight'>${one}</span><span>${end}</span>`;
                 }
             }

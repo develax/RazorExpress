@@ -59,7 +59,7 @@ class ParserErrorProcessor {
 
     missingMatchingEndTag(tag, line, pos, html) {
         var message = `'${tag}' tag at line ${line + 1} pos ${pos + 1} is missing mathing end tag: '${html}' <--`;
-        return new ParserError(message, this.jshtml, line, pos);
+        return new ParserError(message, this.jshtml, line, pos, tag.length);
     }
 
     invalidExpressionChar(ch, line, pos, afterText) {
