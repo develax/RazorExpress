@@ -2,17 +2,33 @@
 
 module.exports = function (args) {
     args = args || {};
+    const ParserError = require('../core/errors/ParserError');
     const path = require('path');
     const app = require('express')();
+    const razor = require("../index");
 
-    require("../index").initEngine(app);
+    initEngine();
     var viewsPath = path.join(__dirname, args.views || '/views');
     app.set('views', viewsPath);
     // ^ In real app you can just write this: +
     // app.set('view engine', "jshtml"); 
     // instead of those 3 lines above.
 
-    const ParserError = require('../core/errors/ParserError');
+    function initEngine() {
+        const ext = "jshtml";
+        app.engine(ext, razor.__express);
+        //expressApp.set('views', './views'); // specify the views directory
+        app.set('view engine', ext);
+    }
+
+    // Parser call..
+    const parser = razor.parser(app.locals.env);
+    var html = parser.compileSync({ 
+        jsHtml: '<span>@(Model)</span>', 
+        model: "Hello World!"
+    });
+    console.log(html);
+
 
     // var cwd = process.cwd();
     // var tmp = require('os').tmpdir();

@@ -1,14 +1,30 @@
 {
   "name": "razor-express",
+  "description": "Razor-like syntax for templating views in Express framework by mixing HTML with JavaScript.",
   "version": "0.0.1",
   "author": {
     "name": "Sergey",
     "email": "develax@gmail.com",
     "url": "https://www.npmjs.com/package/razor-express"
   },
+  "keywords": [
+    "razor",
+    "engine",
+    "mvc",
+    "parser",
+    "template",
+    "express"
+  ],
+  "engines": {
+    "node": ">=10.10.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/DevelAx/RazorExpress"
+  },
   "scripts": {
     "test": "mocha ./test/**/*.test.js",
-    "wtest": "nodemon --exec \"npm test\""
+    "testmon": "nodemon --exec \"npm test\""
   },
   "dependencies": {
     "js-htmlencode": "^0.3.0"

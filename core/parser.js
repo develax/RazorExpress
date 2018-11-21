@@ -271,6 +271,7 @@ module.exports = function (opts) {
     ////////////////
     class Parser {
         constructor(args) {
+            args.filePath = args.filePath || "default";
             this.args = args;
             this.er = new ErrorsFactory({ filename: path.basename(args.filePath), jshtml: args.jsHtml });
         }
@@ -315,6 +316,7 @@ module.exports = function (opts) {
         }
 
         getHtml(htmlArgs) {
+
             let jshtml = this.args.jsHtml;
             var isString = Object.prototype.toString.call(jshtml) === "[object String]";
 
