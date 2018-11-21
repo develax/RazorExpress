@@ -5,7 +5,7 @@ When I just started to dive into the world of **Node.js** after years of working
 
 A quick example
 ===
-Let's first look at the simple example of **Razor markup**, which will allow you to form the first perception, and then we will dive into the details.
+Let's first look at the simple example of **Razor-Express markup**, which will allow you to form the first perception, and then we will dive into the details.
 
 In this example we will display all the days of the week and the title. To do this we will create the view markup and the model. 
 
@@ -17,7 +17,7 @@ const model = {
     days: ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday']
 };
 ```
-The **view** is just a HTML markup mixed with JavaScript syntax (exactly what is called *Razor-like markup*):
+The **view** is just a HTML markup mixed with JavaScript syntax (exactly what is called *Razor-like markup* or *Razor-Express*):
 ```HTML+Razor
 <h3>@Model.title</h3>
 <ul>
