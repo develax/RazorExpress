@@ -8,10 +8,10 @@
 
     describe("INVALID INPUT ARGUMENTS", () => {
         it("should throw an exception if argument is not a string", () => {
-            expect(() => parser.compileSync({})).to.throw(er.rawArgumentShouldBeString);
+            expect(() => parser.compileSync({})).to.throw(er.templateShouldBeString);
         });
         it("should return an empty string if the argument was an empty string", () => {
-            expect(parser.compileSync({ jsHtml: '', filePath: "Empty string test" })).to.be.empty;
+            expect(parser.compileSync({ template: '', filePath: "Empty string test" })).to.be.empty;
         });
     });
 
@@ -22,7 +22,7 @@
             for (let i = 0; i < cases.length; i++) {
                 let c = cases[i];
                 it(c.name, () => {
-                    let result = parser.compileSync({ jsHtml: c.template, filePath: c.name });
+                    let result = parser.compileSync({ template: c.template, filePath: c.name });
                     expect(result).to.equal(c.expected);
                 });
             }
@@ -34,7 +34,7 @@
             for (let i = 0; i < cases.length; i++) {
                 let c = cases[i];
                 it(c.name, () => {
-                    let result = () => parser.compileSync({ jsHtml: c.template, filePath: c.name });
+                    let result = () => parser.compileSync({ template: c.template, filePath: c.name });
                     expect(result).to.throw(c.error);
                 });
             }
@@ -48,7 +48,7 @@
             for (let i = 0; i < cases.length; i++) {
                 let c = cases[i];
                 it(c.name, () => {
-                    let result = parser.compileSync({ jsHtml: c.template, model: c.model, filePath: c.name });
+                    let result = parser.compileSync({ template: c.template, model: c.model, filePath: c.name });
                     expect(c.expected).to.equal(result);
                 });
             }
@@ -60,7 +60,7 @@
             for (let i = 0; i < cases.length; i++) {
                 let c = cases[i];
                 it(c.name, () => {
-                    let result = () => parser.compileSync({ jsHtml: c.template, filePath: c.name });
+                    let result = () => parser.compileSync({ template: c.template, filePath: c.name });
                     expect(result).to.throw(c.error);
                 });
             }
@@ -75,11 +75,11 @@
                 let c = cases[i];
                 it(c.name, () => {
                     if (typeof c.expected !== 'undefined') {
-                        let result = parser.compileSync({ jsHtml: c.template, model: c.model, filePath: c.name });
+                        let result = parser.compileSync({ template: c.template, model: c.model, filePath: c.name });
                         expect(c.expected).to.equal(result);
                     }
                     else {
-                        let result = () => parser.compileSync({ jsHtml: c.template, filePath: c.name });
+                        let result = () => parser.compileSync({ template: c.template, filePath: c.name });
                         expect(result).to.throw(c.error);
                     }
                 });
@@ -95,11 +95,11 @@
                 let c = cases[i];
                 it(c.name, () => {
                     if (c.expected) {
-                        let result = parser.compileSync({ jsHtml: c.template, model: c.model, filePath: c.name });
+                        let result = parser.compileSync({ template: c.template, model: c.model, filePath: c.name });
                         expect(c.expected).to.equal(result);
                     }
                     else {
-                        let result = () => parser.compileSync({ jsHtml: c.template, filePath: c.name });
+                        let result = () => parser.compileSync({ template: c.template, filePath: c.name });
                         expect(result).to.throw(c.error);
                     }
                 });
@@ -114,7 +114,7 @@
             for (let i = 0; i < cases.length; i++) {
                 let c = cases[i];
                 it(c.name, () => {
-                    let result = parser.compileSync({ jsHtml: c.template, model: c.model, filePath: c.name });
+                    let result = parser.compileSync({ template: c.template, model: c.model, filePath: c.name });
                     expect(c.expected).to.equal(result);
                 });
             }

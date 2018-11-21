@@ -165,7 +165,7 @@ class ParserErrorFactory {
     }
 }
 
-ParserErrorFactory.jshtmlShouldBeString = '[jshtml] argument should be a string';
+ParserErrorFactory.templateShouldBeString = 'The [template] argument should be a string.';
 
 function setInnerError(parserError, error){
     if (error.message)

@@ -43,7 +43,7 @@ module.exports = class Razor {
 
                 let parserArgs = {
                     filePath: filepath,
-                    jsHtml: viewStartsJsHtml + jsHtml,
+                    template: viewStartsJsHtml + jsHtml,
                     model: this.options,
                     findPartial: (layoutName, filePath, errorsFactory, done) => {
                         var startDir = path.dirname(filePath);

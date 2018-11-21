@@ -62,7 +62,7 @@ module.exports = function (opts) {
     delete Html._sandbox;
     ${args.js}
 }).call();`;
-        this._jshtml = args.jshtml;
+        this._jshtml = args.template;
         // User section.
         this.layout = null;
         // Private
@@ -81,7 +81,7 @@ module.exports = function (opts) {
             args.findPartial(this.layout, args.filePath, args.er, (err, result) => {
                 if (err) return done(err);
                 let compileOpt = {
-                    jsHtml: result.data,
+                    template: result.data,
                     filePath: result.filePath,
                     model: args.model,
                     bodyHtml: args.html,
@@ -159,7 +159,7 @@ module.exports = function (opts) {
             // https://expressjs.com/en/guide/error-handling.html
             let { data, filePath } = args.findPartialSync(viewName, args.filePath, args.er);
             let compileOpt = {
-                jsHtml: data,
+                template: data,
                 filePath,
                 model: viewModel || args.model, // if is not set explicitly, set default (parent) model
                 findPartial: args.findPartial,
@@ -273,11 +273,12 @@ module.exports = function (opts) {
         constructor(args) {
             args.filePath = args.filePath || "default";
             this.args = args;
-            this.er = new ErrorsFactory({ filename: path.basename(args.filePath), jshtml: args.jsHtml });
+            this.er = new ErrorsFactory({ filename: path.basename(args.filePath), jshtml: args.template });
         }
 
         compile(done) {
             log.debug();
+            let errorFactory = this.er;
 
             try {
                 var html = this.getHtml({}, done);
@@ -285,8 +286,6 @@ module.exports = function (opts) {
             catch (exc) {
                 return onError(exc);
             }
-
-            let errorFactory = this.er;
 
             compilePage(html, this.args.model, isDebugMode(opts), (err, html) => {
                 if (err) 
@@ -317,11 +316,11 @@ module.exports = function (opts) {
 
         getHtml(htmlArgs) {
 
-            let jshtml = this.args.jsHtml;
+            let jshtml = this.args.template;
             var isString = Object.prototype.toString.call(jshtml) === "[object String]";
 
             if (!isString)
-                throw new Error(this.er.jshtmlShouldBeString);
+                throw new Error(ErrorsFactory.templateShouldBeString);
 
             log.debug(`HTML = \`${jshtml}\``);
             this.text = jshtml, this.line = '', this.lineNum = 0, this.pos = 0, this.padding = '';
