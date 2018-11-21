@@ -49,7 +49,7 @@ Here's what we will see in the console:
     <li>Saturday</li>
 </ul>
 ```
-Try this [live example](https://runkit.com/develax/5bf574e98b71430012d4e641).
+You can also play with this [live example](https://runkit.com/develax/5bf574e98b71430012d4e641) on **runkit.com**.
 
 ----------------------
 DRAFT:
