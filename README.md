@@ -27,7 +27,7 @@ The **view** is just a HTML markup mixed with JavaScript syntax (exactly what is
 }
 </ul>
 ```
-How let's compile them together:
+How let's compile them together (the view markup is put into `template` variable as a string ):
 ```js
 const parser = require("razor-express").parser("dev");
 var html = parser.compileSync({ model, template });
@@ -49,7 +49,7 @@ Here's what we will see in the console:
     <li>Saturday</li>
 </ul>
 ```
-Also you can try this [live example](https://runkit.com/develax/5bf574e98b71430012d4e641).
+Try this [live example](https://runkit.com/develax/5bf574e98b71430012d4e641).
 
 ----------------------
 DRAFT:
