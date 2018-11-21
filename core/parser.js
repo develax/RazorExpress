@@ -1,27 +1,21 @@
-﻿'use strict';
+'use strict';
 
 require('./utils');
 
 function compilePageSync(Html, Model, debug) {
     //console.log("DEBUG = " + debug);
     'use strict';
-    var code = Html._js;
 
     if (debug) {
+        let jshtml = Html._jshtml;
         let sandbox = Html._sandbox;
         let vm = Html._vm;
         sandbox.Html = Html;
         sandbox.Model = Model;
-        vm.runInNewContext(code, sandbox);
+        vm.runInNewContext(Html._js, sandbox);
     }
     else {
-        try {
-            eval(code);
-        }
-        catch (exc) {
-            throw exc;  
-            //throw new Error(exc.message); // cut a useless stacktrace
-        }
+        eval(Html._js);
     }
 
     return;
@@ -33,14 +27,13 @@ function compilePage(Html, Model, debug, done) {
         return Html.__renderLayout(done);
     }
     catch (exc) {
-        return Promise.resolve().then(() => done(exc)), null;
+        done(exc);
     }
 }
 
-
 module.exports = function (opts) {
     opts = opts || {};
-    const log = require('./logger')({ on: opts.debug });
+    const log = require('./dbg/logger')({ on: opts.debug });
     log.debug(`Parse debug mode is '${!!opts.debug}'.`);
 
     const HtmlString = require('./HtmlString');
@@ -61,13 +54,15 @@ module.exports = function (opts) {
 
         // function (process,...){...}() prevents [this] to exist for the 'vm.runInNewContext()' method
         this._js = `
-(function (process, window, global, module, compilePage, compilePageSync, code, undefined) { 
+(function (process, window, global, module, compilePage, compilePageSync, undefined) { 
     'use strict';
     delete Html._js;
+    delete Html._jshtml;
     delete Html._vm;
     delete Html._sandbox;
     ${args.js}
 }).call();`;
+        this._jshtml = args.jshtml;
         // User section.
         this.layout = null;
         // Private
@@ -83,7 +78,7 @@ module.exports = function (opts) {
                 return Promise.resolve().then(() => done(null, args.html)), null;
 
             // looking for the `Layout`..
-            args.findPartial(this.layout, args.filePath, (err, result) => {
+            args.findPartial(this.layout, args.filePath, args.er, (err, result) => {
                 if (err) return done(err);
                 let compileOpt = {
                     jsHtml: result.data,
@@ -144,14 +139,14 @@ module.exports = function (opts) {
 
             if (sec) {
                 if (sec.renderedBy)
-                    throw args.er.sectionBeenRendered(name, sec.renderedBy, args.filePath);
+                    throw args.er.sectionBeenRendered(name, sec.renderedBy, args.filePath); // TESTME:
 
                 sec.renderedBy = args.filePath;
                 return new HtmlString(sec.html);
             }
             else {
                 if (required)
-                    throw args.er.sectionIsNotFound(name, args.filePath);
+                    throw args.er.sectionIsNotFound(name, args.filePath); // TESTME:
 
                 return '';
             }
@@ -162,7 +157,7 @@ module.exports = function (opts) {
         this.partial = function (viewName, viewModel) {
             // if an exception occurs it will be thron directly to to ExpressApp and shown on the users' page (fix later):
             // https://expressjs.com/en/guide/error-handling.html
-            let { data, filePath } = args.findPartialSync(viewName, args.filePath);
+            let { data, filePath } = args.findPartialSync(viewName, args.filePath, args.er);
             let compileOpt = {
                 jsHtml: data,
                 filePath,
@@ -265,7 +260,10 @@ module.exports = function (opts) {
     const _sectionKeyword = "section";
     //const _functionKeyword = "function";
     const type = { none: 0, html: 1, code: 2, expr: 3, section: 4 };
-    const ErrorsProcessor = require('./errors/errors');
+    
+    const ParserError = require('./errors/ParserError');
+    const ErrorsFactory = require('./errors/errors');
+    const path = require('path');
     const voidTags = "area|base|br|col|embed|hr|img|input|link|meta|param|source|track|wbr".toUpperCase().split("|").map(s => s.trim());
 
     ////////////////
@@ -274,7 +272,7 @@ module.exports = function (opts) {
     class Parser {
         constructor(args) {
             this.args = args;
-            this.er = new ErrorsProcessor({ jshtml: args.jsHtml });
+            this.er = new ErrorsFactory({ filename: path.basename(args.filePath), jshtml: args.jsHtml });
         }
 
         compile(done) {
@@ -284,30 +282,44 @@ module.exports = function (opts) {
                 var html = this.getHtml({}, done);
             }
             catch (exc) {
-                return Promise.resolve().then(() => done(exc)), null;
+                return onError(exc);
             }
 
-            compilePage(html, this.args.model, isDebugMode(opts), done);
+            let errorFactory = this.er;
+
+            compilePage(html, this.args.model, isDebugMode(opts), (err, html) => {
+                if (err) 
+                    return onError(err, this);
+
+                return done(null, html);
+            });
+
+            function onError(err) {
+                var parserError = toParserError(err, errorFactory);
+                return Promise.resolve().then(() => done(parserError)), null;
+            }
         }
 
         compileSync() {
-            log.debug();
-            var htmlArgs = {};
-            var html = this.getHtml(htmlArgs);
-            compilePageSync(html, this.args.model, isDebugMode(opts));
+            try {
+                log.debug();
+                var htmlArgs = {};
+                var html = this.getHtml(htmlArgs);
+                compilePageSync(html, this.args.model, isDebugMode(opts));
+            }
+            catch (exc) {
+                throw toParserError(exc, this.er);
+            }
+
             return htmlArgs.html;
         }
 
-        getHtml(htmlArgs, done) {
+        getHtml(htmlArgs) {
             let jshtml = this.args.jsHtml;
             var isString = Object.prototype.toString.call(jshtml) === "[object String]";
 
-            if (!isString) {
-                if (done)
-                    return Promise.resolve().then(() => done(this.er.jshtmlShouldBeString)), null;
-                else
-                    throw new Error(this.er.jshtmlShouldBeString);
-            }
+            if (!isString)
+                throw new Error(this.er.jshtmlShouldBeString);
 
             log.debug(`HTML = \`${jshtml}\``);
             this.text = jshtml, this.line = '', this.lineNum = 0, this.pos = 0, this.padding = '';
@@ -323,13 +335,8 @@ module.exports = function (opts) {
                 html: '',
                 valuesQueue,
                 js,
+                jshtml,
                 er: this.er
-                //bodyHtml: this.args.bodyHtml,
-                //filePath: this.args.filePath,
-                //findPartial: this.args.findPartial,
-                //findPartialSync: this.args.findPartialSync,
-                //sections: this.args.sections,
-                //parsedSections: this.args.parsedSections
             });
 
             Object.assign(htmlArgs, this.args);
@@ -1188,6 +1195,18 @@ module.exports = function (opts) {
 
     function isDebugMode(opts) {
         return opts.debug || opts.mode === "dev";
+    }
+
+    function toParserError(err, errorFactory) {
+        if (err instanceof ParserError)
+            return err;
+
+        let parserError = errorFactory.customError(err.message);
+
+        if (err.stack)
+            parserError.stack = err.stack;
+
+        return parserError;
     }
 
     ////////////////

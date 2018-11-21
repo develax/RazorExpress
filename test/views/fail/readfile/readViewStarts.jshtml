@@ -1,0 +1,3 @@
+<div>
+    For testing the failure of the `RazorViewFinder::readViewStarts()` method while reading a file. It should cause an error with `code !== 'ENOENT'`.
+</div>

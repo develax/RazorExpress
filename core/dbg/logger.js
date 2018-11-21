@@ -1,4 +1,4 @@
-﻿(function () {
+(function () {
     module.exports = function (opts) {
         opts = opts || {};
         var exp = {};

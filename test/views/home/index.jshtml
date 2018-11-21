@@ -1,0 +1,15 @@
+﻿@{
+	var title = 'My "Razor-Expess" Engine';
+    //Html.layout = "_layoutBlue123";
+}
+
+<div style="background-color: white">
+    <h1>@title</h1>
+    @{ Html.partial("_text", Model.message); }
+    @Html.partial("_text", Model.message)
+    <div>Start value: @start</div>
+</div>
+
+@section Test{
+    <div style="background-color: greenyellow">SECTION TEST</div>
+}

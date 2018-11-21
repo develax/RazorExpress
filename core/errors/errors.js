@@ -1,1 +1,1 @@
-﻿module.exports = require("./errors.en");
+module.exports = require("./errors.en");

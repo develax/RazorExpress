@@ -44,11 +44,10 @@
             name: "case 9 - `compilePageSync` object should be `undefined`",
             template: '<span>@compilePageSync</span>',
             expected: '<span></span>'
-        }
-        ,
+        },
         {
-            name: "case 10 - `code` object should be `undefined`",
-            template: '<span>@code</span>',
+            name: "case 10 - `Html._jshtml` should be `undefined`",
+            template: '<span>@Html._jshtml</span>',
             expected: '<span></span>'
         }
     ];

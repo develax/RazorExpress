@@ -1,4 +1,4 @@
-﻿////////////////////////////////////////////////
+////////////////////////////////////////////////
 // String
 ////////////////////////////////////////////////
 
@@ -18,7 +18,7 @@ String.isWhiteSpace = String.isWhiteSpace || function (str) {
     return str && str.trim().length === 0;
 };
 
-String.prototype.startsWithIgnoreCase = function (str, pos) {
+String.prototype.startsWithIC = String.prototype.startsWithIgnoreCase = function (str, pos) {
     pos = pos || 0;
 
     if (this.length - pos < str.length)
@@ -30,6 +30,36 @@ String.prototype.startsWithIgnoreCase = function (str, pos) {
 
     return true;
 };
+
+String.equal = function (s1, s2, ignoreCase, useLocale) {
+    if (s1 == null || s2 == null)
+        return false;
+
+    if (!ignoreCase) {
+        if (s1.length !== s2.length)
+            return false;
+
+        return s1 === s2;
+    }
+
+    if (useLocale) {
+        if (useLocale.length)
+            return s1.toLocaleLowerCase(useLocale) === s2.toLocaleLowerCase(useLocale)
+        else
+            return s1.toLocaleLowerCase() === s2.toLocaleLowerCase()
+    }
+    else {
+        if (s1.length !== s2.length)
+            return false;
+
+        return s1.toLowerCase() === s2.toLowerCase();
+    }
+}
+
+// If you don't mind extending the prototype.
+String.prototype.equal = function (string2, ignoreCase, useLocale) {
+    return String.equal(this.valueOf(), string2, ignoreCase, useLocale);
+}
 
 ////////////////////////////////////////////////
 // Char
