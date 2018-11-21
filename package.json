@@ -2,10 +2,12 @@
   "name": "razor-express",
   "version": "0.0.0",
   "author": {
-    "name": ""
+    "name": "Sergey",
+    "email": "develax@gmail.com",
+    "url": "https://www.npmjs.com/package/razor-express"
   },
   "scripts": {
-    "test": "mocha **/*.test.js",
+    "test": "mocha ./test/**/*.test.js",
     "wtest": "nodemon --exec \"npm test\""
   },
   "dependencies": {
