@@ -94,11 +94,12 @@ Node.js + Express example
 ---
 All the code is in the **server.js** file.
 ```js
-// Create Express app.
+// Create Express web server app.
 const app = require('express')();
 
 // Register the 'Razor' template engine and the default extesnion for the view-template files.
 // 'Express' will automatically find the Razor module (within the `node-modules` folder) using this extension. 
+// If you decide to skip registering the engine then you will have to explicitly specify the file extension in the route handler.
 app.set('view engine', "raz");
 
 // Create the route for the "Index.raz" view-template.
@@ -145,7 +146,6 @@ The **index.raz** view-template is pretty much the same as in the previous examp
     </ul>
   </body>
 </html>
-
 ```
 Now if you **run server.js** and open http://localhost:8080/ URL in the browser you will see the HTML page showing something like this:
 ___
