@@ -22,8 +22,7 @@ module.exports = function (args) {
     }
 
     // Parser call..
-    const parser = razor.parser(app.locals.env);
-    var html = parser.compileSync({ 
+    var html = razor.compileSync({ 
         template: '<span>@(Model)</span>', 
         model: "Hello World!"
     });
