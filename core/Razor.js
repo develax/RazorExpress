@@ -37,7 +37,7 @@ module.exports = class Razor {
             let currentDir = path.dirname(filepath);
             let jsHtml = this.addFileNameIfDev(data, filepath);
 
-            this.findViewStarts(currentDir, null, (err, viewStartsJsHtml) => {
+            this.findViewStarts(currentDir, '', (err, viewStartsJsHtml) => {
                 if (err)
                     return done(err);
 

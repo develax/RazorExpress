@@ -8,17 +8,19 @@ module.exports = {
     __express: renderFile,
     compileFile: renderFile,
     compile: getParser().compile,
-    compileSync: getParser().compileSync
+    compileSync: getParser().compileSync,
+    register: registerRazorEngine
 };
 
-const Razor = require('./core/Razor')
+const Razor = require('./core/Razor');
+var razor, parser;
 
 function renderFile(filepath, options, done) {
-    let razor = new Razor(options);
+    if (!razor)
+        razor = new Razor(options);
+
     razor.renderFile(filepath, done);
 }
-
-var parser;
 
 function getParser(){
     if (!parser){
@@ -26,4 +28,10 @@ function getParser(){
         parser = require('./core/parser')({ debug: false, mode: env });
     }
     return parser;
+}
+
+function registerRazorEngine(app) {
+    const ext = "raz";
+    app.engine(ext, renderFile);
+    app.set('view engine', ext);
 }

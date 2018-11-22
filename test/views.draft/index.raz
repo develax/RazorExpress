@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <title>@Model.title</title>
+  </head>
+  <body>
+    <h1>Razor-Express Example</h1>
+    <h2>@Model.title</h2>
+    <ul>
+    @for(var i = 0; i < Model.days.length; i++){
+        var day = Model.days[i];
+        <li>@day</li>
+    }
+    </ul>
+  </body>
+</html>
