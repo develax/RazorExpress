@@ -1,5 +1,5 @@
 # Razor-Express View Template Engine 
-**(it's still draft, don't use it)**
+**(draft)**
 
 
 When I just started to dive into the world of **Node.js** after years of working with [ASP.NET MVC](https://docs.microsoft.com/en-us/aspnet/core/mvc/overview) I couldn't find any **view template engine** that was as convenient, elegant, concise, and syntactically close to native HTML as [Razor](https://docs.microsoft.com/en-us/aspnet/core/mvc/views/layout). I may be exaggerating its merits and maybe it's all just a matter of habit, but I decided to try to create something similar for using in **Node.js** with **Express** library. I must say that I was able to find the closest to **Razor** supported library, but some points were quite different from **Razor** which I was used to and they just looked much less concise and convenient to me (like layouts and partial blocks, for example). So, let's proceed to the description of my creation... my first **JavaScript** creation actually.
@@ -88,8 +88,80 @@ Here's what we will see in the console:
     <li>Saturday</li>
 </ul>
 ```
-And here is the [playground](https://runkit.com/develax/5bf574e98b71430012d4e641) of this example.
+Here is the [playground](https://runkit.com/develax/5bf574e98b71430012d4e641) of this example.
 
+Node.js + Express example
+---
+All the code is in the **server.js** file.
+```js
+// Create Express app.
+const app = require('express')();
+
+// Register the 'Razor' template engine and the default extesnion for the view-template files.
+// 'Express' will automatically find the Razor module (within the `node-modules` folder) using this extension. 
+app.set('view engine', "raz");
+
+// Create the route for the "Index.raz" view-template.
+// Note that we do not specify the file extension explicitly in this route because we already did it when registering the engine.
+app.get('/', (req, res) => {
+    const model = {
+        title: "Names of the Days of the Week",
+        days: ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday']
+    };
+    res.render("./index", model);
+});
+
+// Express-app default port number.
+const port = process.env.PORT || 8080;
+
+// Starting Express-app.
+const server = app.listen(port, () => {
+    console.log("Server is up on port " + port);
+});
+
+// Catch Express-app errors.
+server.on('error', function (e) {
+    if (e.code === 'EADDRINUSE') {
+        console.error('Address is in use, stopped.');
+    }
+});
+```
+
+The **index.raz** view-template is pretty much the same as in the previous example except we have to add the basic HTML markup. Notice that the file has **'.raz'** extension which every Razor view template must have.
+```HTML+Razor
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <title>@Model.title</title>
+  </head>
+  <body>
+    <h2>@Model.title</h2>
+    <ul>
+    @for(var i = 0; i < Model.days.length; i++){
+        var day = Model.days[i];
+        <li>@day</li>
+    }
+    </ul>
+  </body>
+</html>
+
+```
+Now if you **run server.js** and open http://localhost:8080/ URL in the browser you will see the HTML page showing something like this:
+___
+> ### Names of the Days of the Week
+> * Sunday
+> * Monday
+> * Tuesday
+> * Wednesday
+> * Thursday
+> * Friday
+> * Saturday
+____
+
+:sparkles: *The Express server app with Razor template engine works!* :sparkles:
+
+The source code of this example is available in [RazorExpressExample](https://github.com/DevelAx/RazorExpressExample) repository.
 
 ----------------------
 DRAFT:
