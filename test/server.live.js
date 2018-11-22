@@ -34,10 +34,10 @@ module.exports = function (args) {
     // console.log(cwd);
     // console.log(tmp);
 
-    app.use(function (req, res, next) {
-        res.locals.req = req;
-        next();
-    });
+    // app.use(function (req, res, next) {
+    //     res.locals.req = req;
+    //     next();
+    // });
 
     app.get('/', (rq, rs) => {
         rs.render("./home/index", { message: "This is my first NodeJS Express View engine!" });
