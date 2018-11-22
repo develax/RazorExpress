@@ -127,7 +127,7 @@ server.on('error', function (e) {
 });
 ```
 
-The **index.raz** view-template is pretty much the same as in the previous example except we have to add some basic HTML markup. Notice that the file has **'.raz'** extension which every Razor view template must have.
+The **index.raz** view-template is pretty much the same as in the previous example except we have to add some basic HTML markup. Notice that the file has **'.raz'** extension which every Razor view template file must have.
 ```HTML+Razor
 <!DOCTYPE html>
 <html>
