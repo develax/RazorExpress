@@ -5,7 +5,7 @@ const initParser = require('./parser');
 const ErrorsFactory = require('./errors/errors');
 
 'use strict';
-const ext = "jshtml", viewStartName = '_viewStart';
+const ext = "raz", viewStartName = '_viewStart';
 const _eol_ = require('os').EOL;
 
 module.exports = class Razor {

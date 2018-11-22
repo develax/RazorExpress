@@ -11,11 +11,11 @@ module.exports = function (args) {
     var viewsPath = path.join(__dirname, args.views || '/views');
     app.set('views', viewsPath);
     // ^ In real app you can just write this: +
-    // app.set('view engine', "jshtml"); 
+    // app.set('view engine', "raz"); 
     // instead of those 3 lines above.
 
     function initEngine() {
-        const ext = "jshtml";
+        const ext = "raz";
         app.engine(ext, razor.__express);
         //expressApp.set('views', './views'); // specify the views directory
         app.set('view engine', ext);

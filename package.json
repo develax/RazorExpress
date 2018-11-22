@@ -1,13 +1,14 @@
 {
-  "name": "jshtml",
+  "name": "raz",
   "description": "Razor-like syntax for templating views in Express framework by mixing HTML with JavaScript.",
   "version": "0.0.5",
   "author": {
     "name": "Sergey",
     "email": "develax@gmail.com",
-    "url": "https://www.npmjs.com/package/razor-express"
+    "url": "https://www.npmjs.com/package/raz"
   },
   "keywords": [
+    "raz",
     "razor",
     "engine",
     "mvc",

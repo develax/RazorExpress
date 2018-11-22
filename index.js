@@ -3,7 +3,6 @@
 //const parser = require('./core/parser')({ debug: false, mode: "dev" });
 
 module.exports = {
-
     // https://expressjs.com/en/guide/using-template-engines.html
     // https://www.npmjs.com/package/hbs
     __express: renderFile,

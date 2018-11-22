@@ -56,10 +56,10 @@ function FsError(triggerFileName, errCode) {
 // TESTS 
 
 describe("Testing 'Razor' module.", () => {
-    let nonExistView = "_nonExisting.jshtml";
-    let viewIndex = "index.jshtml";
-    let viewStart = "_viewStart.jshtml";
-    //let partial = "_partial.jshtml";
+    let nonExistView = "_nonExisting.raz";
+    let viewIndex = "index.raz";
+    let viewStart = "_viewStart.raz";
+    //let partial = "_partial.raz";
 
 
     // [0] : Test `EACCES` error while reading view file.
@@ -138,14 +138,14 @@ describe("Testing 'Razor' module.", () => {
     // [2.3] : Test 'partialViewNotFound' error.
     {
         let method = Razor.prototype.findPartialSync.name;
-        let viewName = "partialViewNotFound.jshtml";
+        let viewName = "partialViewNotFound.raz";
         it(`[#2.3 Razor.${method} | ${viewName} ]`, (done) => {
             let viewPath = viewErrorPath(viewName);
             razor().renderFile(viewPath, (err, html) => {
                 expect(err).to.exist;
                 expect(html).not.to.exist;
                 expect(err).to.be.an.instanceOf(ParserError);
-                expect(err.message).to.have.string(`The view "${viewName}" cannot find the partial view "_partial.jshtml".`);
+                expect(err.message).to.have.string(`The view "${viewName}" cannot find the partial view "_partial.raz".`);
                 done();
             });
         });
@@ -153,8 +153,8 @@ describe("Testing 'Razor' module.", () => {
     // [2.3.1] : Test 'partialViewNotFound' error.
     {
         let method = Razor.prototype.findPartialSync.name;
-        let viewName = "errorReadingView.jshtml";
-        let errorView = "_partial.jshtml";
+        let viewName = "errorReadingView.raz";
+        let errorView = "_partial.raz";
         let errCode = "EACCES";
         it(`[#2.3.1 Razor.${method} | ${viewName} ]`, (done) => {
             let viewPath = viewErrorPath(viewName);
@@ -173,11 +173,11 @@ describe("Testing 'Razor' module.", () => {
             razor().renderFile(viewPath, (err, html) => {
                 expect(err).not.to.exist;
                 expect(html).to.exist;
-                expect(html, "[#2.4.1]").to.have.string('<div>/home/partials/_partial.jshtml</div>');
-                expect(html, "[#2.4.2]").to.have.string('<div>/home/partials/_partial-2.jshtml</div>');
-                expect(html, "[#2.4.3]").to.have.string('<div>/home/partials/_partial.html.jshtml</div>');
-                expect(html, "[#2.4.4]").to.have.string('<div>/home/_partial.jshtml</div>');
-                expect(html, "[#2.4.5]").to.have.string('<div>/home/_partial-2.jshtml</div>');
+                expect(html, "[#2.4.1]").to.have.string('<div>/home/partials/_partial.raz</div>');
+                expect(html, "[#2.4.2]").to.have.string('<div>/home/partials/_partial-2.raz</div>');
+                expect(html, "[#2.4.3]").to.have.string('<div>/home/partials/_partial.html.raz</div>');
+                expect(html, "[#2.4.4]").to.have.string('<div>/home/_partial.raz</div>');
+                expect(html, "[#2.4.5]").to.have.string('<div>/home/_partial-2.raz</div>');
                 done();
             });
         });
@@ -185,13 +185,13 @@ describe("Testing 'Razor' module.", () => {
     // [2.5] : Test 'findPartial' for '_layout' searching.
     {
         let method = Razor.prototype.findPartial.name;
-        let viewName = "findPartial_partialViewNotFound.jshtml";
+        let viewName = "findPartial_partialViewNotFound.raz";
         let layoutName = "_absentLayout";
         it(`[#2.5 Razor.${method} | ${viewName} ]`, (done) => {
             let viewPath = viewErrorPath(viewName);
             razor({ layout: layoutName }).renderFile(viewPath, (err, html) => {
                 expect(html).not.to.exist;
-                expectPartialViewNotFound(err, viewName, `${layoutName}.jshtml`, null);
+                expectPartialViewNotFound(err, viewName, `${layoutName}.raz`, null);
                 done();
             });
         });
@@ -200,9 +200,9 @@ describe("Testing 'Razor' module.", () => {
     // [2.5.1] : Test 'findPartial' for '_layout' searching.
     {
         let method = Razor.prototype.findPartial.name;
-        let viewName = "findPartial_partialViewNotFound.jshtml";
+        let viewName = "findPartial_partialViewNotFound.raz";
         let layoutName = "_absentLayout";
-        let errorView = `${layoutName}.jshtml`;
+        let errorView = `${layoutName}.raz`;
         let errCode = "EACCES";
         it(`[#2.5.1 Razor.${method} | ${viewName} ]`, (done) => {
             let viewPath = viewErrorPath(viewName);

@@ -2,13 +2,13 @@
 <h1>Home-Index</h1>
 <div>
     <!--[#2.4.1]-->
-    @Html.partial("/home/partials/_partial.jshtml")
+    @Html.partial("/home/partials/_partial.raz")
     <!--[#2.4.2]-->
     @Html.partial("/home/partials/_partial-2")
     <!--[#2.4.3]-->
-    @Html.partial("/home/partials/_partial.html.jshtml")
+    @Html.partial("/home/partials/_partial.html.raz")
     <!--[#2.4.4]-->
-    @Html.partial("_partial.jshtml")
+    @Html.partial("_partial.raz")
     <!--[#2.4.5]-->
     @Html.partial("./_partial-2")
 </div>

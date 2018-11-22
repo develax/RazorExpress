@@ -1,5 +1,0 @@
-<h1>partialViewNotFound.jshtml</h1>
-<div>
-    <!--[#2.3]-->
-    @Html.partial("./_partial.jshtml")
-</div>

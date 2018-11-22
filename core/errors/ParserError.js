@@ -133,7 +133,7 @@ module.exports = class ParserError extends Error {
 </head>
 <body>
     <h1>
-        An error occurred during the compilation of a 'jshtml' page required to process this request.
+        An error occurred during the compilation of a 'razor-syntax' page required to process this request.
     </h1>
     <div class="stack">${stack}</div>
     <hr />
