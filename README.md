@@ -171,7 +171,7 @@ ___
 > * Saturday
 ____
 
-:sparkles: *The Express server app with Razor template engine works!* :sparkles:
+*The Express server app with Razor template engine works!* :thumbsup:
 
 The source code of this example is available in [RazorExpressExample](https://github.com/DevelAx/RazorExpressExample) repository.
 
