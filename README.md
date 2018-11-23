@@ -2,7 +2,9 @@
 **(draft)**
 
 
-When I just started to dive into the world of **Node.js** after years of working with [ASP.NET MVC](https://docs.microsoft.com/en-us/aspnet/core/mvc/overview) I couldn't find any **view template engine** that was as convenient, elegant, concise, and syntactically close to native HTML as [Razor](https://docs.microsoft.com/en-us/aspnet/core/mvc/views/layout). I may be exaggerating its merits and maybe it's all just a matter of habit, but I decided to try to create something similar for using in **Node.js** with **Express** library. I must say that I was able to find the closest to **Razor** supported library, but some points were quite different from **Razor** which I was used to and they just looked much less concise and convenient to me (like layouts and partial blocks, for example). So, let's proceed to the description of my creation... my first **JavaScript** creation actually.
+When I just started to dive into the world of **Node.js** after years of working with [ASP.NET MVC](https://docs.microsoft.com/en-us/aspnet/core/mvc/overview) I couldn't find any **view template engine** that was as convenient, elegant, concise, and syntactically close to native HTML as [Razor](https://docs.microsoft.com/en-us/aspnet/core/mvc/views/layout). I may be exaggerating its merits and maybe it's all just a matter of habit, but I decided to try to create something similar for using in **Node.js** with **Express** library. The closest to **Razor** supported library I could found was [Vash](https://www.npmjs.com/package/vash), but some points of it were quite different from **Razor** which I was used to and they just looked much less concise and convenient to me (like layouts and partial blocks, for example). 
+
+Although I tried to make my library as close as possible to Razor there are certain differences that need to be taken into account. So, enough lyrics, let's get started look into my creation... it's my first JavaScript creation actually.
 
 Quick Start
 ===
@@ -10,7 +12,7 @@ Let's first quickly look at the key concepts and terms.
 
 What is View Template?
 ---
-In most cases when building an HTML page we want to display some data on it. To perform this task, we need the **data** itself and the **page template** (that defines the rules through a special markup language for displaying the data in HTML format). The page template is usually referred to simply as a **"view"** and the data is referred to as a **"view model"** or just **"model"**. So, this is what is usually called *"view templating"*. This consept is used for separating concerns within a web application (for more details [read this](https://docs.microsoft.com/en-us/aspnet/core/mvc/overview)).
+In most cases when building an HTML page we want to display some data on it (what else could it be?). To perform this task, we need the **data** itself and the **page template** (that defines the rules through a special markup language for displaying the data in HTML format). The page template is usually referred to simply as a **"view"** and the data is referred to as a **"view model"** or just **"model"**. So, this is what is usually called *"view templating"*. This consept is used for separating concerns within a web application (for more details [read this](https://docs.microsoft.com/en-us/aspnet/core/mvc/overview)).
 
 What is View Template Engine?
 ---
@@ -27,7 +29,7 @@ Examples
 
 Now when you've got the basic idea let's look at two simple examples of using *Razor-Express markup*, which allow you to form the first perception before going into details. 
 
-**The task:** to compile an HTML markup to display all the days of the week and the title. 
+**The goal** is to compile an HTML markup to display all the days of the week and the title. 
 
 To do this, we need to create a *model* and a *view* template.
 
