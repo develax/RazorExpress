@@ -5,6 +5,8 @@
 - [**Quick Start**](#quick-start)
   - [Node.js example](#nodejs-example)
   - [Express web-server example](#express-web-server-example)
+- [**Pitfalls**](#common-pitfalls)
+  - [Missing semicolon](#missing-semicolon)
 - [**Overview**](https://github.com/DevelAx/RazorExpress/blob/master/docs/overview.md)
   - [What is View Template](https://github.com/DevelAx/RazorExpress/blob/master/docs/overview.md#what-is-view-template)
   - [What is View Template Engine](https://github.com/DevelAx/RazorExpress/blob/master/docs/overview.md#what-is-view-template-engine)
@@ -168,8 +170,42 @@ ____
 
 The source code of this example is available in [RazorExpressExample](https://github.com/DevelAx/RazorExpressExample) repository.
 
-Common pitfalls
+:warning: Common pitfalls
 ===
+Missing semicolon
+---
+Some developers have a habit of not putting a semicolon at the end of a line of JavaScript code. This is a personal matter, although not considered good form. Be that as it may, when writing view-templates for Razor-Express, a **semicolon at the end of JavaScript expressions is strictly required!** If you do not follow this requirement, there may be cases when Razor won't be able to understand your instructions and will throw a pretty vague error. Let's take a look at one example.
 
+```JS
+////////////////////////////////////////////////
+//  Example of missing semicolon error in Razor-Express.
+//  https://www.npmjs.com/package/raz
+////////////////////////////////////////////////
+
+// Semicolon is missed at the end of the line of code "var text = i * i".
+const template = `
+<ul>
+@for(var i = 0; i < 10; i++){
+    var text = i * i
+    <li>@text</li>
+}
+</ul>`;
+
+const razor = require("raz")
+
+try{
+    var html = razor.compileSync({ template });
+}
+catch(err){
+    console.log(err);
+}
+```
+If you run this code you will get the error:
+> RazorError: **The code or section block is missing a closing "}" character.** Make sure you have a matching "}" character for all the "{" characters within this block, and that none of the "}" characters are being interpreted as markup. The block starts at line 3 with text: "@for(var i = 0; i < 10; i++){"
+
+[Test this example with RunKit.](https://runkit.com/develax/razor-pitfalls-semicolon)
+
+
+--------------------
 ## To be continued soon..
 > `layouts`, `partial views`, `sections` and `viewStarts` are implemented but haven't been documented yet.
