@@ -2,9 +2,9 @@
 **(draft)**
 
 
-When I just started to dive into the world of **Node.js** after years of working with [ASP.NET MVC](https://docs.microsoft.com/en-us/aspnet/core/mvc/overview) I couldn't find any **view template engine** that was as convenient, elegant, concise, and syntactically close to native HTML markup language as [Razor](https://docs.microsoft.com/en-us/aspnet/core/mvc/views/layout) was. To be more precise, *Razor markup is a hybrid of HTML markup and C# programming language*. And when it comes to code it's also syntactically close to the original C# language. So, this is exactly what I expected to see in the NodeJS world (except that it should be JavaScript instead of C#). 
+When I just started to dive into the world of *Node.js* after years of working with [ASP.NET MVC](https://docs.microsoft.com/en-us/aspnet/core/mvc/overview) I couldn't find any *view template engine* that was as convenient, elegant, concise, and syntactically close to native HTML markup language as [Razor](https://docs.microsoft.com/en-us/aspnet/core/mvc/views/layout) was. To be more precise, **ASP.NET MVC Razor markup is a hybrid of HTML markup and C# programming language**. And when it comes to code it's also syntactically close to the original C# language. So, this is exactly what I expected to see in the NodeJS world (except that it should be JavaScript instead of C#). 
 
-The closest to **Razor** currently supported library I could find was [Vash](https://www.npmjs.com/package/vash), but in some points, it was quite different from [ASP.NET MVC Razor syntax](https://docs.microsoft.com/en-us/aspnet/core/mvc/views/razor) which I was used to and it just looked much less concise and convenient to me (the concepts of layouts and partial blocks, for example). I may be exaggerating the merits of *ASP.NET MVC Razor* and maybe it's all just a matter of habit, but whatever it is I decided to create something more similar for using it with [ExpressJS](https://expressjs.com) library.
+The closest to *Razor* currently supported library I could find was [Vash](https://www.npmjs.com/package/vash), but in some points, it was quite different from [ASP.NET MVC Razor syntax](https://docs.microsoft.com/en-us/aspnet/core/mvc/views/razor) which I was used to and it just looked much less concise and convenient to me (the concepts of layouts and partial blocks, for example). I may be exaggerating the merits of *ASP.NET MVC Razor* and maybe it's all just a matter of habit, but whatever it is I decided to create something more similar for using it with [ExpressJS](https://expressjs.com) library.
 
 Although I tried to make my library as close as possible to Razor there are certain differences that need to be taken into account. So, enough lyrics, let's get started and look into my creation... it's my first JavaScript creation actually.
 
@@ -33,9 +33,9 @@ which is just a *JavaScript object*. And we want to get some HTML displaying the
 
 As you can see the **view-template** (or just **view**) is nothing more than *HTML markup mixed with JavaScript syntax*. This is exactly what Razor-Express syntax is [!].
 
-We'll take these two complents and "compile" them into pure HTML. 
+We'll take these two components and "compile" them into pure HTML.   
 
-**First**, we'll be doing this "compilation" without creating any web-server to keep things as simple as possible. It can be done either in Node.js environment or in just the browser JavaScript. To do this we will declare two variables `model` and `tempate`:
+**First**, we'll be doing this "compilation" without creating any web-server to keep things as simple as possible. It can be done either in Node.js environment or in just the browser JavaScript. To do this we will declare two variables `model` and `template`:
 
 ```JS
 const model = {
@@ -78,7 +78,8 @@ Here's what we can see in the console:
     <li>Saturday</li>
 </ul>
 ```
-Here is the [playground](https://runkit.com/develax/5bf574e98b71430012d4e641) of this example.
+That's all! Isn't it simple?
+If you'd like to see all the parts working together here is the [playground](https://runkit.com/develax/5bf574e98b71430012d4e641) of it.
 
 Node.js + Express example
 ---
