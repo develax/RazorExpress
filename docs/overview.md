@@ -1,6 +1,6 @@
 # The overview of Razor-Express view template engine
 
-Let's first quickly look at the key concepts and terms.
+Let's quickly look at the key concepts and terms.
 
 What is View Template?
 ---
