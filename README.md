@@ -141,7 +141,7 @@ server.on('error', function (e) {
   </body>
 </html>
 ```
-Now you can just **run server.js** and open http://localhost:8080/ URL in the browser you will see the HTML page showing something like this:
+Now you if run **node server.js** command in console/terminal and open http://localhost:8080/ URL in your browser you will see the HTML page showing something like this:
 ___
 > ### Names of the Days of the Week
 > * Sunday
