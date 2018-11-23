@@ -183,7 +183,7 @@ The source code of this example is available in [RazorExpressExample](https://gi
 ===
 Missing semicolon
 ---
-Some developers have a habit of not putting a semicolon at the end of JavaScript code lines. This is a personal matter of course, although not considered good form. **As for JavaScript in the Razor-Express engine, a semicolon at the end of JavaScript expressions is strictly required!** If you do not follow this requirement, there may be cases when Razor isn't able to understand your instructions and throws a pretty vague error. Let's take a look at this example.
+Some developers have a habit of not putting a semicolon at the end of JavaScript code lines. This is a personal matter of course, although not considered good form. **As for JavaScript in the Razor-Express engine templates, a semicolon at the end of JavaScript expressions is strictly required!** If you do not follow this requirement, there may be cases when Razor isn't able to understand your instructions and throws a pretty vague error. Let's take a look at this example.
 
 ```JS
 // Semicolon is missed at the end of the line of code "var text = i * i".
