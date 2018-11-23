@@ -51,6 +51,7 @@ const template = `
 ...which are pretty much self-explained as we remember what our two components are. Next, we have to compile them together using Razor-Express library to get the expected HTML:
 
 ```JS
+// This code is meant for Node.js 
 const razor = require("raz");
 var html = razor.compileSync({ model, template });
 ```
