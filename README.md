@@ -156,3 +156,6 @@ ____
 :sparkles: *The Express server app with Razor template engine works!* :sparkles:
 
 The source code of this example is available in [RazorExpressExample](https://github.com/DevelAx/RazorExpressExample) repository.
+
+## To be continued soon..
+> `layouts`, `partial views`, `sections` and `viewStarts` are implemented but haven't been documented yet.
