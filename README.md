@@ -8,39 +8,17 @@ Although I tried to make my library as close as possible to Razor there are cert
 
 Quick Start
 ===
-Let's first quickly look at the key concepts and terms.
 
-What is View Template?
----
-In most cases when building an HTML page we want to display some data on it (what else could it be?). To perform this task, we need the **data** itself and the **page template** (that defines the rules through a special markup language for displaying the data in HTML format). The page template is usually referred to simply as a **"view"** and the data is referred to as a **"view model"** or just **"model"**. So, this is what is usually called *"view templating"*. This consept is used for separating concerns within a web application (for more details [read this](https://docs.microsoft.com/en-us/aspnet/core/mvc/overview)).
+Assuming that you are already familiar with [the basic idea](https://github.com/DevelAx/RazorExpress/blob/master/docs/overview.md#the-overview-of-razor-express) let's look at a simple example. 
 
-What is View Template Engine?
----
-A **template engine** allows you to create HTML pages based on the model data and the view template. In other words the engine can understand the view template markup laguage and it also knows how to apply your model data to it to get the HTML page you need.
-
-What is Razor-Express
----
-**Razor-Express** is a view template engine which can understand *Razor-like markup language* syntax. Razor-Express is intended to be used with the [Express library](https://expressjs.com/) but it also can be used with any other library or purpose.
-
-> To get more about using template engines with Express read [their guide](https://expressjs.com/en/guide/using-template-engines.html).
-
-Examples
----
-
-Now when you've got the basic idea let's look at two simple examples of using *Razor-Express markup*, which allow you to form the first perception before going into details. 
-
-**The goal** is to compile an HTML markup to display all the days of the week and the title. 
-
-To do this, we need to create a *model* and a *view* template.
-
-The **model** is just a JavaScript object:
+Our **first component** is a **model**:
 ```js
 {
     title: "Names of the Days of the Week",
     days: ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday']
 };
 ```
-The **view** is the HTML markup mixed with JavaScript syntax (more in the Razor-Express syntax paragraph [!]):
+which is just a *JavaScript object*. And we want to get some HTML displaying the data of this model in some simple way. Later we might want to change the model data and still get the same HTML structure to display it. So, we need our **second component** which is called **view-template**:
 ```HTML+Razor
 <h3>@Model.title</h3>
 <ul>
@@ -50,13 +28,12 @@ The **view** is the HTML markup mixed with JavaScript syntax (more in the Razor-
 }
 </ul>
 ```
-We are going to perform this task in two ways. 
-* The first, we will use Razor-Express alone in the Node.js environment to compile HTML just as a string. 
-* The second, we will use it with the Express library to create a simple web-server.
 
-Node.js example
----
-```js
+As you can see the **view-template** (or just **view**) actually is just the *HTML markup mixed with JavaScript syntax*. This is exactly what Razor-Express syntax is [!].
+
+**First**, we'll do this "compilation" without creating any web-server to keep things as simple as possible. It can be done either in Node.js environment or in just the browser JavaScript. To do this we will declare two variables `model` and `tempate`:
+
+```JS
 const model = {
     title: "Names of the Days of the Week",
     days: ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday']
@@ -70,15 +47,21 @@ const template = `
     <li>@day</li>
 }
 </ul>`;
+```
+...which are pretty much self-explained as we remember what our two components are. Next, we have to compile them together using Razor-Express library to get the expected HTML:
 
-const razor = require("razor-express");
+```JS
+const razor = require("raz");
 var html = razor.compileSync({ model, template });
+```
 
-// Output the `html` variable value to see the result.
+Now let's display it in the console to make sure our expectations are fully met.
+
+```JS
 console.log(html);
 ```
-Here's what we will see in the console:
-```html
+Here's what we can see in the console:
+```HTML
 <h3>Names of the Days of the Week</h3>
 <ul>
     <li>Sunday</li>
