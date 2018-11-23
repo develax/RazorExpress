@@ -6,7 +6,7 @@ When I just started to dive into the world of **Node.js** after years of working
 
 The closest to **Razor** currently supported library I could find was [Vash](https://www.npmjs.com/package/vash), but in some points it was quite different from [ASP.NET MVC Razor syntax](https://docs.microsoft.com/en-us/aspnet/core/mvc/views/razor) which I was used to and it just looked much less concise and convenient to me (the concepts of layouts and partial blocks, for example). I may be exaggerating the merits of *ASP.NET MVC Razor* and maybe it's all just a matter of habit, but whatever it is I decided to create something more similar for using it with [ExpressJS](https://expressjs.com) library.
 
-Although I tried to make my library as close as possible to Razor there are certain differences that need to be taken into account. So, enough lyrics, let's get started look into my creation... it's my first JavaScript creation actually.
+Although I tried to make my library as close as possible to Razor there are certain differences that need to be taken into account. So, enough lyrics, let's get started and look into my creation... it's my first JavaScript creation actually.
 
 Quick Start
 ===
