@@ -1,4 +1,4 @@
-# The overview of Razor-Express engine
+# The overview of Razor-Express view template engine
 
 Let's first quickly look at the key concepts and terms.
 
