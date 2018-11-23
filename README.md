@@ -184,11 +184,6 @@ Missing semicolon
 Some developers have a habit of not putting a semicolon at the end of JavaScript code lines. This is a personal matter of course, although not considered good form. Be that as it may, when writing view-templates for Razor-Express, a **semicolon at the end of JavaScript expressions is strictly required!** If you do not follow this requirement, there may be cases when Razor isn't able to understand your instructions and throws a pretty vague error. Let's take a look at this example.
 
 ```JS
-////////////////////////////////////////////////
-//  Example of missing semicolon error in Razor-Express.
-//  https://www.npmjs.com/package/raz
-////////////////////////////////////////////////
-
 // Semicolon is missed at the end of the line of code "var text = i * i".
 const template = `
 <ul>
