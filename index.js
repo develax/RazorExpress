@@ -9,10 +9,12 @@ module.exports = {
     compileFile: renderFile,
     compile: getParser().compile,
     compileSync: getParser().compileSync,
-    register: registerRazorEngine
+    register: registerRazorEngine,
+    handleErrors: handleErrors
 };
 
 const Razor = require('./core/Razor');
+const RazorError = require('./core/errors/RazorError');
 var razor, parser;
 
 function renderFile(filepath, options, done) {
@@ -35,3 +37,24 @@ function registerRazorEngine(app) {
     app.engine(ext, renderFile);
     app.set('view engine', ext);
 }
+
+function handleErrors(app, errorCode){
+    app.use(appErrorHandler);
+
+    function appErrorHandler(err, req, res, next) {
+        if (res.headersSent)
+            return next(err); // must
+    
+        var env = app.get('env');
+    
+        if (env === "dev" && err instanceof RazorError) {
+            var errorHtml = err.html();
+            res.status(errorCode || 500);
+            res.send(errorHtml);
+            return;
+        }
+        
+        return next(err);
+    }
+}
+

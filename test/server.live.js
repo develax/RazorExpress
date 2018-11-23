@@ -2,33 +2,18 @@
 
 module.exports = function (args) {
     args = args || {};
-    const RazorError = require('../core/errors/RazorError');
     const path = require('path');
     const app = require('express')();
-    
+
     const razor = require("../index");
     razor.register(app);
+    
 
     var viewsPath = path.join(__dirname, args.views || '/views');
     app.set('views', viewsPath);
     // ^ In real app you can just write this: +
     // app.set('view engine', "raz"); 
     // instead of those 3 lines above.
-
-
-
-    // Parser call..
-    var html = razor.compileSync({ 
-        template: '<span>@(Model)</span>', 
-        model: "Hello World!"
-    });
-    console.log(html);
-
-
-    // var cwd = process.cwd();
-    // var tmp = require('os').tmpdir();
-    // console.log(cwd);
-    // console.log(tmp);
 
     // app.use(function (req, res, next) {
     //     res.locals.req = req;
@@ -52,7 +37,6 @@ module.exports = function (args) {
         rs.render(routePath, {});
     });
 
-
     // app.get('/', (rq, rs) => {
     //     rs.render("./sections/index", { header: "This is a HEADER", content: 'This is CONTENT.', footer: "This is FOOTER" });
     // });
@@ -73,28 +57,7 @@ module.exports = function (args) {
     //    rs.render("./test/index", { message: "This is my first NodeJS Express View engine!" });
     //});
 
-    app.use(appErrorHandler);
-
-    function appErrorHandler(err, req, res, next) {
-        if (res.headersSent)
-            return next(err); // must
-
-        var env = app.get('env');
-
-        if (env !== "production" && err instanceof RazorError) {
-            var errorHtml = err.getHtml();
-            res.status(500);
-            res.send(errorHtml);
-        }
-        else {
-            return next(err);
-        }
-
-
-        //res.status(500);
-        //res.render('error', { error: err });
-    }
-
+    razor.handleErrors(app);
     const port = process.env.PORT || 1337;
 
     return {

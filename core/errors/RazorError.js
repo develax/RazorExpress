@@ -15,7 +15,7 @@ module.exports = class RazorError extends Error {
         Error.captureStackTrace(this, this.constructor);
     }
 
-    getHtml() {
+    html() {
         let mainInfo = '';
         let lines = this.stack.split('\n');
         let stack = '<div>';
@@ -133,7 +133,7 @@ module.exports = class RazorError extends Error {
 </head>
 <body>
     <h1>
-        An error occurred during the compilation of a 'razor-syntax' page required to process this request.
+        A template compilation error occured
     </h1>
     <div class="stack">${stack}</div>
     <hr />
