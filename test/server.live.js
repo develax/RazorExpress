@@ -2,7 +2,7 @@
 
 module.exports = function (args) {
     args = args || {};
-    const ParserError = require('../core/errors/ParserError');
+    const RazorError = require('../core/errors/RazorError');
     const path = require('path');
     const app = require('express')();
     
@@ -81,7 +81,7 @@ module.exports = function (args) {
 
         var env = app.get('env');
 
-        if (env !== "production" && err instanceof ParserError) {
+        if (env !== "production" && err instanceof RazorError) {
             var errorHtml = err.getHtml();
             res.status(500);
             res.send(errorHtml);

@@ -7,7 +7,7 @@ const htmlEncode = require('js-htmlencode');
 
 const regex = /.*Error:/;
 
-module.exports = class ParserError extends Error {
+module.exports = class RazorError extends Error {
     constructor(message, source, line, pos, len) {
         super(message);
         this.name = this.constructor.name;

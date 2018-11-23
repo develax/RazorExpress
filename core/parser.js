@@ -261,7 +261,7 @@ module.exports = function (opts) {
     //const _functionKeyword = "function";
     const type = { none: 0, html: 1, code: 2, expr: 3, section: 4 };
     
-    const ParserError = require('./errors/ParserError');
+    const RazorError = require('./errors/RazorError');
     const ErrorsFactory = require('./errors/errors');
     const path = require('path');
     const voidTags = "area|base|br|col|embed|hr|img|input|link|meta|param|source|track|wbr".toUpperCase().split("|").map(s => s.trim());
@@ -1199,7 +1199,7 @@ module.exports = function (opts) {
     }
 
     function toParserError(err, errorFactory) {
-        if (err instanceof ParserError)
+        if (err instanceof RazorError)
             return err;
 
         let parserError = errorFactory.customError(err.message);

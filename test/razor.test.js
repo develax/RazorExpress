@@ -13,7 +13,7 @@ const fs = require('fs');
 
 
 const Razor = require("../core/Razor");
-const ParserError = require('../core/errors/ParserError');
+const RazorError = require('../core/errors/RazorError');
 //const ErrorFactory = require('../core/errors/errors');
 
 const locals = server.locals;
@@ -144,7 +144,7 @@ describe("Testing 'Razor' module.", () => {
             razor().renderFile(viewPath, (err, html) => {
                 expect(err).to.exist;
                 expect(html).not.to.exist;
-                expect(err).to.be.an.instanceOf(ParserError);
+                expect(err).to.be.an.instanceOf(RazorError);
                 expect(err.message).to.have.string(`The view "${viewName}" cannot find the partial view "_partial.raz".`);
                 done();
             });
@@ -216,7 +216,7 @@ describe("Testing 'Razor' module.", () => {
 
     function expectError(err, errorViewName, method, errCode) {
         expect(err).to.exist;
-        expect(err).to.be.an.instanceOf(ParserError);
+        expect(err).to.be.an.instanceOf(RazorError);
         expect(err.inner).to.exist;
         expect(err.inner.code).to.equal(errCode);
         expect(err.inner.stack).to.have.string(`at Razor.${method} `);
@@ -225,7 +225,7 @@ describe("Testing 'Razor' module.", () => {
 
     function expectPartialViewNotFound(err, errorView, partialView, method) {
         expect(err).to.exist;
-        expect(err).to.be.an.instanceOf(ParserError);
+        expect(err).to.be.an.instanceOf(RazorError);
 
         if (method)
             expect(err.stack).to.have.string(`at Razor.${method} `);
