@@ -11,7 +11,7 @@ Although I tried to make my library as close as possible to Razor there are cert
 Quick Start
 ===
 
-Assuming that you are already familiar with [the basic idea](https://github.com/DevelAx/RazorExpress/blob/master/docs/overview.md#the-overview-of-razor-express) let's look at a simple example. 
+Assuming that you are already familiar with the [basic idea](https://github.com/DevelAx/RazorExpress/blob/master/docs/overview.md#the-overview-of-razor-express) let's look at a simple example. 
 
 Our **first component** is a **model**:
 ```js
@@ -141,7 +141,7 @@ server.on('error', function (e) {
   </body>
 </html>
 ```
-Now you if run **node server.js** command in console/terminal and open http://localhost:8080/ URL in your browser you will see the HTML page showing something like this:
+Now you if run the '**node server.js**' command in console (or terminal) and open http://localhost:8080/ URL in your browser you will see the HTML page showing something like this:
 ___
 > ### Names of the Days of the Week
 > * Sunday
