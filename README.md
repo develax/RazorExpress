@@ -33,9 +33,11 @@ which is just a *JavaScript object*. And we want to get some HTML displaying the
 
 As you can see the **view-template** (or just **view**) is nothing more than *HTML markup mixed with JavaScript syntax*. This is exactly what Razor-Express syntax is [!].
 
-We'll take these two components and "compile" them into pure HTML.   
+Now we are going to take these two components and "compile" them into pure HTML.   
 
-**First**, we'll be doing this "compilation" without creating any web-server to keep things as simple as possible. It can be done either in Node.js environment or in just the browser JavaScript. To do this we will declare two variables `model` and `template`:
+Node.js example
+---
+First, we'll be doing this "compilation" without creating any web-server to keep things as simple as possible. It can be done either in Node.js environment or in just the browser JavaScript. To do this we will declare two variables `model` and `template`:
 
 ```JS
 const model = {
@@ -52,7 +54,7 @@ const template = `
 }
 </ul>`;
 ```
-...which are pretty much self-explained as we remember what our two components are. Next, we have to compile them together using Razor-Express library to get the expected HTML:
+...which are pretty much self-explained as we remember what our two components are. Next, we have to compile them together using Razor-Express library to get the expected HTML.
 
 ```JS
 // This code is meant for Node.js 
@@ -79,11 +81,12 @@ Here's what we can see in the console:
 </ul>
 ```
 That's all! Isn't it simple?
-If you'd like to see all the parts working together here is the [playground](https://runkit.com/develax/5bf574e98b71430012d4e641) of it.
 
-Node.js + Express example
+If you'd like to see all these parts working together here is the [playground](https://runkit.com/develax/5bf574e98b71430012d4e641) of it.
+
+Express web-server example
 ---
-All the code is in the **server.js** file.
+**server.js** file with comments:
 ```js
 // Create Express web server app.
 const app = require('express')();
@@ -119,7 +122,7 @@ server.on('error', function (e) {
 });
 ```
 
-The **index.raz** view-template is pretty much the same as in the previous example except we have to add some basic HTML markup. Notice that the file has **'.raz'** extension which every Razor view template file must have.
+**index.raz** file is just a *view-template* which is pretty much the same as in the previous example except we have to add some basic HTML markup. We put this file into the *"views"* folder which is a default folder for the Express app. Notice that the file has **'.raz'** extension which every Razor *view* file must have.
 ```HTML+Razor
 <!DOCTYPE html>
 <html>
@@ -138,7 +141,7 @@ The **index.raz** view-template is pretty much the same as in the previous examp
   </body>
 </html>
 ```
-Now if you **run server.js** and open http://localhost:8080/ URL in the browser you will see the HTML page showing something like this:
+Now you can just **run server.js** and open http://localhost:8080/ URL in the browser you will see the HTML page showing something like this:
 ___
 > ### Names of the Days of the Week
 > * Sunday
@@ -153,14 +156,3 @@ ____
 :sparkles: *The Express server app with Razor template engine works!* :sparkles:
 
 The source code of this example is available in [RazorExpressExample](https://github.com/DevelAx/RazorExpressExample) repository.
-
-----------------------
-DRAFT:
-----------------------
-* `Html.layout` is optional.
-* `Html.body` is optional.
-* `Html.section` can be called from the `Layout`and any other `View`.
-* `@section {...}` can be declared in any `View` including partial views.
-
-* Run tests: npm run testmon
-*     "start": "node ./test/server.live.js",
