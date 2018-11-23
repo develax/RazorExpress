@@ -29,7 +29,7 @@ which is just a *JavaScript object*. And we want to get some HTML displaying the
 </ul>
 ```
 
-As you can see the **view-template** (or just **view**) actually is just the *HTML markup mixed with JavaScript syntax*. This is exactly what Razor-Express syntax is [!].
+As you can see the **view-template** (or just **view**) is just the *HTML markup mixed with JavaScript syntax*. This is exactly what Razor-Express syntax is [!].
 
 **First**, we'll do this "compilation" without creating any web-server to keep things as simple as possible. It can be done either in Node.js environment or in just the browser JavaScript. To do this we will declare two variables `model` and `tempate`:
 
