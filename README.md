@@ -1,6 +1,17 @@
-# Razor-Express View Template Engine 
+# Razor-Express View Template Engine (raz)
 **(draft)**
 
+- [**Intro**](#intro)
+- [**Quick Start**](#quick-start)
+  - [Node.js example](#nodejs-example)
+  - [Express web-server example](#express-web-server-example)
+- [**Overview**](https://github.com/DevelAx/RazorExpress/blob/master/docs/overview.md)
+  - [What is View Template](https://github.com/DevelAx/RazorExpress/blob/master/docs/overview.md#what-is-view-template)
+  - [What is View Template Engine](https://github.com/DevelAx/RazorExpress/blob/master/docs/overview.md#what-is-view-template-engine)
+  - [What is Razor-Express](https://github.com/DevelAx/RazorExpress/blob/master/docs/overview.md#what-is-razor-express)
+
+Intro
+===
 
 When I just started to dive into the world of *Node.js* after years of working with [ASP.NET MVC](https://docs.microsoft.com/en-us/aspnet/core/mvc/overview) I couldn't find any *view template engine* that was as convenient, elegant, concise, and syntactically close to native HTML markup language as [Razor](https://docs.microsoft.com/en-us/aspnet/core/mvc/views/layout) was. To be more precise, **ASP.NET MVC Razor markup is a hybrid of HTML markup and C# programming language**. And when it comes to code it's also syntactically close to the original C# language. So, this is exactly what I expected to see in the NodeJS world (except that it should be JavaScript instead of C#). 
 
@@ -82,7 +93,7 @@ Here's what we can see in the console:
 ```
 That's all! Isn't it simple?
 
-If you'd like to see all these parts working together here is the [playground](https://runkit.com/develax/5bf574e98b71430012d4e641) of it.
+If you'd like to see all these parts working together here is the [playground](https://runkit.com/develax/razor-quick-example) of it.
 
 Express web-server example
 ---
@@ -156,6 +167,9 @@ ____
 :sparkles: *The Express server app with Razor template engine works!* :sparkles:
 
 The source code of this example is available in [RazorExpressExample](https://github.com/DevelAx/RazorExpressExample) repository.
+
+Common pitfalls
+===
 
 ## To be continued soon..
 > `layouts`, `partial views`, `sections` and `viewStarts` are implemented but haven't been documented yet.
