@@ -1,7 +1,7 @@
 # Errors handling in Razor-Express
 
 Let's consider a minimum example of the Express web-server application which tries to render a view with incorrect HTML. 
-> This exapmle is included into the [RazorExpressExamples](https://github.com/DevelAx/RazorExpressExamples) repository as `error-handling-1.js`.
+> This exapmle is included into the [RazorExpressExamples](https://github.com/DevelAx/RazorExpressExamples) repository as [error-handling-1.js](https://github.com/DevelAx/RazorExpressExamples/blob/master/error-handling-2.js).
 
 **Express web-server:**
 ```JS
@@ -73,4 +73,4 @@ function appErrorHandler(err, req, res, next) {
     return next(err);
 }
 ```
-The working example is located in the same [RazorExpressExamples](https://github.com/DevelAx/RazorExpressExamples) repository in the `error-handling-2.js` file.
+The working example is located in the same [RazorExpressExamples](https://github.com/DevelAx/RazorExpressExamples) repository in the [error-handling-2.js](https://github.com/DevelAx/RazorExpressExamples/blob/master/error-handling-1.js) file.
