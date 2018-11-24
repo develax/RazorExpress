@@ -62,21 +62,22 @@ module.exports = function (args) {
 
     return {
         app,
-        startServer() {
-            var server = app.listen(port, (e, b, c) => {
-                console.log("Server is up on port " + port);
-            });
-            server.on('error', function (e) {
-                if (e.code === 'EADDRINUSE') {
-                    console.log('Address in use, retrying...');
-                    setTimeout(() => {
-                        server.close();
-                        startServer();
-                    }, 3000);
-                }
-            });
-        }
+        startServer
     }
 
+    function startServer() {
+        var server = app.listen(port, (e, b, c) => {
+            console.log("Server is up on port " + port);
+        });
+        server.on('error', function (e) {
+            if (e.code === 'EADDRINUSE') {
+                console.log('Address in use, retrying...');
+                setTimeout(() => {
+                    server.close();
+                    startServer();
+                }, 3000);
+            }
+        });
+    }
 }
 

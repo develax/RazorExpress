@@ -27,7 +27,7 @@ class ParserErrorFactory {
     }
 
     unexpectedEndOfFile(text) {
-        var message = `Unexpected end of file after "${text}" <--`;
+        var message = `Unexpected end of file after '${text}'.`;
         return new RazorError(message, this.args);
     }
 
@@ -46,10 +46,10 @@ class ParserErrorFactory {
         return new RazorError(message, this.args, line);
     }
 
-    invalidHtmlChar(ch, lineNum, posNum, afterText, expected) {
-        var message = `"${ch}" is not a valid HTML character at line ${lineNum} pos ${posNum}` + (afterText ? ` after "${afterText}" < --` : expected ? ` (expected char = "${expected}")` : '.');
-        return new RazorError(message, this.args, lineNum, posNum);
-    }
+    // invalidHtmlChar(ch, lineNum, posNum, afterText, expected) {
+    //     var message = `"${ch}" is not a valid HTML character at line ${lineNum} pos ${posNum}` + (afterText ? ` after "${afterText}"` : expected ? ` (expected char = "${expected}")` : '.');
+    //     return new RazorError(message, this.args, lineNum, posNum);
+    // }
 
     missingMatchingStartTag(tag, line, pos, html) {
         var message = `'${tag}' tag at line ${line + 1} pos ${pos + 1} is missing mathing start tag: '${html}' <--`;
