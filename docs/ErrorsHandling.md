@@ -73,6 +73,8 @@ function appErrorHandler(err, req, res, next) {
     return next(err);
 }
 ```
-The working example is located in the same [RazorExpressExamples](https://github.com/DevelAx/RazorExpressExamples) repository in the [error-handling-2.js](https://github.com/DevelAx/RazorExpressExamples/blob/master/error-handling-1.js) file.
+>The working example is located in the same [RazorExpressExamples](https://github.com/DevelAx/RazorExpressExamples) repository in the [error-handling-2.js](https://github.com/DevelAx/RazorExpressExamples/blob/master/error-handling-1.js) file.
 
-> See also [Express Error Handling](https://expressjs.com/en/guide/error-handling.html).
+Please, go to [expressjs.com](https://expressjs.com/en/guide/error-handling.html) to learn more about "The default error handler" & "Writing error handlers".
+
+
