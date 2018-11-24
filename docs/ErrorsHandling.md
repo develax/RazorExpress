@@ -75,6 +75,7 @@ function appErrorHandler(err, req, res, next) {
 ```
 >The working example is located in the same [RazorExpressExamples](https://github.com/DevelAx/RazorExpressExamples) repository in the [error-handling-2.js](https://github.com/DevelAx/RazorExpressExamples/blob/master/error-handling-1.js) file.
 
-Please, go to [expressjs.com](https://expressjs.com/en/guide/error-handling.html) to read more on *"The default error handler"* & *"Writing error handlers"* topics.
+Please, go to [expressjs.com](https://expressjs.com/en/guide/error-handling.html) to read more on *"The default error handler"* & *"Writing error handlers"* topics. Or at least take note of this qoute:
+> You define error-handling middleware last, after other app.use() and routes calls...
 
 
