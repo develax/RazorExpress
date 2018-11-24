@@ -42,7 +42,7 @@ Now run the app again and refresh the browser page. You will see the same error 
 
 ![Razor-Express HTML error](https://github.com/DevelAx/RazorExpressExamples/blob/master/docs/error-handling/HtmlError.jpg)
 
-It looks a little nicer I guess. Now you can see not only the exception stack and error message but also the name of the file that caused the error as well as its content.   
+Now it looks a little nicer and you can see not only the exception stack and error message but also the name of the file that caused the error as well as its content.   
 
 The `handleErrors` method has two additional parameters (`errorCode` and `mode`) by which you can pass the server response code and mode in which this error handler will be triggered. 
 
