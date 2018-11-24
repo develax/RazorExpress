@@ -42,8 +42,10 @@ Now run the app again and refresh the browser page. You will see the same error 
 
 ![Razor-Express HTML error](https://github.com/DevelAx/RazorExpressExamples/blob/master/docs/error-handling-1/HtmlError.jpg)
 
-It looks a little nicer I guess. 
+It looks a little nicer I guess. Now you can see not only the exception stack and error message but also the name of the file that caused the error as well as its content.   
 
-Now you can see not only the exception stack and error message but also the name of the file that caused the error as well as its content.   
+The `handleErrors` method has two additional parameters (`errorCode` and `mode`) by which you can pass the server response code and mode in which this error handler will be triggered. 
+
+By default `errorCode` is `500`  and `mode` is `"development"`. This means that by default you'll get an HTML-formatted error and HTTP response with code 500 only if the **NODE_ENV** environment variable has a value equal to `"development"` ([express](https://expressjs.com/en/advanced/best-practice-performance.html#set-node_env-to-production), [stackoverflow](https://stackoverflow.com/a/16979503/1844247)). If the NODE_ENV is not set at all then it's considered (by Express) to be `"development"` by default.
 
 
