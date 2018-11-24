@@ -3,11 +3,9 @@
 require('./utils');
 
 function compilePageSync(Html, Model, debug) {
-    //console.log("DEBUG = " + debug);
     'use strict';
 
     if (debug) {
-        let jshtml = Html._jshtml;
         let sandbox = Html._sandbox;
         let vm = Html._vm;
         sandbox.Html = Html;
@@ -69,7 +67,7 @@ module.exports = function (opts) {
         let section = null;
         let sections = args.sections || {};
 
-        this.__val = function (i) { // getValueAt
+        this.__val = function (i) {
             return args.valuesQueue.getAt(i);
         };
 
@@ -244,17 +242,6 @@ module.exports = function (opts) {
                 return this._items[i];
             }
         }
-
-        //deq() {
-        //    if (opts.debug) {
-        //        let item = this._items.shift();
-        //        log.debug(item);
-        //        return item;
-        //    }
-        //    else {
-        //        return this._items.shift();
-        //    }
-        //}
     }
 
     const _sectionKeyword = "section";

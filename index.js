@@ -38,7 +38,8 @@ function registerRazorEngine(app) {
     app.set('view engine', ext);
 }
 
-function handleErrors(app, errorCode){
+function handleErrors(app, errorCode, mode){
+    mode = mode || "dev";
     app.use(appErrorHandler);
 
     function appErrorHandler(err, req, res, next) {
@@ -47,7 +48,7 @@ function handleErrors(app, errorCode){
     
         var env = app.get('env');
     
-        if (env === "dev" && err instanceof RazorError) {
+        if (env === mode && err instanceof RazorError) {
             var errorHtml = err.html();
             res.status(errorCode || 500);
             res.send(errorHtml);
