@@ -39,7 +39,7 @@ function registerRazorEngine(app) {
 }
 
 function handleErrors(app, errorCode, mode){
-    mode = mode || "dev";
+    mode = mode || "development";
     app.use(appErrorHandler);
 
     function appErrorHandler(err, req, res, next) {

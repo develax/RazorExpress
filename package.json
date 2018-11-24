@@ -1,7 +1,7 @@
 {
   "name": "raz",
   "description": "Razor-like syntax for templating views in Express framework by mixing HTML with JavaScript.",
-  "version": "0.0.12",
+  "version": "0.0.14",
   "author": {
     "name": "Sergey",
     "email": "develax@gmail.com",

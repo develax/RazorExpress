@@ -57,7 +57,7 @@ module.exports = function (args) {
     //    rs.render("./test/index", { message: "This is my first NodeJS Express View engine!" });
     //});
 
-    razor.handleErrors(app, 503, "dev");
+    razor.handleErrors(app, 500);
     const port = process.env.PORT || 1337;
 
     return {
