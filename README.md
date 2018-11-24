@@ -1,4 +1,4 @@
-# Razor-Express View Template Engine (raz)
+# Razor-Express view template engine (raz)
 **(draft)**
 
 - [**Intro**](#intro)
@@ -18,11 +18,13 @@
 Intro
 ===
 
-When I just started to dive into the world of *Node.js* after years of working with [ASP.NET MVC](https://docs.microsoft.com/en-us/aspnet/core/mvc/overview) I couldn't find any *view template engine* that was as convenient, elegant, concise, and syntactically close to native HTML markup language as [Razor](https://docs.microsoft.com/en-us/aspnet/core/mvc/views/layout) was. To be more precise, **ASP.NET MVC Razor markup is a hybrid of HTML markup and C# programming language**. And when it comes to code it's also syntactically close to the original C# language. So, this is exactly what I expected to see in the NodeJS world (except that it should be JavaScript instead of C#). 
+When I just started to dive into the world of *Node.js* after years of working with [ASP.NET MVC](https://docs.microsoft.com/en-us/aspnet/core/mvc/overview) I couldn't find any *view template engine* that was as convenient, elegant, concise, and syntactically close to native HTML markup language as [Razor](https://docs.microsoft.com/en-us/aspnet/core/mvc/views/layout) was. To be more precise, **ASP.NET MVC Razor markup is a hybrid of HTML markup and C# programming language**. And when it comes to code it's also syntactically close to the original C# language. So, this is exactly what I expected to see in the NodeJS world - **a hybrid of HTML and JavaScript**. 
 
-The closest to *Razor* currently supported library I could find was [Vash](https://www.npmjs.com/package/vash), but in some points, it was quite different from [ASP.NET MVC Razor syntax](https://docs.microsoft.com/en-us/aspnet/core/mvc/views/razor) which I was used to and it just looked much less concise and convenient to me (the concepts of layouts and partial blocks, for example). I may be exaggerating the merits of *ASP.NET MVC Razor* and maybe it's all just a matter of habit, but whatever it is I decided to create something more similar for using it with [ExpressJS](https://expressjs.com) library.
+The closest to *Razor* currently supported library I could find was [Vash](https://www.npmjs.com/package/vash), but in some points, it was quite different from [ASP.NET MVC Razor syntax](https://docs.microsoft.com/en-us/aspnet/core/mvc/views/razor) which I was used to and it just looked much less concise and convenient to me (the concepts of layouts and partial blocks, for example). In short, it did not suit me completely and what's more important I couldn't see its current development. 
 
-Although I tried to make my library as close as possible to Razor there are certain differences that need to be taken into account. So, enough lyrics, let's get started and look into my creation... it's my first JavaScript creation actually.
+I may be exaggerating the merits of *ASP.NET MVC Razor* and maybe it's all just a matter of habit, but whatever it is I decided to create something more similar for using it with [ExpressJS](https://expressjs.com) library.
+
+Although I tried to make my library as close as possible to ASP.NET Razor there are certain differences that need to be taken into account.
 
 -----------------------
 
@@ -181,14 +183,9 @@ The source code of this example is available in [RazorExpressExample](https://gi
 ===
 Missing semicolon
 ---
-Some developers have a habit of not putting a semicolon at the end of JavaScript code lines. This is a personal matter of course, although not considered good form. Be that as it may, when writing view-templates for Razor-Express, a **semicolon at the end of JavaScript expressions is strictly required!** If you do not follow this requirement, there may be cases when Razor isn't able to understand your instructions and throws a pretty vague error. Let's take a look at this example.
+Some developers have a habit of not putting a semicolon at the end of JavaScript code lines. This is a personal matter of course, although not considered good form. **As for JavaScript in the Razor-Express engine templates, a semicolon at the end of JavaScript expressions is strictly required!** If you do not follow this requirement, there may be cases when Razor isn't able to understand your instructions and throws a pretty vague error. Let's take a look at this example.
 
 ```JS
-////////////////////////////////////////////////
-//  Example of missing semicolon error in Razor-Express.
-//  https://www.npmjs.com/package/raz
-////////////////////////////////////////////////
-
 // Semicolon is missed at the end of the line of code "var text = i * i".
 const template = `
 <ul>
