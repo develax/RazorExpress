@@ -1,4 +1,4 @@
-# Razor-Express view template engine (raz)
+# RAZ: Razor-Express view template engine
 **(draft)**
 
 - [**Intro**](#intro)
