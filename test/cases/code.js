@@ -180,7 +180,7 @@
 @{
     <span>X<span/>
 }`,
-            error: "'<span>' tag at line 3 pos 5 is missing mathing end tag: '    <span>' <--"
+            error: "'<span>' tag at line 3 pos 5 is missing mathing end tag."
         },
         {
             name: "Code 21",
@@ -196,7 +196,7 @@
 @{
     <span>X</div>
 }`,
-            error: "'</div>' tag at line 3 pos 12 is missing mathing start tag: '    <span>X</div>' <--"
+            error: "'</div>' tag at line 3 pos 12 is missing mathing start tag."
         },
         {
             name: "Code 23",
@@ -241,7 +241,7 @@
         {
             name: "Code 28",
             template: `@{<>}`,
-            error: "Tag name expected at line 1 pos 4: '@{<' <--"
+            error: "Tag name expected at line 1 pos 4."
         },
         {
             name: "Code 29",
@@ -254,7 +254,7 @@
 @for(var i = 0; i < 10; i++){
     <
 }`,
-            error: "Tag name expected at line 3 pos 6: '    <' <--"
+            error: "Tag name expected at line 3 pos 6."
         },
         {
             name: "Code 31",
@@ -262,7 +262,7 @@
 @{
     <span>< /span>
 }`,
-            error: `'<span>' tag at line 3 pos 5 is missing mathing end tag: '    <span>' <--`
+            error: `'<span>' tag at line 3 pos 5 is missing mathing end tag.`
         },
         {
             name: "Code 31.1",
@@ -270,7 +270,7 @@
 @{
     <span>< span>
 }`,
-            error: `'<span>' tag at line 3 pos 5 is missing mathing end tag: '    <span>' <--`
+            error: `'<span>' tag at line 3 pos 5 is missing mathing end tag.`
         },
         {
             name: "Code 32",
@@ -286,7 +286,7 @@
 @{
     < span></span>
 }`,
-            error: "Tag name expected at line 3 pos 6: '    <' <--"
+            error: "Tag name expected at line 3 pos 6."
         },
         {
             name: "Code 34",
@@ -294,7 +294,7 @@
 @{
     <span></ span>
 }`,
-            error: "Tag name expected at line 3 pos 13: '    <span></' <--"
+            error: "Tag name expected at line 3 pos 13."
         },
         {
             name: "Code 35",
@@ -333,7 +333,7 @@
         {
             name: "Code 41",
             template: '<div>@(1 + 3]</div>',
-            error: 'Invalid "]" symbol in expression at line 1 pos 13 after "<div>@(1 + 3" <--'
+            error: 'Invalid "]" symbol in expression at line 1 pos 13 after "<div>@(1 + 3".'
         },
         {
             name: "Code 42",
@@ -346,7 +346,7 @@
 @{
     <span></span>
 )`,
-            error: 'Invalid ")" symbol in expression at line 4 pos 1 after "" <--'
+            error: 'Invalid ")" symbol in expression at line 4 pos 1.'
         },
         {
             name: "Code 44",
@@ -425,7 +425,7 @@
     </div>
 }
 `,
-            error: `'<div style="background-color: yellow">' tag at line 3 pos 5 is missing mathing end tag: '    <div style="background-color: yellow">' <--`
+            error: `'<div style="background-color: yellow">' tag at line 3 pos 5 is missing mathing end tag.`
         }
     ];
     module.exports = cases;

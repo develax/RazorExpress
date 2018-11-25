@@ -2,48 +2,48 @@ const RazorError = require('./RazorError');
 
 
 class ParserErrorFactory {
-    constructor(args) {
-        this.args = args;
+    constructor(templateInfo) {
+        this.info = templateInfo;
     }
 
     endOfFileFoundAfterAtSign(lineNum, posNum) {
         var message = `End-of-file was found after the "@" character at line ${lineNum + 1} pos ${posNum + 1}. "@" must be followed by a valid code block. If you want to output an "@", escape it using the sequence: "@@"`;
-        return new RazorError(message, this.args, lineNum, posNum);
+        return RazorError.new({ message, info: this.info, line: lineNum, pos: posNum, capture: this.endOfFileFoundAfterAtSign });
     }
 
     unexpectedCharacter(ch, lineNum, posNum, line) {
-        var message = `unexpected '${ch}' character at line ${lineNum + 1} pos ${posNum + 1} after '${line}' <--`;
-        return new RazorError(message, this.args, lineNum, posNum);
+        var message = `unexpected '${ch}' character at line ${lineNum + 1} pos ${posNum + 1} after '${line}'`;
+        return RazorError.new({ message, info: this.info, line: lineNum, pos: posNum, capture: this.unexpectedCharacter });
     }
 
     unexpectedAtCharacter(lineNum, posNum) {
         var message = `unexpected '@' character at line ${lineNum + 1} pos ${posNum + 1}. Once inside the body of a code block (@if {}, @{}, etc.) or a section (@section{}) you do not need to use "@{" to switch to code.`;
-        return new RazorError(message, this.args, lineNum, posNum);
+        return RazorError.new({ message, info: this.info, line: lineNum, pos: posNum, capture: this.unexpectedCharacter });
     }
 
     notValidStartOfCodeBlock(ch, lineNum, posNum) {
         var message = `"${ch}" is not valid at the start of a code block at line ${lineNum + 1} pos ${posNum + 1}. Only identifiers, keywords, "(" and "{" are valid.`;
-        return new RazorError(message, this.args, lineNum, posNum);
+        return RazorError.new({ message, info: this.info, line: lineNum, pos: posNum, capture: this.notValidStartOfCodeBlock });
     }
 
     unexpectedEndOfFile(text) {
         var message = `Unexpected end of file after '${text}'.`;
-        return new RazorError(message, this.args);
+        return RazorError.new({ message, info: this.info, capture: this.unexpectedEndOfFile });
     }
 
     characterExpected(ch, line, pos) {
         var message = `'${ch}' character is expected at line ${line + 1} pos ${pos + 1}.`;
-        return new RazorError(message, this.args, line, pos);
+        return RazorError.new({ message, info: this.info, line, pos, capture: this.characterExpected });
     }
 
     expressionMissingEnd(expr, ch, line, pos) {
         var message = `The explicit expression "${expr}" is missing a closing character "${ch}" at line ${line + 1} pos ${pos + 1}.`;
-        return new RazorError(message, this.args, line, pos);
+        return RazorError.new({ message, info: this.info, line, pos, capture: this.expressionMissingEnd });
     }
 
     jsCodeBlockMissingClosingChar(line, codeFirstLine) {
         var message = `The code or section block is missing a closing "}" character. Make sure you have a matching "}" character for all the "{" characters within this block, and that none of the "}" characters are being interpreted as markup. The block starts at line ${line + 1} with text: "${codeFirstLine}"`;
-        return new RazorError(message, this.args, line);
+        return RazorError.new({ message, info: this.info, line, capture: this.jsCodeBlockMissingClosingChar });
     }
 
     // invalidHtmlChar(ch, lineNum, posNum, afterText, expected) {
@@ -51,108 +51,108 @@ class ParserErrorFactory {
     //     return new RazorError(message, this.args, lineNum, posNum);
     // }
 
-    missingMatchingStartTag(tag, line, pos, html) {
-        var message = `'${tag}' tag at line ${line + 1} pos ${pos + 1} is missing mathing start tag: '${html}' <--`;
-        return new RazorError(message, this.args, line, pos, tag.length);
+    missingMatchingStartTag(tag, line, pos) {
+        var message = `'${tag}' tag at line ${line + 1} pos ${pos + 1} is missing mathing start tag.`;
+        return RazorError.new({ message, info: this.info, line, pos, len: tag.length, capture: this.missingMatchingStartTag });
     }
 
-    missingMatchingEndTag(tag, line, pos, html) {
-        var message = `'${tag}' tag at line ${line + 1} pos ${pos + 1} is missing mathing end tag: '${html}' <--`;
-        return new RazorError(message, this.args, line, pos, tag.length);
+    missingMatchingEndTag(tag, line, pos) {
+        var message = `'${tag}' tag at line ${line + 1} pos ${pos + 1} is missing mathing end tag.`;
+        return RazorError.new({ message, info: this.info, line, pos, len: tag.length, capture: this.missingMatchingEndTag });
     }
 
     invalidExpressionChar(ch, line, pos, afterText) {
-        var message = `Invalid "${ch}" symbol in expression at line ${line + 1} pos ${pos + 1} after "${afterText}" <--`;
-        return new RazorError(message, this.args, line, pos);
+        var message = `Invalid "${ch}" symbol in expression at line ${line + 1} pos ${pos + 1}` + (afterText ? ` after "${afterText}".` : ".");
+        return RazorError.new({ message, info: this.info, line, pos, capture: this.invalidExpressionChar });
     }
 
-    invalidHtmlTag(tag) {
+    invalidHtmlTag(tag, line, pos) {
         var message = `Invalid HTML-tag: '${tag}'`;
-        return new RazorError(message, this.args);
+        return RazorError.new({ message, info: this.info, line, pos, len: tag && tag.length, capture: this.invalidHtmlTag });
     }
 
-    forbiddenViewName(viewName) {
-        var message = `The file "${viewName}" is not available.`;
-        return new RazorError(message, this.args);
-    }
+    // forbiddenViewName(viewName) {
+    //     var message = `The file "${viewName}" is not available.`;
+    //     return new RazorError(message, this.info);
+    // }
 
     whiteSpaceExpectedAfter(keyword, line, pos) {
         var message = `A whitespace expected after the "${keyword}" keyword at line ${line + 1} pos ${pos + 1}.`;
-        return new RazorError(message, this.args, line, pos);
+        return RazorError.new({ message, info: this.info, line, pos, capture: this.whiteSpaceExpectedAfter }); // cannot be tested.
     }
 
     tagNameExpected(line, pos, html) {
-        var message = `Tag name expected at line ${line + 1} pos ${pos + 1}: '${html}' <--`;
-        return new RazorError(message, this.args, line, pos);
+        var message = `Tag name expected at line ${line + 1} pos ${pos + 1}.`;
+        return RazorError.new({ message, info: this.info, line, pos, capture: this.tagNameExpected });
     }
 
     sectionNameExpectedAfter(keyword, line, pos) {
         var message = `A section name expected after the "${keyword}" keyword at line ${line + 1} pos ${pos + 1}.`;
-        return new RazorError(message, this.args, line, pos);
+        return RazorError.new({ message, info: this.info, line, pos, capture: this.sectionNameExpectedAfter });
     }
 
     sectionNameCannotStartWith(ch, line, pos) {
         var message = `A section name cannot start with '${ch}' at line ${line + 1} pos ${pos + 1}.`;
-        return new RazorError(message, this.args, line, pos);
+        return RazorError.new({ message, info: this.info, line, pos, capture: this.sectionNameCannotStartWith });
     }
 
     sectionNameCannotInclude(ch, line, pos) {
         var message = `A section name cannot include '${ch}' character at line ${line + 1} pos ${pos + 1}.`;
-        return new RazorError(message, this.args, line, pos);
+        return RazorError.new({ message, info: this.info, line, pos, capture: this.sectionNameCannotInclude });
     }
 
     unexpectedLiteralFollowingTheSection(ch, line, pos) {
         var message = `Unexpected literal '${ch}' following the 'section' directive at line ${line + 1} pos ${pos + 1}. Expected '{'.`;
-        return new RazorError(message, this.args, line, pos);
+        return RazorError.new({ message, info: this.info, line, pos, capture: this.unexpectedLiteralFollowingTheSection });
     }
 
     sectionIsAlreadyDefined(sectionName, line, pos) {
         var message = `The section '${sectionName}' at line ${line + 1} pos ${pos + 1} has been already defined.`;
-        return new RazorError(message, this.args, line, pos);
+        return RazorError.new({ message, info: this.info, line, pos, capture: this.sectionIsAlreadyDefined });
     }
 
-    sectionBlockIsMissingClosingBrace(sectionName) {
-        var message = `The section block '${sectionName}' is missing a closing "}" character.`;
-        return new RazorError(message, this.args);
-    }
+    // sectionBlockIsMissingClosingBrace(sectionName) {
+    //     var message = `The section block '${sectionName}' is missing a closing "}" character.`;
+    //     return new RazorError(message, this.info);
+    // }
 
     sectionsCannotBeNested(line, pos) {
         var message = `Section blocks cannot be nested at line ${line + 1} pos ${pos + 1}.`;
-        return new RazorError(message, this.args, line, pos);
+        return RazorError.new({ message, info: this.info, line, pos, capture: this.sectionsCannotBeNested });
     }
 
     sectionIsNotFound(sectionName, filePath) {
         var message = `The view '${filePath}' requires the section '${sectionName}' which cannot be found.`;
-        return new RazorError(message, this.args);
+        return RazorError.new({ message, info: this.info, capture: this.sectionIsNotFound });
     }
 
     sectionBeenRendered(sectionName, renderedBy, attemptedBy) {
         var message = `The section '${sectionName}' has already been rendered by '${renderedBy}'. There is an atempt to rendered it again by '${attemptedBy}'.`;
-        return new RazorError(message, this.args);
+        return RazorError.new({ message, info: this.info, capture: this.sectionBeenRendered });
     }
 
-    partialViewNotFound(partialView, searchedLocations){
-        let message = `The view "${this.args.filename}" cannot find the partial view "${partialView}".\nThe following locations were searched:\n${searchedLocations.join("\n")}.`;
-        return new RazorError(message, this.args);
+    partialViewNotFound(partialView, searchedLocations) {
+        let message = `The view "${this.info.filename}" cannot find the partial view "${partialView}".\nThe following locations were searched:\n${searchedLocations.join("\n")}.`;
+        return RazorError.new({ message, info: this.info, capture: this.partialViewNotFound });
     }
 
-    errorReadingFile(error){
-        let message = `Reading file '${this.args.filename}' caused an error: ${error}`;
-        let parserError = new RazorError(message, this.args);
+    errorReadingFile(error) {
+        let message = `Reading file '${this.info.filename}' caused an error: ${error}`;
+        let parserError = RazorError.new({ message, info: this.info, capture: this.errorReadingFile });
         setInnerError(parserError, error);
         return parserError;
     }
 
-    errorReadingView(filename, error){
+    errorReadingView(filename, error) {
         let message = `Reading view file '${filename}' caused an error: ${error}`;
-        let parserError = new RazorError(message, this.args);
+        let parserError = RazorError.new({ message, info: this.info, capture: this.errorReadingView });
         setInnerError(parserError, error);
         return parserError;
     }
 
-    partialLayoutNameExpected(){
+    partialLayoutNameExpected() {
         let message = "Partial layout name is expected."
-        return new RazorError(message, this.args);
+        return RazorError.new({ message, info: this.info, capture: this.partialLayoutNameExpected });
     }
 
     // invalidViewExtension(viewName, expectedExtension){
@@ -160,14 +160,14 @@ class ParserErrorFactory {
     //     return new ParserError(message, this.args);
     // }
 
-    customError(error) {
-        return new RazorError(error, this.args);
+    customError(message) {
+        return RazorError.new({ message, info: this.info, capture: this.customError });
     }
 }
 
 ParserErrorFactory.templateShouldBeString = 'The [template] argument should be a string.';
 
-function setInnerError(parserError, error){
+function setInnerError(parserError, error) {
     if (error.message)
         parserError.inner = error;
 }

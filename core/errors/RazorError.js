@@ -8,11 +8,17 @@ const htmlEncode = require('js-htmlencode');
 const regex = /.*Error:/;
 
 module.exports = class RazorError extends Error {
-    constructor(message, source, line, pos, len) {
+    constructor(message, templateInfo, line, pos, len, captureFrame) {
         super(message);
         this.name = this.constructor.name;
-        this.data = Object.assign({ line, pos, len }, source);
-        Error.captureStackTrace(this, this.constructor);
+        this.data = Object.assign({ line, pos, len }, templateInfo);
+
+        if (captureFrame && Error.captureStackTrace)
+            Error.captureStackTrace(this, captureFrame);
+    }
+
+    static new(args){
+        return new RazorError(args.message, args.info, args.line, args.pos, args.len, args.capture || this.new);
     }
 
     html() {

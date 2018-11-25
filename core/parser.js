@@ -440,7 +440,7 @@ module.exports = function (opts) {
 
                                 if (openTag) { // if we have an open tag we must close it before we can go back to the caller method
                                     if (openTag.name.toUpperCase() !== tagName.toUpperCase())
-                                        throw this.er.missingMatchingStartTag(tag, this.lineNum, this.linePos() - tag.length + 1, this.line + ch); // tested by "Invalid-HTML 1+, 2+, 7"
+                                        throw this.er.missingMatchingStartTag(tag, this.lineNum, this.linePos() - tag.length + 1); // tested by "Invalid-HTML 1+, 2+, 7"
                                     // else they are neitralizing each other..
                                 }
                                 else if (outerWaitTag && outerWaitTag === tagName) {
@@ -448,11 +448,11 @@ module.exports = function (opts) {
                                     break;
                                 }
                                 else {
-                                    throw this.er.missingMatchingStartTag(tag, this.lineNum, this.linePos() - tag.length + 1, this.line + ch); // tested by "Invalid-HTML 4", "Code 22"
+                                    throw this.er.missingMatchingStartTag(tag, this.lineNum, this.linePos() - tag.length + 1); // tested by "Invalid-HTML 4", "Code 22"
                                 }
                             }
                             else if (tagKind === tagKinds.open) {
-                                openTags.push({ tag: tag, name: tagName, lineNum: this.lineNum, linePos: this.linePos() - tag.length + 1, line: this.line + ch });
+                                openTags.push({ tag: tag, name: tagName, lineNum: this.lineNum, linePos: this.linePos() - tag.length + 1 });
                             }
                             else {
                                 // just do nothing
@@ -504,7 +504,7 @@ module.exports = function (opts) {
 
             if (openTags.length) {
                 let openTag = openTags[openTags.length - 1];
-                throw this.er.missingMatchingEndTag(openTag.tag, openTag.lineNum, openTag.linePos, openTag.line); // tested by "Invalid-HTML 3"
+                throw this.er.missingMatchingEndTag(openTag.tag, openTag.lineNum, openTag.linePos); // tested by "Invalid-HTML 3"
             }
 
             if (!stop)
@@ -516,7 +516,7 @@ module.exports = function (opts) {
             const textQuotes = '\'"';
             var quotes = [];
             var tag = '', openTag = '', openTagName = '', lineLastLiteral = '';
-            let openTagLineNum, openTagPos, openTagLine;
+            let openTagLineNum, openTagPos;
             var block = newBlock(type.html, blocks);
             var lastCh = '';
             let stop = false, inComments = false;
@@ -619,7 +619,7 @@ module.exports = function (opts) {
                                 let tagName = getTagName(tag);
 
                                 if (openTagName.toUpperCase() !== tagName.toUpperCase())
-                                    throw this.er.missingMatchingStartTag(tag, this.lineNum, this.linePos() - tag.length + 1, this.line); // tested by "Code 22"
+                                    throw this.er.missingMatchingStartTag(tag, this.lineNum, this.linePos() - tag.length + 1); // tested by "Code 22"
 
                                 openTag = openTagName = ''; // open-tag is closed
                             }
@@ -632,16 +632,15 @@ module.exports = function (opts) {
                             }
                             else if (tag.length > 2) { // it's an open-tag, at least `<a>`
                                 if (tag[1] === '/') // it's a close-tag, unexpected..
-                                    throw this.er.missingMatchingStartTag(tag, this.lineNum, this.linePos() - tag.length + 1, this.line + ch); // tested by "Invalid-HTML 5"
+                                    throw this.er.missingMatchingStartTag(tag, this.lineNum, this.linePos() - tag.length + 1); // tested by "Invalid-HTML 5"
 
                                 openTag = tag;
                                 openTagName = tagName;
                                 openTagPos = this.linePos() - tag.length + 1;
                                 openTagLineNum = this.lineNum;
-                                openTagLine = this.line + ch;
                             }
                             else
-                                throw this.er.tagNameExpected(this.lineNum, this.linePos(), this.line); // tested by "Code 28"
+                                throw this.er.tagNameExpected(this.lineNum, this.linePos()); // tested by "Code 28"
                         }
 
                         tag = ''; //  reset it & go on..
@@ -650,7 +649,7 @@ module.exports = function (opts) {
                 else if (isSpace) {
                     if (tag) { // within a tag
                         if (lastCh === '<' || lastCh === '/') // '<' or '</' or '<tag/'
-                            throw this.er.tagNameExpected(this.lineNum, this.linePos(), this.line); // tests: "Code 33", "Code 34"
+                            throw this.er.tagNameExpected(this.lineNum, this.linePos()); // tests: "Code 33", "Code 34"
                         else
                             tag += ch;
                     }
@@ -698,7 +697,7 @@ module.exports = function (opts) {
             }
 
             if (openTagName)
-                throw this.er.missingMatchingEndTag(openTag, openTagLineNum, openTagPos, openTagLine); // tested by "Invalid-HTML 6", "Code 20", "Code 31"
+                throw this.er.missingMatchingEndTag(openTag, openTagLineNum, openTagPos); // tested by "Invalid-HTML 6", "Code 20", "Code 31"
 
             if (!stop)
                 this.flushPadding(blocks);
@@ -1161,7 +1160,9 @@ module.exports = function (opts) {
     }
 
     function getTagName(tag) {
-        if (!tag || tag.length < 2) throw this.er.invalidHtmlTag(tag);
+        if (!tag || tag.length < 2) 
+            throw this.er.invalidHtmlTag(tag, this.pos, this.line);
+
         var tagName = '';
         for (var i = 1; i < tag.length; i++) { // skip '<' & '>'
             var ch = tag[i];
@@ -1173,7 +1174,7 @@ module.exports = function (opts) {
                 if (tagName)
                     break;
                 else
-                    throw this.er.invalidHtmlTag(tag);
+                    throw this.er.invalidHtmlTag(tag, this.pos - tag.len, this.line);
             }
 
             tagName += ch;
