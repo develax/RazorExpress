@@ -20,13 +20,13 @@
 Intro
 ===
 
-When I just started to dive into the world of *Node.js* after years of working with [ASP.NET MVC](https://docs.microsoft.com/en-us/aspnet/core/mvc/overview) I couldn't find any *view template engine* that was as convenient, elegant, concise, and syntactically close to native HTML markup language as [Razor](https://docs.microsoft.com/en-us/aspnet/core/mvc/views/layout) was. To be more precise, **ASP.NET MVC Razor markup is a hybrid of HTML markup and C# programming language**. And when it comes to code it's also syntactically close to the original C# language. So, this is exactly what I expected to see in the NodeJS world - **a hybrid of HTML and JavaScript**. 
+When I just started to dive into the world of *Node.js* after years of working with [ASP.NET MVC](https://docs.microsoft.com/en-us/aspnet/core/mvc/overview) I couldn't find any *view template engine* that was as convenient, elegant, concise, and syntactically close to native HTML markup language as [Razor](https://docs.microsoft.com/en-us/aspnet/core/mvc/views/layout) was. And when it comes to code it's also syntactically close to the original C# language. Actually, **ASP.NET MVC Razor markup is a hybrid of HTML markup and C# programming language**. This is exactly what I expected to see in the NodeJS world - **a hybrid of HTML and JavaScript**. 
 
 The closest to *Razor* currently supported library I could find was [Vash](https://www.npmjs.com/package/vash), but in some points, it was quite different from [ASP.NET MVC Razor syntax](https://docs.microsoft.com/en-us/aspnet/core/mvc/views/razor) which I was used to and it just looked much less concise and convenient to me (the concepts of layouts and partial blocks, for example). In short, it did not suit me completely and what's more important I couldn't see its current development. 
 
 I may be exaggerating the merits of *ASP.NET MVC Razor* and maybe it's all just a matter of habit, but whatever it is I decided to create something more similar for using it with [ExpressJS](https://expressjs.com) library.
 
-Although I tried to make my library as close as possible to ASP.NET Razor there are certain differences that need to be taken into account.
+Although I tried to make my library as close as possible to ASP.NET Razor there are some differences that need to be taken into account.
 
 -----------------------
 
