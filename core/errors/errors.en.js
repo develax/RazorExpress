@@ -132,7 +132,7 @@ class ParserErrorFactory {
     }
 
     partialViewNotFound(partialView, searchedLocations) {
-        let message = `The view "${this.info.filename}" cannot find the partial view "${partialView}".\nThe following locations were searched:\n${searchedLocations.join("\n")}.`;
+        let message = `The view "${this.info.filename}" cannot find the partial view "${partialView}".\nThe following locations were searched:\n${searchedLocations.join("\n")}`;
         return RazorError.new({ message, info: this.info, capture: this.partialViewNotFound });
     }
 

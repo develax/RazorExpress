@@ -220,7 +220,7 @@ module.exports = class Razor {
     }
 
     addFileNameIfDev(data, filename) {
-        if (this.env === 'dev')
+        if (this.env === 'development')
             return this.wrapInHtmlComment(filename) + _eol_ + data.toString();
 
         return data.toString();
