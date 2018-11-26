@@ -247,7 +247,7 @@ module.exports = function (opts) {
     const _sectionKeyword = "section";
     //const _functionKeyword = "function";
     const type = { none: 0, html: 1, code: 2, expr: 3, section: 4 };
-    
+
     const RazorError = require('./errors/RazorError');
     const ErrorsFactory = require('./errors/errors');
     const voidTags = "area|base|br|col|embed|hr|img|input|link|meta|param|source|track|wbr".toUpperCase().split("|").map(s => s.trim());
@@ -274,7 +274,7 @@ module.exports = function (opts) {
             }
 
             compilePage(html, this.args.model, isDebugMode(opts), (err, html) => {
-                if (err) 
+                if (err)
                     return onError(err, this);
 
                 return done(null, html);
@@ -362,7 +362,7 @@ module.exports = function (opts) {
 
                         tag = '';
                     }
-                    else{
+                    else {
                         tag = '';
                     }
                 }
@@ -1162,7 +1162,7 @@ module.exports = function (opts) {
     }
 
     function getTagName(tag) {
-        if (!tag || tag.length < 2) 
+        if (!tag || tag.length < 2)
             throw this.er.invalidHtmlTag(tag, this.pos, this.line);
 
         var tagName = '';
@@ -1189,8 +1189,18 @@ module.exports = function (opts) {
     }
 
     function toParserError(err, errorFactory) {
-        if (err instanceof RazorError)
+        if (err instanceof RazorError) {
+            // cut everything above (excessive information from the VM in debug mode), for example this:
+            // d:\Projects\NodeJS\RazorExpressFullExample\node_modules\raz\core\Razor.js:117
+            // throw errorsFactory.partialViewNotFound(path.basename(partialViewName), searchedLocations); // [#2.3]
+            // ^
+            let pos = err.stack.indexOf("RazorError: ");
+            if (pos > 0)
+                err.stack = err.stack.substring(pos);
+
             return err;
+        }
+
 
         let parserError = errorFactory.customError(err.message);
 
