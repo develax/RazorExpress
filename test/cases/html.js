@@ -269,6 +269,11 @@
             name: "HTML 30",
             template: '<span><img></span>',
             expected: '<span><img></span>'
+        },
+        {
+            name: "HTML 31",
+            template: `<span>1'2</span>`,
+            expected: `<span>1'2</span>`
         }
     ];
 

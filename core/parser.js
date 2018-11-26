@@ -387,7 +387,7 @@ module.exports = function (opts) {
                         }
                     }
                 }
-                else if (textQuotes.indexOf(ch) !== -1) { // it could be opening text qoutes
+                else if (tag && textQuotes.indexOf(ch) !== -1) { // it could be opening text qoutes
                     quotes.push(ch);
                     inQuotes = true;
                     if (tag) tag += ch;

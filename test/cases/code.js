@@ -426,6 +426,11 @@
 }
 `,
             error: `'<div style="background-color: yellow">' tag at line 3 pos 5 is missing mathing end tag.`
+        },
+        {
+            name: "Code 53",
+            template: `@{<span>1'2</span>}`,
+            expected: `<span>1'2</span>`
         }
     ];
     module.exports = cases;
