@@ -213,7 +213,7 @@ module.exports = function (opts) {
                     i = valuesQueue.enq(block.text);
                     return "\r\nHtml.encode(eval(Html.__val(" + i + ")));";
                 case type.code:
-                    return block.text;
+                    return "\r\n" + block.text; // to be on a separate line
                 default:
                     throw new Error(`Unexpected block type = "${blockType}".`);
             }
