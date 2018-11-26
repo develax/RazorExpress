@@ -3,6 +3,7 @@ const fs = require('fs');
 const path = require('path');
 const initParser = require('./parser');
 const ErrorsFactory = require('./errors/errors');
+const dbg = require('./dbg/debugger');
 
 'use strict';
 const ext = "raz", viewStartName = '_viewStart';
@@ -220,7 +221,7 @@ module.exports = class Razor {
     }
 
     addFileNameIfDev(data, filename) {
-        if (this.env === 'development')
+        if (dbg.isDebug(this.env))
             return this.wrapInHtmlComment(filename) + _eol_ + data.toString();
 
         return data.toString();

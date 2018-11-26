@@ -1,5 +1,4 @@
 'use strict';
-
 require('./utils');
 
 function compilePageSync(Html, Model, debug) {
@@ -31,6 +30,7 @@ function compilePage(Html, Model, debug, done) {
 
 module.exports = function (opts) {
     opts = opts || {};
+    const dbg = require('./dbg/debugger');
     const log = require('./dbg/logger')({ on: opts.debug });
     log.debug(`Parse debug mode is '${!!opts.debug}'.`);
 
@@ -250,7 +250,6 @@ module.exports = function (opts) {
     
     const RazorError = require('./errors/RazorError');
     const ErrorsFactory = require('./errors/errors');
-    const path = require('path');
     const voidTags = "area|base|br|col|embed|hr|img|input|link|meta|param|source|track|wbr".toUpperCase().split("|").map(s => s.trim());
 
     ////////////////
@@ -1186,7 +1185,7 @@ module.exports = function (opts) {
     }
 
     function isDebugMode(opts) {
-        return opts.debug || opts.mode === "dev";
+        return opts.debug || dbg.isDebug(opts.mode);
     }
 
     function toParserError(err, errorFactory) {
