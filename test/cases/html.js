@@ -176,6 +176,53 @@
             expected: '<!--<span>-->'
         },
         {
+            name: "HTML 28.1",
+            template: `
+<!--test-->
+@{
+    var x = "123";
+}
+<div>
+    <span>@x</span>
+    <a href="/"><<-- back</a>
+</div>`,
+            expected: `
+<!--test-->
+<div>
+    <span>123</span>
+    <a href="/"><<-- back</a>
+</div>`
+        },
+        {
+            name: "HTML 28.2",
+            template: `
+<!-- d-l -->
+<div>
+    <a href="/"><<-- back</a>
+</div>`,
+            expected: `
+<!-- d-l -->
+<div>
+    <a href="/"><<-- back</a>
+</div>`
+        },
+        {
+            name: "HTML 28.3",
+            template: `
+@{
+<!-- d-l -->
+<div>
+    <a href="/"><<-- back</a>
+</div>
+}`,
+            expected: `
+<!-- d-l -->
+<div>
+    <a href="/"><<-- back</a>
+</div>
+`
+        },
+        {
             name: "HTML 29",
             template: `
 <script type="text/javascript">

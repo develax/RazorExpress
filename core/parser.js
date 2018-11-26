@@ -363,6 +363,9 @@ module.exports = function (opts) {
 
                         tag = '';
                     }
+                    else{
+                        tag = '';
+                    }
                 }
                 else if (ch === '@') {
                     if (nextCh === '@') { // checking for '@@' that means just text '@'
