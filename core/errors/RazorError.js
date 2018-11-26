@@ -5,7 +5,7 @@ const htmlEncode = require('js-htmlencode');
 // https://rclayton.silvrback.com/custom-errors-in-node-js
 /////////////////////////////////////////////////////////////////////////
 
-const regex = /.*Error:/;
+// const regex = /.*Error:/;
 
 module.exports = class RazorError extends Error {
     constructor(message, templateInfo, line, pos, len, captureFrame) {
@@ -14,7 +14,7 @@ module.exports = class RazorError extends Error {
         this.data = Object.assign({ line, pos, len }, templateInfo);
 
         if (captureFrame && Error.captureStackTrace)
-            Error.captureStackTrace(this, captureFrame);
+            Error.captureStackTrace(this, captureFrame || this.constructor);
     }
 
     static new(args){
@@ -36,7 +36,11 @@ module.exports = class RazorError extends Error {
             let encodedLine = htmlEncode(line);
             let style = '';
 
-            if (line && line.trim() === "^" || nextLine && nextLine.trim() === "^" || regex.exec(line)) {
+            // if (line && line.trim() === "^" || nextLine && nextLine.trim() === "^" || regex.exec(line)) {
+            //     style = 'class="main"';
+            //     mainInfo += encodedLine;
+            // }
+            if (line && !line.trim().startsWith("at ")) {
                 style = 'class="main"';
                 mainInfo += encodedLine;
             }
@@ -106,8 +110,9 @@ module.exports = class RazorError extends Error {
             white-space: pre;
         }
         .stack .main{
-            color: red;
+            color: #e20000;
             white-space: pre-wrap;
+            font-weight: bold;
         }
         ol {
             color: darkgray;
