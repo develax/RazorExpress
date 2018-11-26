@@ -139,7 +139,7 @@ describe("server routes", () => {
                     let h1 = $('h1');
                     expect(h1.length).to.be.equal(1);
                     expect(h1.text()).to.have.string("A template compilation error occured");
-                    let layouts = $(`:contains(RazorError: The view "invalid.raz" cannot find the partial view)`);
+                    let layouts = $(`:contains(invalid.raz" cannot find the partial view)`);
                     expect(layouts, "error message").to.have.lengthOf.above(0);
                     console.log(`> testing rote "/invalid"...done`);
                     done();

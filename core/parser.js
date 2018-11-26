@@ -260,7 +260,7 @@ module.exports = function (opts) {
         constructor(args) {
             args.filePath = args.filePath || "default";
             this.args = args;
-            this.er = new ErrorsFactory({ filename: path.basename(args.filePath), jshtml: args.template });
+            this.er = new ErrorsFactory({ filename: args.filePath, jshtml: args.template });
         }
 
         compile(done) {

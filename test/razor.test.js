@@ -6,7 +6,9 @@
 console.log("STARTED: RAZOR.test.js");
 
 const server = require('./server.live')({ views: "./razor.test.views" }).app;
-var expect = require('chai').expect;
+const chai = require('chai');
+chai.use(require('chai-string'));
+var expect = chai.expect;
 const path = require('path');
 const proxyquire = require('proxyquire');
 const fs = require('fs');
@@ -145,7 +147,7 @@ describe("Testing 'Razor' module.", () => {
                 expect(err).to.exist;
                 expect(html).not.to.exist;
                 expect(err).to.be.an.instanceOf(RazorError);
-                expect(err.message).to.have.string(`The view "${viewName}" cannot find the partial view "_partial.raz".`);
+                expect(err.message).to.have.string(`${viewName}" cannot find the partial view "_partial.raz".`);
                 done();
             });
         });
@@ -220,7 +222,7 @@ describe("Testing 'Razor' module.", () => {
         expect(err.inner).to.exist;
         expect(err.inner.code).to.equal(errCode);
         expect(err.inner.stack).to.have.string(`at Razor.${method} `);
-        expect(err.data.filename).to.be.equal(errorViewName);
+        expect(err.data.filename).to.endsWith(errorViewName);
     }
 
     function expectPartialViewNotFound(err, errorView, partialView, method) {
@@ -230,8 +232,8 @@ describe("Testing 'Razor' module.", () => {
         if (method)
             expect(err.stack).to.have.string(`at Razor.${method} `);
 
-        expect(err.data.filename).to.be.equal(errorView);
-        let expectedMessage = `The view "${errorView}" cannot find the partial view "${partialView}".`;
+        expect(err.data.filename).to.endsWith(errorView);
+        let expectedMessage = `${errorView}" cannot find the partial view "${partialView}".`;
         expect(err.message).to.have.string(expectedMessage);
     }
 
