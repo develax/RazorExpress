@@ -446,10 +446,9 @@ else{
 }
 `,
             expected: "\n    <span>B</span>\n"
-        }
-        ,
+        },
         {
-            name: "Code 54",
+            name: "Code 55",
             template: `
 @{
     var a = 1, b = 2;
@@ -460,6 +459,32 @@ else{
 else
 `,
         error: "'{' character is expected at line 8 pos 5"
+        },
+        {
+            name: "Code 56",
+            template: `
+@{
+    var a = 1, b = 2;
+}
+@while (a <= b) {
+    <span>@a</span>
+    a++;
+}
+`,
+        expected: "\n    <span>1</span>\n    <span>2</span>\n"
+        },
+        {
+            name: "Code 57",
+            template: `
+@{
+    var a = 1, b = 2;
+}
+@do{
+    <span>@a</span>
+    a++;
+} while (a <= b);
+`,
+        expected: "\n    <span>1</span>\n    <span>2</span>\n"
         }
     ];
     module.exports = cases;

@@ -3,7 +3,7 @@
     console.log("STARTED: parser.test.js");
 
     var expect = require('chai').expect;
-    const parser = require('../core/parser')({ debug: false, mode: "dev" });
+    const parser = require('../core/parser')({ debug: false, mode: "development" });
     const er = new require('../core/errors/errors');
 
     describe("INVALID INPUT ARGUMENTS", () => {

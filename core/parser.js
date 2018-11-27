@@ -806,8 +806,15 @@ module.exports = function (opts) {
                         if (Char.isWhiteSpace(ch) || ch === '{') {
                             if (checkForSection.call(this))
                                 return;
-                            else if (ch === '{')
+                            else if (ch === '{'){
+                                var op = block.text.trim();
+                                if (op === "do"){
+                                    operatorName = op;
+                                    checkForBlockCode = true;
+                                    continue;
+                                }
                                 break;
+                            } 
                         }
                         else if (ch === '.') { // @Model.text
                             let nextCh = this.pickNextChar();
@@ -827,7 +834,7 @@ module.exports = function (opts) {
                 else {
                     if (!checkForBlockCode)
                         this.flushPadding(blocks);
-                        
+
                     block.append(ch);
                 }
 
@@ -920,10 +927,21 @@ module.exports = function (opts) {
                             if (wait === ch) {
                                 wait = waits.pop(); // collasping scope..
                                 if (!wait && ch === firstScope) { // the last & closing scope..
-                                    waitOperator = ("if" === operatorName) ? "else" : null;
+                                    switch (operatorName) {
+                                        case "if":
+                                            waitOperator = "else";
+                                            firstScope = null;
+                                            break;
+                                        case "do":
+                                            waitOperator = "while";
+                                            //firstScope = null; Don't do this for 'while' - it shouldn't expect the '{' char after that.
+                                            break;
+                                        default:
+                                            waitOperator = null;
+                                    }
                                     stop = !waitOperator;
                                     skipCh = (ch === '}') && !hasOperator;// skip the outer {} of the code-block
-                                    operatorName = firstScope = null; // reset
+                                    operatorName = null; 
                                     waitOperatorPos = this.pos;
                                 }
                             }
