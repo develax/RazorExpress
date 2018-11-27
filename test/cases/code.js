@@ -172,7 +172,7 @@
     return 123;
 }
 <div>@getValue()</div>`,
-            error: "Unexpected end of input"
+            expected: "\n<div>123</div>"
         },
         {
             name: "Code 20",
@@ -431,6 +431,35 @@
             name: "Code 53",
             template: `@{<span>1'2</span>}`,
             expected: `<span>1'2</span>`
+        },
+        {
+            name: "Code 54",
+            template: `
+@{
+    var a = 1, b = 2;
+}
+@if (a > b) {
+    <span>A</span>
+}
+else{
+    <span>B</span>
+}
+`,
+            expected: "\n    <span>B</span>\n"
+        }
+        ,
+        {
+            name: "Code 54",
+            template: `
+@{
+    var a = 1, b = 2;
+}
+@if (a > b) {
+    <span>A</span>
+}
+else
+`,
+        error: "'{' character is expected at line 8 pos 5"
         }
     ];
     module.exports = cases;

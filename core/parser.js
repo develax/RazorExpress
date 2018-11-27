@@ -33,6 +33,7 @@ module.exports = function (opts) {
     const dbg = require('./dbg/debugger');
     const log = require('./dbg/logger')({ on: opts.debug });
     log.debug(`Parse debug mode is '${!!opts.debug}'.`);
+    const debugMode = isDebugMode(opts);
 
     const HtmlString = require('./HtmlString');
     const htmlEncode = require('js-htmlencode');
@@ -45,22 +46,23 @@ module.exports = function (opts) {
         // Non-user section.
         this._vm = vm;
 
-        if (isDebugMode(opts)) {
+        if (debugMode) {
             this._sandbox = Object.create(null);
             vm.createContext(this._sandbox);
         }
 
         // function (process,...){...}() prevents [this] to exist for the 'vm.runInNewContext()' method
+        var deleteTemplate = (debugMode) ? "" : "delete Html.__template;";
         this._js = `
 (function (process, window, global, module, compilePage, compilePageSync, undefined) { 
     'use strict';
     delete Html._js;
-    delete Html._jshtml;
+    ${deleteTemplate}
     delete Html._vm;
     delete Html._sandbox;
     ${args.js}
 }).call();`;
-        this._jshtml = args.template;
+        this.__template = args.template;
         // User section.
         this.layout = null;
         // Private
@@ -745,6 +747,7 @@ module.exports = function (opts) {
             this.padding = '';
             var checkForBlockCode = false;
             let inText = false;
+            let operatorName = '';
 
             for (var ch = this.pickChar(); ch; ch = this.pickChar()) { // pick or fetch ??
                 if (checkForBlockCode) {
@@ -754,7 +757,7 @@ module.exports = function (opts) {
                     else if (ch === '{') {
                         this.flushPadding(blocks);
                         block.type = type.code;
-                        return this.parseJsBlock(blocks, block);
+                        return this.parseJsBlock(blocks, block, operatorName);
                     }
                     else {
                         break;
@@ -774,10 +777,13 @@ module.exports = function (opts) {
                     if (pos !== -1) { // ch === '(' || ch === '['
                         if (!firstScope) {
                             wait = firstScope = endScopes[pos];
+                            operatorName = block.text.trim();
                         }
                         else {
-                            if (wait) waits.push(wait);
+                            if (wait)
+                                waits.push(wait);
                             wait = endScopes[pos];
+
                         }
                     }
                     else if (wait) {
@@ -800,7 +806,7 @@ module.exports = function (opts) {
                         if (Char.isWhiteSpace(ch) || ch === '{') {
                             if (checkForSection.call(this))
                                 return;
-                            else
+                            else if (ch === '{')
                                 break;
                         }
                         else if (ch === '.') { // @Model.text
@@ -813,7 +819,18 @@ module.exports = function (opts) {
                         }
                     }
                 }
-                block.append(ch);
+
+                if (Char.isWhiteSpace(ch)) {
+                    if (!checkForBlockCode)
+                        this.padding += ch;
+                }
+                else {
+                    if (!checkForBlockCode)
+                        this.flushPadding(blocks);
+                        
+                    block.append(ch);
+                }
+
                 lastCh = ch;
                 this.fetchChar();
             }
@@ -837,7 +854,7 @@ module.exports = function (opts) {
             }
         }
 
-        parseJsBlock(blocks, block) {
+        parseJsBlock(blocks, block, operatorName) {
             log.debug();
             const startScopes = '{([';
             const endScopes = '})]';
@@ -852,6 +869,7 @@ module.exports = function (opts) {
             let hasOperator = !!block;
             block = block || newBlock(type.code, blocks);
             let firstLine = this.line, firstLineNum = this.lineNum, trackFirstLine = true;
+            let waitOperator = null, waitOperatorPos;
 
             for (var ch = this.pickChar(); !stop && ch; ch = this.pickChar()) { // pick or fetch ??
                 if (trackFirstLine) {
@@ -862,7 +880,18 @@ module.exports = function (opts) {
 
                 skipCh = false;
 
-                if (inText) {
+                if (waitOperator) {
+                    if (!Char.isWhiteSpace(ch)) {
+                        if (ch === waitOperator[0]) {
+                            waitOperator = waitOperator.slice(1);
+                        }
+                        else {
+                            this.stepBack(blocks, this.pos - waitOperatorPos);
+                            stop = true;
+                        }
+                    }
+                }
+                else if (inText) {
                     if (textQuotes.indexOf(ch) !== -1) { // it's some sort of text qoutes
                         if (ch === wait) {
                             wait = waits.pop(); // collasping quotes..
@@ -891,8 +920,11 @@ module.exports = function (opts) {
                             if (wait === ch) {
                                 wait = waits.pop(); // collasping scope..
                                 if (!wait && ch === firstScope) { // the last & closing scope..
-                                    stop = true;
+                                    waitOperator = ("if" === operatorName) ? "else" : null;
+                                    stop = !waitOperator;
                                     skipCh = (ch === '}') && !hasOperator;// skip the outer {} of the code-block
+                                    operatorName = firstScope = null; // reset
+                                    waitOperatorPos = this.pos;
                                 }
                             }
                             else {
@@ -958,6 +990,8 @@ module.exports = function (opts) {
                     ch = this.fetchChar();
                     if (ch === '\n') break; // a `\n` the last to skip
                 }
+                if (block.text === '')
+                    blocks.pop();
             }
             else {
                 this.flushPadding(blocks);
