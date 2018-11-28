@@ -287,6 +287,24 @@
 <script type="text/javascript">
     var longText = "<div>";
 </script>`
+        },
+        {
+            name: "HTML 32.1",
+            template: `
+<div>JS</div>
+<script type="text/javascript">
+    var longText = \`<div>\`;
+</script>`,
+            expected: `
+<div>JS</div>
+<script type="text/javascript">
+    var longText = \`<div>\`;
+</script>`
+        },
+        {
+            name: "HTML 32.2",
+            template: '<script type="text/javascript">var x = 2;var longText = `<div>${x}`;</script>',
+            expected: '<script type="text/javascript">var x = 2;var longText = `<div>${x}`;</script>'
         }
     ];
 

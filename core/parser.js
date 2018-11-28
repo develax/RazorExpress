@@ -336,7 +336,7 @@ module.exports = function (opts) {
         parseHtml(blocks, outerWaitTag) {
             log.debug();
             const docTypeName = "!DOCTYPE";
-            const textQuotes = '\'"';
+            const textQuotes = `'"\``;
             var quotes = [];
             const tagKinds = { open: 0, close: 1, selfclose: 2 };
             var openTags = [];
