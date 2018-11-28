@@ -46,6 +46,11 @@ class ParserErrorFactory {
         return RazorError.new({ message, info: this.info, line, capture: this.jsCodeBlockMissingClosingChar });
     }
 
+    wordExpected(word, line, pos, len){
+        var message = `'${word}' expected at line ${line + 1} pos ${pos + 1}.`;
+        return RazorError.new({ message, info: this.info, line, pos, len, capture: this.wordExpected });
+    }
+
     // invalidHtmlChar(ch, lineNum, posNum, afterText, expected) {
     //     var message = `"${ch}" is not a valid HTML character at line ${lineNum} pos ${posNum}` + (afterText ? ` after "${afterText}"` : expected ? ` (expected char = "${expected}")` : '.');
     //     return new RazorError(message, this.args, lineNum, posNum);
@@ -81,7 +86,7 @@ class ParserErrorFactory {
         return RazorError.new({ message, info: this.info, line, pos, capture: this.whiteSpaceExpectedAfter }); // cannot be tested.
     }
 
-    tagNameExpected(line, pos, html) {
+    tagNameExpected(line, pos) {
         var message = `Tag name expected at line ${line + 1} pos ${pos + 1}.`;
         return RazorError.new({ message, info: this.info, line, pos, capture: this.tagNameExpected });
     }

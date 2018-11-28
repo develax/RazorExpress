@@ -910,7 +910,7 @@ module.exports = function (opts) {
                     }
                     else if (waitAcc) { // there shouldn't be any spaces within the 'waitOperator'
                         if (waitOperator === "while")
-                            throw this.er.wordExpected(waitOperator, this.lineNum, this.linePos() - waitAcc.length);
+                            throw this.er.wordExpected(waitOperator, this.lineNum, this.linePos() - waitAcc.length); // [Code 59]
 
                         this.stepBack(blocks, waitAcc.length);
                         stop = true;
@@ -1034,7 +1034,7 @@ module.exports = function (opts) {
                 throw this.er.characterExpected(operatorExpectScope, this.lineNum, this.linePos());
 
             if (waitOperator === "while")
-                throw this.er.wordExpected(waitOperator, this.lineNum, this.linePos() - waitAcc.length);
+                throw this.er.wordExpected(waitOperator, this.lineNum, this.linePos() - waitAcc.length); // [Code 60]
 
             if (stop) {
                 // skip all spaces until a new line

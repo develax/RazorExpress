@@ -458,7 +458,20 @@ else{
 }
 else
 `,
-        error: "'{' character is expected at line 8 pos 5"
+            error: "'{' character is expected at line 8 pos 5"
+        },
+        {
+            name: "Code 55.1",
+            template: `
+@{
+    var a = 1, b = 2;
+}
+@if (a > b) {
+    <span>A</span>
+}
+els
+`,
+            expected: "\nels\n"
         },
         {
             name: "Code 56",
@@ -471,7 +484,7 @@ else
     a++;
 }
 `,
-        expected: "\n    <span>1</span>\n    <span>2</span>\n"
+            expected: "\n    <span>1</span>\n    <span>2</span>\n"
         },
         {
             name: "Code 57",
@@ -484,7 +497,45 @@ else
     a++;
 } while (a <= b);
 `,
-        expected: "\n    <span>1</span>\n    <span>2</span>\n"
+            expected: "\n    <span>1</span>\n    <span>2</span>\n"
+        },
+        {
+            name: "Code 58",
+            template: `
+@{
+    var a = 1, b = 2;
+}
+@do{
+    <span>@a</span>
+    a++;
+} while;
+`,
+            error: `'(' character is expected at line 8 pos 8.`
+        },
+        {
+            name: "Code 59",
+            template: `
+@{
+    var a = 1, b = 2;
+}
+@do{
+    <span>@a</span>
+    a++;
+} whil
+`,
+            error: "'while' expected at line 8 pos 3."
+        },
+        {
+            name: "Code 60",
+            template: `
+@{
+    var a = 1, b = 2;
+}
+@do{
+    <span>@a</span>
+    a++;
+} whil`,
+            error: "'while' expected at line 8 pos 3."
         }
     ];
     module.exports = cases;
