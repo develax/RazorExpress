@@ -342,7 +342,8 @@ module.exports = function (opts) {
             var openTags = [];
             var tag = '', lineLastLiteral = '', lastLiteral = '';
             var block = newBlock(type.html, blocks);
-            let stop = false, inComments = false, inJs = false;
+            let stop = false, inComments = false;
+            let inJs = "script".equal(outerWaitTag, true);
             var lastCh = '';
 
             for (var ch = this.pickChar(); ch; ch = this.pickChar()) {

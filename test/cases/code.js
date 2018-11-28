@@ -536,6 +536,22 @@ els
     a++;
 } whil`,
             error: "'while' expected at line 8 pos 3."
+        },
+        {
+            name: "Code 61",
+            template: `
+<div>JS</div>
+@if (2 > 1) {
+    <script type="text/javascript">
+        var longText = "<div>";
+    </script>
+}`,
+            expected: `
+<div>JS</div>
+    <script type="text/javascript">
+        var longText = "<div>";
+    </script>
+`
         }
     ];
     module.exports = cases;
