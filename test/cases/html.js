@@ -274,6 +274,19 @@
             name: "HTML 31",
             template: `<span>1'2</span>`,
             expected: `<span>1'2</span>`
+        },
+        {
+            name: "HTML 32",
+            template: `
+<div>JS</div>
+<script type="text/javascript">
+    var longText = "<div>";
+</script>`,
+            expected: `
+<div>JS</div>
+<script type="text/javascript">
+    var longText = "<div>";
+</script>`
         }
     ];
 

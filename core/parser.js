@@ -340,10 +340,9 @@ module.exports = function (opts) {
             var quotes = [];
             const tagKinds = { open: 0, close: 1, selfclose: 2 };
             var openTags = [];
-            let openTagLineNum, openTagPos, openTagLine;
             var tag = '', lineLastLiteral = '', lastLiteral = '';
             var block = newBlock(type.html, blocks);
-            let stop = false, inComments = false;
+            let stop = false, inComments = false, inJs = false;
             var lastCh = '';
 
             for (var ch = this.pickChar(); ch; ch = this.pickChar()) {
@@ -389,7 +388,7 @@ module.exports = function (opts) {
                         }
                     }
                 }
-                else if (tag && textQuotes.indexOf(ch) !== -1) { // it could be opening text qoutes
+                else if ((tag || inJs) && textQuotes.indexOf(ch) !== -1) { // it could be opening text qoutes within a tag's attributes or a JS-block
                     quotes.push(ch);
                     inQuotes = true;
                     if (tag) tag += ch;
@@ -446,6 +445,8 @@ module.exports = function (opts) {
                                     if (openTag.name.toUpperCase() !== tagName.toUpperCase())
                                         throw this.er.missingMatchingStartTag(tag, this.lineNum, this.linePos() - tag.length + 1); // tested by "Invalid-HTML 1+, 2+, 7"
                                     // else they are neitralizing each other..
+                                    if ("script".equal(tagName, true))
+                                        inJs = false;
                                 }
                                 else if (outerWaitTag && outerWaitTag === tagName) {
                                     this.stepBack(blocks, tag.length - 1);
@@ -456,10 +457,11 @@ module.exports = function (opts) {
                                 }
                             }
                             else if (tagKind === tagKinds.open) {
+                                inJs = "script".equal(tagName, true);
                                 openTags.push({ tag: tag, name: tagName, lineNum: this.lineNum, linePos: this.linePos() - tag.length + 1 });
                             }
                             else {
-                                // just do nothing
+                                // just do nothing (self-close tag)
                             }
                             tag = '';
                         }
@@ -513,6 +515,8 @@ module.exports = function (opts) {
 
             if (!stop)
                 this.flushPadding(blocks);
+
+            this.removeEmptyBlock();
         }
 
         parseHtmlInsideCode(blocks) {
@@ -806,15 +810,15 @@ module.exports = function (opts) {
                         if (Char.isWhiteSpace(ch) || ch === '{') {
                             if (checkForSection.call(this))
                                 return;
-                            else if (ch === '{'){
+                            else if (ch === '{') {
                                 var op = block.text.trim();
-                                if (op === "do"){
+                                if (op === "do") {
                                     operatorName = op;
                                     checkForBlockCode = true;
                                     continue;
                                 }
                                 break;
-                            } 
+                            }
                         }
                         else if (ch === '.') { // @Model.text
                             let nextCh = this.pickNextChar();
@@ -876,7 +880,7 @@ module.exports = function (opts) {
             let hasOperator = !!block;
             block = block || newBlock(type.code, blocks);
             let firstLine = this.line, firstLineNum = this.lineNum, trackFirstLine = true;
-            let waitOperator = null, waitOperatorPos;
+            let waitOperator = null, waitAcc = '', operatorExpectScope;
 
             for (var ch = this.pickChar(); !stop && ch; ch = this.pickChar()) { // pick or fetch ??
                 if (trackFirstLine) {
@@ -889,13 +893,28 @@ module.exports = function (opts) {
 
                 if (waitOperator) {
                     if (!Char.isWhiteSpace(ch)) {
-                        if (ch === waitOperator[0]) {
-                            waitOperator = waitOperator.slice(1);
+                        waitAcc += ch;
+
+                        if (waitOperator.startsWith(waitAcc)) {
+                            if (waitOperator === waitAcc) {
+                                waitOperator = null;
+                                if (waitAcc === "while")
+                                    operatorExpectScope = '(';
+                            }
                         }
                         else {
-                            this.stepBack(blocks, this.pos - waitOperatorPos);
+                            this.stepBack(blocks, waitAcc.length);
                             stop = true;
+                            break;
                         }
+                    }
+                    else if (waitAcc) { // there shouldn't be any spaces within the 'waitOperator'
+                        if (waitOperator === "while")
+                            throw this.er.wordExpected(waitOperator, this.lineNum, this.linePos() - waitAcc.length);
+
+                        this.stepBack(blocks, waitAcc.length);
+                        stop = true;
+                        break;
                     }
                 }
                 else if (inText) {
@@ -910,6 +929,13 @@ module.exports = function (opts) {
                     if (!firstScope && ch !== '{')
                         throw this.er.characterExpected('{', this.lineNum, this.linePos());
 
+                    if (operatorExpectScope && !Char.isWhiteSpace(ch)) {
+                        if (ch === operatorExpectScope)
+                            operatorExpectScope = null;
+                        else
+                            throw this.er.characterExpected(operatorExpectScope, this.lineNum, this.linePos());
+                    }
+
                     let pos = startScopes.indexOf(ch);
                     // IF it's a start-scope literal
                     if (pos !== -1) {
@@ -921,6 +947,9 @@ module.exports = function (opts) {
                             if (wait) waits.push(wait);
                             wait = endScopes[pos];
                         }
+
+                        if (operatorExpectScope == wait)
+                            operatorExpectScope = null;
                     }
                     else if (wait) {
                         if (endScopes.indexOf(ch) !== -1) { // IF it's an end-scope literal
@@ -941,8 +970,7 @@ module.exports = function (opts) {
                                     }
                                     stop = !waitOperator;
                                     skipCh = (ch === '}') && !hasOperator;// skip the outer {} of the code-block
-                                    operatorName = null; 
-                                    waitOperatorPos = this.pos;
+                                    operatorName = null;
                                 }
                             }
                             else {
@@ -1002,14 +1030,19 @@ module.exports = function (opts) {
             if (wait)
                 throw this.er.jsCodeBlockMissingClosingChar(firstLineNum, firstLine); // tests: "Code 29"
 
+            if (operatorExpectScope)
+                throw this.er.characterExpected(operatorExpectScope, this.lineNum, this.linePos());
+
+            if (waitOperator === "while")
+                throw this.er.wordExpected(waitOperator, this.lineNum, this.linePos() - waitAcc.length);
+
             if (stop) {
                 // skip all spaces until a new line
                 while (Char.isWhiteSpace(this.pickChar())) {
                     ch = this.fetchChar();
                     if (ch === '\n') break; // a `\n` the last to skip
                 }
-                if (block.text === '')
-                    blocks.pop();
+                this.removeEmptyBlock();
             }
             else {
                 this.flushPadding(blocks);
@@ -1186,6 +1219,11 @@ module.exports = function (opts) {
             let str = this.text.substr(this.pos, len);
             this.pos += len;
             return str;
+        }
+
+        removeEmptyBlock() {
+            if (this.blocks.length && !this.blocks[this.blocks.length - 1].text)
+                this.blocks.pop();
         }
     }
 
