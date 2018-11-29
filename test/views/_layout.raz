@@ -14,6 +14,7 @@
         <div>
             <strong>@name</strong>
         </div>
+        <div class="shared-data">@Shared.test</div>
         @Html.body()
         <hr />
         <footer>

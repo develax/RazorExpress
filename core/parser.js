@@ -1,7 +1,7 @@
 'use strict';
 require('./utils');
 
-function compilePageSync(Html, Model, debug) {
+function compilePageSync(Html, Model, Shared, debug) {
     'use strict';
 
     if (debug) {
@@ -9,6 +9,7 @@ function compilePageSync(Html, Model, debug) {
         let vm = Html._vm;
         sandbox.Html = Html;
         sandbox.Model = Model;
+        sandbox.Shared = Shared;
         vm.runInNewContext(Html._js, sandbox);
     }
     else {
@@ -18,9 +19,9 @@ function compilePageSync(Html, Model, debug) {
     return;
 }
 
-function compilePage(Html, Model, debug, done) {
+function compilePage(Html, Model, Shared, debug, done) {
     try {
-        compilePageSync(Html, Model, debug);
+        compilePageSync(Html, Model, Shared, debug);
         return Html.__renderLayout(done);
     }
     catch (exc) {
@@ -65,6 +66,7 @@ module.exports = function (opts) {
         if (debugMode)
             this.__dbg = { viewName: args.filePath, template: args.template }
         
+        this.$ =
         this.layout = null;
         // Private
         let section = null;
@@ -89,7 +91,8 @@ module.exports = function (opts) {
                     findPartial: args.findPartial,
                     findPartialSync: args.findPartialSync,
                     sections,
-                    parsedSections: args.parsedSections
+                    parsedSections: args.parsedSections,
+                    viewsSharedData: args.viewsSharedData
                 };
                 compile(compileOpt, done);
             });
@@ -166,7 +169,8 @@ module.exports = function (opts) {
                 findPartial: args.findPartial,
                 findPartialSync: args.findPartialSync,
                 sections,
-                parsedSections: args.parsedSections
+                parsedSections: args.parsedSections,
+                viewsSharedData: args.viewsSharedData
             };
             let html = compileSync(compileOpt);
             args.html += html;
@@ -276,7 +280,7 @@ module.exports = function (opts) {
                 return onError(exc);
             }
 
-            compilePage(html, this.args.model, isDebugMode(opts), (err, html) => {
+            compilePage(html, this.args.model, this.args.viewsSharedData, isDebugMode(opts), (err, html) => {
                 if (err)
                     return onError(err, this);
 
@@ -294,7 +298,7 @@ module.exports = function (opts) {
                 log.debug();
                 var htmlArgs = {};
                 var html = this.getHtml(htmlArgs);
-                compilePageSync(html, this.args.model, isDebugMode(opts));
+                compilePageSync(html, this.args.model, this.args.viewsSharedData, isDebugMode(opts));
             }
             catch (exc) {
                 throw toParserError(exc, this.er);
@@ -304,7 +308,6 @@ module.exports = function (opts) {
         }
 
         getHtml(htmlArgs) {
-
             let jshtml = this.args.template;
             var isString = Object.prototype.toString.call(jshtml) === "[object String]";
 
@@ -315,6 +318,7 @@ module.exports = function (opts) {
             this.text = jshtml, this.line = '', this.lineNum = 0, this.pos = 0, this.padding = '';
             this.inSection = false;
             this.args.parsedSections = this.args.parsedSections || {};
+            this.args.viewsSharedData = this.args.viewsSharedData || {};
             this.blocks = [];
             this.parseHtml(this.blocks);
             var valuesQueue = new Queue();

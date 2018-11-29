@@ -91,6 +91,8 @@ describe("server routes", () => {
                     let $ = jQuery(res.text);
                     let layouts = $(`div > strong:contains('${layoutNames[0]}')`);
                     expect(layouts, "layouts count").to.have.lengthOf(layoutNames.length);
+                    let sharedTests = $('div.shared-data:contains("Test shared object.")');
+                    expect(sharedTests, "views shared data test").to.have.lengthOf(3);
 
                     for (var i = 0; i < layouts.length; i++) {
                         let layout = layouts[i];

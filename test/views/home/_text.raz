@@ -1,1 +1,2 @@
 ﻿<p>@Model</p>
+<div class="shared-data">@Shared.test</div>
