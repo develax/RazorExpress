@@ -119,7 +119,7 @@ module.exports = class RazorError extends Error {
         }
         ol li {
             background-color: #fbfbfb;
-            white-space: pre-wrap;
+            white-space: pre;
         }
         ol li.highlight{
             color: red;// darkslategray;

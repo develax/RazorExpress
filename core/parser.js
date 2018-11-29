@@ -52,18 +52,19 @@ module.exports = function (opts) {
         }
 
         // function (process,...){...}() prevents [this] to exist for the 'vm.runInNewContext()' method
-        var deleteTemplate = (debugMode) ? "" : "delete Html.__template;";
         this._js = `
 (function (process, window, global, module, compilePage, compilePageSync, undefined) { 
     'use strict';
     delete Html._js;
-    ${deleteTemplate}
     delete Html._vm;
     delete Html._sandbox;
     ${args.js}
 }).call();`;
-        this.__template = args.template;
+
         // User section.
+        if (debugMode)
+            this.__dbg = { viewName: args.filePath, template: args.template }
+        
         this.layout = null;
         // Private
         let section = null;
