@@ -1292,7 +1292,7 @@ module.exports = function (opts) {
             return err;
         }
 
-        let parserError = errorFactory.customError(err.message || err, this.toParserError);
+        let parserError = errorFactory.customError(err.message || err, toParserError);
 
         if (err.stack)
             parserError.stack = err.stack;
