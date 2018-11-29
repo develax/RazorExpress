@@ -904,7 +904,7 @@ module.exports = function (opts) {
                             }
                         }
                         else {
-                            this.stepBack(blocks, waitAcc.length);
+                            this.stepBack(blocks, waitAcc.length - 1);
                             stop = true;
                             break;
                         }
@@ -1163,7 +1163,7 @@ module.exports = function (opts) {
             let block = blocks[blocks.length - 1];
 
             if (count > this.line.length || block.text.length < count)
-                throw `this.stepBack(${count}) is out of range.`;
+                throw new Error(`this.stepBack(${count}) is out of range.`);
 
             var cut;
 
@@ -1292,8 +1292,7 @@ module.exports = function (opts) {
             return err;
         }
 
-
-        let parserError = errorFactory.customError(err.message);
+        let parserError = errorFactory.customError(err.message || err, this.toParserError);
 
         if (err.stack)
             parserError.stack = err.stack;

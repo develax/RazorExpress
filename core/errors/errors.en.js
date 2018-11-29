@@ -165,8 +165,8 @@ class ParserErrorFactory {
     //     return new ParserError(message, this.args);
     // }
 
-    customError(message) {
-        return RazorError.new({ message, info: this.info, capture: this.customError });
+    customError(message, capture) {
+        return RazorError.new({ message, info: this.info, capture: capture || this.customError });
     }
 }
 
