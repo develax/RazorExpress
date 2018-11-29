@@ -9,7 +9,7 @@
   - [What is View Template](https://github.com/DevelAx/RazorExpress/blob/master/docs/overview.md#what-is-view-template)
   - [What is View Template Engine](https://github.com/DevelAx/RazorExpress/blob/master/docs/overview.md#what-is-view-template-engine)
   - [What is Razor-Express](https://github.com/DevelAx/RazorExpress/blob/master/docs/overview.md#what-is-razor-express)
-- [**Pitfalls**](#warning-common-pitfalls)
+- [**Common pitfalls & remarks**](#warning-common-pitfalls)
   - [Missing semicolon](#missing-semicolon)
 - [**Errors handling**](https://github.com/DevelAx/RazorExpress/blob/master/docs/ErrorsHandling.md)
   - [Custom error handler](https://github.com/DevelAx/RazorExpress/blob/master/docs/ErrorsHandling.md#custom-error-handler)
