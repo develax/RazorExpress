@@ -1,7 +1,7 @@
 'use strict';
 require('./utils');
 
-function compilePageSync(Html, Model, Shared, debug) {
+function compilePageSync(Html, Model, ViewData, debug) {
     'use strict';
 
     if (debug) {
@@ -9,7 +9,7 @@ function compilePageSync(Html, Model, Shared, debug) {
         let vm = Html._vm;
         sandbox.Html = Html;
         sandbox.Model = Model;
-        sandbox.Shared = Shared;
+        sandbox.ViewData = ViewData;
         vm.runInNewContext(Html._js, sandbox);
     }
     else {
@@ -19,9 +19,9 @@ function compilePageSync(Html, Model, Shared, debug) {
     return;
 }
 
-function compilePage(Html, Model, Shared, debug, done) {
+function compilePage(Html, Model, ViewData, debug, done) {
     try {
-        compilePageSync(Html, Model, Shared, debug);
+        compilePageSync(Html, Model, ViewData, debug);
         return Html.__renderLayout(done);
     }
     catch (exc) {
@@ -92,7 +92,7 @@ module.exports = function (opts) {
                     findPartialSync: args.findPartialSync,
                     sections,
                     parsedSections: args.parsedSections,
-                    viewsSharedData: args.viewsSharedData
+                    viewData: args.viewData
                 };
                 compile(compileOpt, done);
             });
@@ -170,7 +170,7 @@ module.exports = function (opts) {
                 findPartialSync: args.findPartialSync,
                 sections,
                 parsedSections: args.parsedSections,
-                viewsSharedData: args.viewsSharedData
+                viewData: args.viewData
             };
             let html = compileSync(compileOpt);
             args.html += html;
@@ -280,7 +280,7 @@ module.exports = function (opts) {
                 return onError(exc);
             }
 
-            compilePage(html, this.args.model, this.args.viewsSharedData, isDebugMode(opts), (err, html) => {
+            compilePage(html, this.args.model, this.args.viewData, isDebugMode(opts), (err, html) => {
                 if (err)
                     return onError(err, this);
 
@@ -298,7 +298,7 @@ module.exports = function (opts) {
                 log.debug();
                 var htmlArgs = {};
                 var html = this.getHtml(htmlArgs);
-                compilePageSync(html, this.args.model, this.args.viewsSharedData, isDebugMode(opts));
+                compilePageSync(html, this.args.model, this.args.viewData, isDebugMode(opts));
             }
             catch (exc) {
                 throw toParserError(exc, this.er);
@@ -318,7 +318,7 @@ module.exports = function (opts) {
             this.text = jshtml, this.line = '', this.lineNum = 0, this.pos = 0, this.padding = '';
             this.inSection = false;
             this.args.parsedSections = this.args.parsedSections || {};
-            this.args.viewsSharedData = this.args.viewsSharedData || {};
+            this.args.viewData = this.args.viewData || this.args.ViewData || {};
             this.blocks = [];
             this.parseHtml(this.blocks);
             var valuesQueue = new Queue();
