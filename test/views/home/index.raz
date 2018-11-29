@@ -1,7 +1,7 @@
 ﻿@{
 	var title = 'My "Razor-Expess" Engine';
     //Html.layout = "_layoutBlue123";
-    Shared.test = "Test shared object.";
+    ViewData.test = "Test shared object.";
 }
 
 <div style="background-color: white">

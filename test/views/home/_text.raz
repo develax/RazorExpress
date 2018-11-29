@@ -1,2 +1,2 @@
 ﻿<p>@Model</p>
-<div class="shared-data">@Shared.test</div>
+<div class="shared-data">@ViewData.test</div>
