@@ -1116,7 +1116,7 @@ module.exports = function (opts) {
             let sectionId = sectionName + "#" + this.args.filePath;
             let section = this.args.parsedSections[sectionId];
 
-            if (section && section.filePath === this.args.filePath)
+            if (section)
                 throw this.er.sectionIsAlreadyDefined(sectionName, this.lineNum, sectionNamePos, this.args.filePath); // Tests: "Section 8".
 
             this.args.parsedSections[sectionId] = { name: sectionName, filePath: this.args.filePath };
