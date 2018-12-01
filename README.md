@@ -10,7 +10,7 @@
   - [What is View Template Engine](https://github.com/DevelAx/RazorExpress/blob/master/docs/overview.md#what-is-view-template-engine)
   - [What is Razor-Express](https://github.com/DevelAx/RazorExpress/blob/master/docs/overview.md#what-is-razor-express)
 - [**Razor-Express View API**](#razor-express-view-api)
-  - [Analogues of ASP.NET MVC Razor HtmlHelper methods](#xxx)
+  - [Analogues of ASP.NET MVC Razor HtmlHelper methods](#analogues-of-aspnet-mvc-razor-htmlhelper-methods)
   - [Examples of usage](#examples-of-usage)
 - [**Common pitfalls & remarks**](#warning-common-pitfalls)
   - [Missing semicolon](#missing-semicolon)
