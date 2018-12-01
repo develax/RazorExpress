@@ -1335,7 +1335,9 @@ module.exports = function (opts) {
     // Module/Exports..
     return {
         compile,
-        compileSync
+        compileSync: args => {
+            return compileSync(args).html;
+        }
     };
 
 }; // module.export
