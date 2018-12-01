@@ -112,7 +112,7 @@ class ParserErrorFactory {
     }
 
     sectionIsAlreadyDefined(sectionName, line, pos, viewFilePath) {
-        var message = `The section '${sectionName}' at line ${line + 1} pos ${pos + 1} has been already defined in the file '${viewFilePath}'. You cannot assign the same name to different sections in the same file.`;
+        var message = `Section '${sectionName}' at line ${line + 1} pos ${pos + 1} has been already defined in the file '${viewFilePath}'. You cannot assign the same name to different sections in the same file.`;
         return RazorError.new({ message, info: this.info, line, pos, len: sectionName.length, capture: this.sectionIsAlreadyDefined });
     }
 
@@ -127,12 +127,17 @@ class ParserErrorFactory {
     }
 
     sectionIsNotFound(sectionName, filePath) {
-        var message = `The view '${filePath}' requires the section '${sectionName}' which cannot be found.`;
+        var message = `View '${filePath}' requires the section '${sectionName}' which cannot be found.`;
         return RazorError.new({ message, info: this.info, capture: this.sectionIsNotFound });
     }
 
-    sectionBeenRendered(sectionName, renderedBy, attemptedBy) {
-        var message = `The section '${sectionName}' has already been rendered by '${renderedBy}'. There is an atempt to rendered it again by '${attemptedBy}'.`;
+    sectionsAlreadyRendered(sectionName, renderedBy, attemptedBy) {
+        var message = `Sections named '${sectionName}' have already been rendered by '${renderedBy}'. There is an atempt to rendered it again by '${attemptedBy}'.`;
+        return RazorError.new({ message, info: this.info, capture: this.sectionBeenRendered });
+    }
+
+    sectionNeverRendered(sectionName,) {
+        var message = `Section '${sectionName}' has never been rendered. If a section exists it must be rendered.`;
         return RazorError.new({ message, info: this.info, capture: this.sectionBeenRendered });
     }
 

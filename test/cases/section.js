@@ -88,7 +88,7 @@
     @section Scripts{
     }
 </div>`,
-            error: `The section 'Scripts' at line 5 pos 14 has been already defined in the file 'Section 8'. You cannot assign the same name to different sections in the same file.`
+            error: `Section 'Scripts' at line 5 pos 14 has been already defined in the file 'Section 8'. You cannot assign the same name to different sections in the same file.`
         },
         {
             name: "Section 9",

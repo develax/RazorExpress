@@ -69,8 +69,8 @@ module.exports = function (opts) {
         this.$ =
             this.layout = null;
         // Private
-        let section = null;
-        let sections = args.sections || {};
+        let sectionName = null;
+        let sections = args.parsedSections;
 
         this.__val = function (i) {
             return args.jsValues.getAt(i);
@@ -90,7 +90,6 @@ module.exports = function (opts) {
                     bodyHtml: args.html,
                     findPartial: args.findPartial,
                     findPartialSync: args.findPartialSync,
-                    sections,
                     parsedSections: args.parsedSections,
                     partialsCache: args.partialsCache,
                     viewData: args.viewData
@@ -99,11 +98,11 @@ module.exports = function (opts) {
             });
         };
 
-        this.__sec = function (name) { // section
-            if (!section)
-                section = name;
-            else if (section === name)
-                section = null;
+        this.__sec = function (name) { // in section
+            if (!sectionName)
+                sectionName = name;
+            else if (sectionName === name)
+                sectionName = null;
             else
                 throw new Error(`Unexpected section name = '${name}'.`); // Cannot be tested via user-inputs.
         };
@@ -112,11 +111,8 @@ module.exports = function (opts) {
             if (typeof val === 'undefined' || val === '') // 'undefined' can be passed when `Html.raw()` is used by user in the view, in this case it will be wrapped into `Html.ecnode()` anyway an it will call `Html.raw` passing 'undefined' to it.
                 return;
 
-            if (section) {
-                if (!sections[section])
-                    sections[section] = { html: '' };
-
-                sections[section].html += val;
+            if (sectionName) {
+                sections[sectionName][args.filePath].html += val;
             }
             else {
                 args.html += val;
@@ -150,14 +146,23 @@ module.exports = function (opts) {
             if (!args.filePath)
                 throw new Error("'args.filePath' is not set.");
 
-            let sec = sections[name];
+            let secGroup = sections[name];
 
-            if (sec) {
-                if (sec.renderedBy)
-                    throw args.er.sectionBeenRendered(name, sec.renderedBy, args.filePath); // TESTME:
+            if (secGroup) {
+                if (secGroup.renderedBy)
+                    throw args.er.sectionsAlreadyRendered(name, secGroup.renderedBy, args.filePath); // TESTME:
 
-                sec.renderedBy = args.filePath;
-                return new HtmlString(sec.html);
+                let html = '';
+
+                for (var key in secGroup) {
+                    if (secGroup.hasOwnProperty(key)) {
+                        let sec = secGroup[key];
+                        html += sec.html;
+                    }
+                }
+
+                secGroup.renderedBy = args.filePath;
+                return new HtmlString(html);
             }
             else {
                 if (required)
@@ -306,7 +311,15 @@ module.exports = function (opts) {
 
             compilePage(html, this.args.model, this.args.viewData, isDebugMode(opts), (err, html) => {
                 if (err)
-                    return onError(err, this);
+                    return onError(err);
+
+                try {
+                    if (this.args.root)
+                        this.checkSections();
+                }
+                catch (exc) {
+                    return onError(exc);
+                }
 
                 return done(null, html);
             });
@@ -323,6 +336,9 @@ module.exports = function (opts) {
                 var htmlArgs = {};
                 var html = this.getHtml(htmlArgs);
                 compilePageSync(html, this.args.model, this.args.viewData, isDebugMode(opts));
+
+                if (this.args.root)
+                    this.checkSections();
             }
             catch (exc) {
                 throw toParserError(exc, this.er);
@@ -367,6 +383,20 @@ module.exports = function (opts) {
             Object.assign(htmlArgs, this.args);
             var html = new Html(htmlArgs);
             return html;
+        }
+
+        // Check if all sections have been rendered.
+        checkSections() {
+            let sections = this.args.parsedSections;
+
+            for (var key in sections) {
+                if (sections.hasOwnProperty(key)) {
+                    let sec = sections[key];
+                    
+                    if (!sec.renderedBy)
+                        throw this.er.sectionNeverRendered(key);
+                }
+            }
         }
 
         parseHtml(blocks, outerWaitTag) {
@@ -1126,13 +1156,18 @@ module.exports = function (opts) {
             }
 
             // check if the section name is unique ..
-            let sectionId = sectionName + "#" + this.args.filePath;
-            let section = this.args.parsedSections[sectionId];
+            let sections = this.args.parsedSections[sectionName];
 
-            if (section)
-                throw this.er.sectionIsAlreadyDefined(sectionName, this.lineNum, sectionNamePos, this.args.filePath); // Tests: "Section 8".
+            if (sections) {
+                let section = sections[this.args.filePath]
+                if (section)
+                    throw this.er.sectionIsAlreadyDefined(sectionName, this.lineNum, sectionNamePos, this.args.filePath); // Tests: "Section 8".
+            }
+            else {
+                this.args.parsedSections[sectionName] = sections = {};
+            }
 
-            this.args.parsedSections[sectionId] = { name: sectionName, filePath: this.args.filePath };
+            sections[this.args.filePath] = { name: sectionName, filePath: this.args.filePath, html: '' };
 
             // skip all following whitespaces ..
             ch = this.skipWhile(c => Char.isWhiteSpace(c));
@@ -1347,8 +1382,12 @@ module.exports = function (opts) {
 
     // Module/Exports..
     return {
-        compile,
+        compile: (args, done) => {
+            args.root = true;
+            return compile(args, done);
+        },
         compileSync: args => {
+            args.root = true;
             return compileSync(args).html;
         }
     };
