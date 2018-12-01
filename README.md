@@ -9,6 +9,9 @@
   - [What is View Template](https://github.com/DevelAx/RazorExpress/blob/master/docs/overview.md#what-is-view-template)
   - [What is View Template Engine](https://github.com/DevelAx/RazorExpress/blob/master/docs/overview.md#what-is-view-template-engine)
   - [What is Razor-Express](https://github.com/DevelAx/RazorExpress/blob/master/docs/overview.md#what-is-razor-express)
+- [**Razor-Express View API**](#razor-express-view-api)
+  - [Analogues of ASP.NET MVC Razor HtmlHelper methods](#xxx)
+  - [Examples of usage](#examples-of-usage)
 - [**Common pitfalls & remarks**](#warning-common-pitfalls)
   - [Missing semicolon](#missing-semicolon)
 - [**Errors handling**](https://github.com/DevelAx/RazorExpress/blob/master/docs/ErrorsHandling.md)
@@ -179,7 +182,65 @@ ____
 
 The source code of this example is available in [RazorExpressExample](https://github.com/DevelAx/RazorExpressExample) repository.
 
------------------------
+
+Razor-Express View API
+===
+Analogues of ASP.NET MVC Razor HtmlHelper methods
+---
+
+Razor-Express methods | ASP.NET MVC methods
+------------ | -------------
+Html.layout | Layout 
+Html.body | RenderBody
+Html.partial |  Html.RenderPartial & Html.Partial
+Html.raw | Html.Raw
+
+Examples of usage
+===
+Html.layout
+---
+```HTML+RAZOR
+@{
+    Html.layout = "_layout";
+}
+```
+Html.body
+---
+```HTML+RAZOR
+<!DOCTYPE html>
+<html>
+<head>...</head>
+<body>
+  ...
+  @Html.body()
+  ...
+</body>
+</html>
+```
+Html.partial
+---
+```HTML+RAZOR
+<div>
+  @Html.partial("_userForm")
+</div>
+```
+or
+```HTML+RAZOR
+@if(Model.showUserForm){
+    Html.partial("_userForm");
+}
+```
+Html.raw
+---
+```HTML+RAZOR
+@{
+  var boldText = "This is an example of <b>bold text</b>.";
+}
+<span>@Html.raw(boldText)</span>
+```
+
+**While the documentation is under development, use [this repository](https://github.com/DevelAx/RazorExpressFullExample) for more comprehensive examples.**
+
 
 :warning: Common pitfalls
 ===
