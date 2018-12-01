@@ -21,7 +21,7 @@ module.exports = class Razor {
         let originFilePath = filepath;
         filepath = path.normalize(filepath);
         //let fileName = path.fileName(filepath);
-        let viewsPath = path.normalize(this.options.settings.views);
+        //let viewsPath = path.normalize(this.options.settings.views);
 
         if (!path.extname(filepath))
             filepath += '.' + this.viewExt();

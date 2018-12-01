@@ -132,6 +132,16 @@ module.exports = function (opts) {
                 this.raw(htmlEncode(val.toString()));
         };
 
+        this.getEncoded = function (val) {
+            if (!val || typeof val === "number" || val instanceof Number || val instanceof HtmlString)
+                return val;
+
+            if (typeof val === "string" || val instanceof String)
+                return htmlEncode(val);
+
+            return htmlEncode(val.toString());
+        };
+
         this.body = function () {
             return new HtmlString(args.bodyHtml);
         };
@@ -159,7 +169,7 @@ module.exports = function (opts) {
             // TODO: throw error that section was not rendered.
         };
 
-        this.partial = function (viewName, viewModel) {
+        this.getPartial = function (viewName, viewModel) {
             let compileOpt = {
                 model: viewModel || args.model, // if is not set explicitly, set default (parent) model
                 findPartial: args.findPartial,
@@ -184,8 +194,11 @@ module.exports = function (opts) {
             partial.js = precompiled.js; // put to cache
             partial.jsValues = precompiled.jsValues; // put to cache
 
-            args.html += html;
-            return ''; // for the case of call as expression <div>@Html.partial()</div>
+            return html;
+        };
+
+        this.partial = function (viewName, viewModel) {
+            args.html += this.getPartial(viewName, viewModel);
         };
     }
 
