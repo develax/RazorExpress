@@ -65,15 +65,15 @@ module.exports = function (opts) {
         // User section.
         if (debugMode)
             this.__dbg = { viewName: args.filePath, template: args.template }
-        
+
         this.$ =
-        this.layout = null;
+            this.layout = null;
         // Private
         let section = null;
         let sections = args.sections || {};
 
         this.__val = function (i) {
-            return args.valuesQueue.getAt(i);
+            return args.jsValues.getAt(i);
         };
 
         this.__renderLayout = (done) => {
@@ -92,6 +92,7 @@ module.exports = function (opts) {
                     findPartialSync: args.findPartialSync,
                     sections,
                     parsedSections: args.parsedSections,
+                    partialsCache: args.partialsCache,
                     viewData: args.viewData
                 };
                 compile(compileOpt, done);
@@ -159,20 +160,30 @@ module.exports = function (opts) {
         };
 
         this.partial = function (viewName, viewModel) {
-            // if an exception occurs it will be thron directly to to ExpressApp and shown on the users' page (fix later):
-            // https://expressjs.com/en/guide/error-handling.html
-            let { data, filePath } = args.findPartialSync(viewName, args.filePath, args.er);
             let compileOpt = {
-                template: data,
-                filePath,
                 model: viewModel || args.model, // if is not set explicitly, set default (parent) model
                 findPartial: args.findPartial,
                 findPartialSync: args.findPartialSync,
                 sections,
                 parsedSections: args.parsedSections,
+                partialsCache: args.partialsCache,
                 viewData: args.viewData
             };
-            let html = compileSync(compileOpt);
+
+            // Read file and complie to JS.
+            let partial = args.findPartialSync(viewName, args.filePath, args.er, args.partialsCache);
+            compileOpt.template = partial.data;
+            compileOpt.filePath = partial.filePath;
+
+            if (partial.js) { // if it's taken from cache
+                compileOpt.js = partial.js;
+                compileOpt.jsValues = partial.jsValues;
+            }
+
+            let { html, precompiled } = compileSync(compileOpt);
+            partial.js = precompiled.js; // put to cache
+            partial.jsValues = precompiled.jsValues; // put to cache
+
             args.html += html;
             return ''; // for the case of call as expression <div>@Html.partial()</div>
         };
@@ -191,19 +202,19 @@ module.exports = function (opts) {
             //this.text += (ch === '"') ? '\\"' : ch;
         }
 
-        toScript(valuesQueue) {
-            return toScript(this, valuesQueue);
+        toScript(jsValues) {
+            return toScript(this, jsValues);
         }
     }
 
-    function toScript(block, valuesQueue) {
+    function toScript(block, jsValues) {
         if (block.type === type.section) {
             let secMarker = `\r\nHtml.__sec("${block.name}");`;
             let script = secMarker;
 
             for (let n = 0; n < block.blocks.length; n++) {
                 let sectionBlock = block.blocks[n];
-                script += toScript(sectionBlock, valuesQueue);
+                script += toScript(sectionBlock, jsValues);
             }
 
             script += secMarker;
@@ -214,10 +225,10 @@ module.exports = function (opts) {
 
             switch (block.type) {
                 case type.html:
-                    i = valuesQueue.enq(block.text);
+                    i = jsValues.enq(block.text);
                     return "\r\nHtml.raw(Html.__val(" + i + "));";
                 case type.expr:
-                    i = valuesQueue.enq(block.text);
+                    i = jsValues.enq(block.text);
                     return "\r\nHtml.encode(eval(Html.__val(" + i + ")));";
                 case type.code:
                     return "\r\n" + block.text; // to be on a separate line
@@ -304,32 +315,39 @@ module.exports = function (opts) {
                 throw toParserError(exc, this.er);
             }
 
-            return htmlArgs.html;
+            return { html: htmlArgs.html, precompiled: { js: htmlArgs.js, jsValues: htmlArgs.jsValues } };
         }
 
         getHtml(htmlArgs) {
-            let jshtml = this.args.template;
-            var isString = Object.prototype.toString.call(jshtml) === "[object String]";
-
-            if (!isString)
-                throw new Error(ErrorsFactory.templateShouldBeString);
-
-            log.debug(`HTML = \`${jshtml}\``);
-            this.text = jshtml, this.line = '', this.lineNum = 0, this.pos = 0, this.padding = '';
-            this.inSection = false;
             this.args.parsedSections = this.args.parsedSections || {};
             this.args.viewData = this.args.viewData || this.args.ViewData || {};
-            this.blocks = [];
-            this.parseHtml(this.blocks);
-            var valuesQueue = new Queue();
-            var scripts = this.blocks.map(b => b.toScript(valuesQueue));
-            var js = scripts.join("");
+            this.args.partialsCache = this.args.partialsCache || {};
+            let js = this.args.js;
+            let jsValues = this.args.jsValues;
+            let template = this.args.template;
+
+            if (!js) {
+                var isString = Object.prototype.toString.call(template) === "[object String]";
+
+                if (!isString)
+                    throw new Error(ErrorsFactory.templateShouldBeString);
+
+                log.debug(`HTML = \`${template}\``);
+                this.text = template;
+                this.line = '', this.lineNum = 0, this.pos = 0, this.padding = '';
+                this.inSection = false;
+                this.blocks = [];
+                this.parseHtml(this.blocks);
+                jsValues = new Queue();
+                var scripts = this.blocks.map(b => b.toScript(jsValues));
+                js = scripts.join("");
+            }
 
             Object.assign(htmlArgs, {
                 html: '',
-                valuesQueue,
+                jsValues,
                 js,
-                jshtml,
+                template,
                 er: this.er
             });
 
@@ -1095,14 +1113,17 @@ module.exports = function (opts) {
             }
 
             // check if the section name is unique ..
-            let section = this.args.parsedSections[sectionName]; //.find(s => sectionName === s);
+            let sectionId = sectionName + "#" + this.args.filePath;
+            let section = this.args.parsedSections[sectionId];
 
-            if (section)
-                throw this.er.sectionIsAlreadyDefined(sectionName, this.lineNum, sectionNamePos); // Tests: "Section 8".
+            if (section && section.filePath === this.args.filePath)
+                throw this.er.sectionIsAlreadyDefined(sectionName, this.lineNum, sectionNamePos, this.args.filePath); // Tests: "Section 8".
 
-            this.args.parsedSections[sectionName] = { filePath: this.args.filePath };
+            this.args.parsedSections[sectionId] = { name: sectionName, filePath: this.args.filePath };
+
             // skip all following whitespaces ..
             ch = this.skipWhile(c => Char.isWhiteSpace(c));
+
             if (ch !== '{')
                 throw this.er.unexpectedLiteralFollowingTheSection(ch, this.lineNum, this.linePos()); // Tests: "Section 7".
 
@@ -1297,7 +1318,7 @@ module.exports = function (opts) {
             return err;
         }
 
-        let parserError = errorFactory.customError(err.message || err, toParserError);
+        let parserError = errorFactory.customError(err.message || err);
 
         if (err.stack)
             parserError.stack = err.stack;

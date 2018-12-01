@@ -111,9 +111,9 @@ class ParserErrorFactory {
         return RazorError.new({ message, info: this.info, line, pos, capture: this.unexpectedLiteralFollowingTheSection });
     }
 
-    sectionIsAlreadyDefined(sectionName, line, pos) {
-        var message = `The section '${sectionName}' at line ${line + 1} pos ${pos + 1} has been already defined.`;
-        return RazorError.new({ message, info: this.info, line, pos, capture: this.sectionIsAlreadyDefined });
+    sectionIsAlreadyDefined(sectionName, line, pos, viewFilePath) {
+        var message = `The section '${sectionName}' at line ${line + 1} pos ${pos + 1} has been already defined in the file '${viewFilePath}'. You cannot assign the same name to different sections in the same file.`;
+        return RazorError.new({ message, info: this.info, line, pos, len: sectionName.length, capture: this.sectionIsAlreadyDefined });
     }
 
     // sectionBlockIsMissingClosingBrace(sectionName) {

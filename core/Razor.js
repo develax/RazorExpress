@@ -47,9 +47,9 @@ module.exports = class Razor {
                         var startDir = path.dirname(filePath);
                         this.findPartial(startDir, layoutName, [], errorsFactory, done);
                     },
-                    findPartialSync: (layoutName, filePath, errorsFactory) => {
+                    findPartialSync: (layoutName, filePath, errorsFactory, cache) => {
                         var startDir = path.dirname(filePath);
-                        return this.findPartialSync(startDir, layoutName, [], errorsFactory);
+                        return this.findPartialSync(startDir, layoutName, [], errorsFactory, cache);
                     }
                 };
 
@@ -83,7 +83,7 @@ module.exports = class Razor {
         });
     }
 
-    findPartialSync(startDir, partialViewName, searchedLocations, errorsFactory) {
+    findPartialSync(startDir, partialViewName, searchedLocations, errorsFactory, cache) {
         searchedLocations = searchedLocations || [];
 
         if (!partialViewName || !partialViewName.length)
@@ -98,7 +98,7 @@ module.exports = class Razor {
             let viewPath = path.normalize(partialViewName);
 
             if (partialViewName[0] === '/') { // it's relative to the `views` root folder
-                if (!viewPath.startsWithIC(this.viewsDir)) // for linux onlry (in Windows an absolute path cannot start with '/')
+                if (!viewPath.startsWithIC(this.viewsDir)) // for linux only (in Windows an absolute path cannot start with '/')
                     viewPath = path.join(this.viewsDir, viewPath);
                 // [#2.4.1], [#2.4.2], [#2.4.3]
             }
@@ -108,6 +108,11 @@ module.exports = class Razor {
 
             try {
                 searchedLocations.push(viewPath);
+                let cachedData = cache && cache[viewPath];
+                
+                if (cachedData)
+                    return cachedData;
+
                 let data = fs.readFileSync(viewPath);
                 let dataStr = this.addFileNameIfDev(data, viewPath);
                 return successResult(dataStr, viewPath);
@@ -126,6 +131,11 @@ module.exports = class Razor {
 
         try {
             searchedLocations.push(filePath);
+            let cachedData = cache && cache[filePath];
+                
+            if (cachedData)
+                return cachedData;
+
             let data = fs.readFileSync(filePath);
             let dataStr = this.addFileNameIfDev(data, filePath);
             return successResult(dataStr, filePath);
@@ -145,7 +155,12 @@ module.exports = class Razor {
         }
 
         function successResult(data, filePath) {
-            return { data, filePath };
+            var result = { data, filePath };
+            
+            if (cache)
+                cache[filePath] = result;
+            
+            return result;
         }
     }
 
@@ -230,4 +245,14 @@ module.exports = class Razor {
     wrapInHtmlComment(text) {
         return `<!-- ${text} -->`;
     }
+
+    // static checkFileReadAccessSync(path){
+    //     try{
+    //         fs.accessSync(path, fs.constants.R_OK);
+    //         return true;
+    //     }
+    //     catch(exc){
+    //         return false;
+    //     }
+    // }
 }
