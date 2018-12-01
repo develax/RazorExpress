@@ -147,7 +147,7 @@ module.exports = class Razor {
                 if (!startDir)
                     throw errorsFactory.partialViewNotFound(partialViewName, searchedLocations); // [#2.1].
                 else
-                    return this.findPartialSync(startDir, partialViewName, searchedLocations, errorsFactory);
+                    return this.findPartialSync(startDir, partialViewName, searchedLocations, errorsFactory, cache);
             }
             else {
                 throw errorsFactory.errorReadingView(filePath, err);  // [#2].
