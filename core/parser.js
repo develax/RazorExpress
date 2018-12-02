@@ -116,7 +116,9 @@ module.exports = function (opts) {
                 return;
 
             if (sectionName) {
-                sections[sectionName][args.filePath].html += val;
+                let sec = sections[sectionName][args.filePath];
+                if (!sec.compiled) // it could have been compiled already if it's defined in a partial view which is rendred more than once
+                    sec.html += val;
             }
             else {
                 args.html += val;
