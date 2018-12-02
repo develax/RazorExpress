@@ -1,2 +1,6 @@
 @Html.partial("_partial")
 @Html.partial("_partial")
+
+@Html.partial("_anotherPartial")
+
+@Html.section("Partial")

@@ -310,21 +310,41 @@ describe("Testing 'Razor' module.", () => {
                 });
             }
         });
-        // describe(`[#4 : declare & render section in different views]`, () => {
-        //     // [#4.1] : section from partial views is rendered only once
-        //     {
-        //         let viewName = "index.raz";
-        //         let filePath = joinViewPath("sections", viewName);
-        //         it(`[#4.1 | OK: section from partial views is rendered only once ]`, (done) => {
-        //             razor({ h1: "HEADERS" }).renderFile(filePath, (err, html) => {
-        //                 expect(err).not.to.exist;
-        //                 expect(html).to.exist;
-        //                 expect(html).to.have.string("<h1>HEADERS</h1>");
-        //                 done();
-        //             });
-        //         });
-        //     }
-        // });
+        describe(`[#4 : declare & render section in different views]`, () => {
+            // [#4.1] : section from partial views is rendered only once
+            {
+                let viewName = "index.raz";
+                let filePath = joinViewPath("sections", viewName);
+                let testText = "This-is-a-partial-section";
+                it(`[#4.1 | OK: section from partial views is rendered only once ]`, (done) => {
+                    razor({ text: testText }).renderFile(filePath, (err, html) => {
+                        expect(err).not.to.exist;
+                        expect(html).to.exist;
+                        let count = html.split(testText).length - 1;
+                        expect(count).to.equal(1);
+                        done();
+                    });
+                });
+            }
+            // [#4.2] : sections with the same name from different views are all rendered
+            {
+                let viewName = "index.raz";
+                let filePath = joinViewPath("sections", viewName);
+                let testText = "This-is-a-partial-section-1";
+                let testText2 = "This-is-a-partial-section-2";
+                it(`[#4.2 | OK: sections with the same name from different views are all rendered ]`, (done) => {
+                    razor({ text: testText, text2: testText2 }).renderFile(filePath, (err, html) => {
+                        expect(err).not.to.exist;
+                        expect(html).to.exist;
+                        let count1 = html.split(testText).length - 1;
+                        expect(count1).to.equal(1);
+                        let count2 = html.split(testText2).length - 1;
+                        expect(count2).to.equal(1);
+                        done();
+                    });
+                });
+            }
+        });
     });
 
 

@@ -1,0 +1,3 @@
+@section Partial{
+    <div>@Model.text2</div>
+}
