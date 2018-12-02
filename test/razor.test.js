@@ -23,13 +23,6 @@ const viewsPath = locals.settings.views;
 //locals.settings.env = "dev"; set in `launch.json`
 //const razor = new Razor(locals);
 
-// Testing view names.
-const views = {
-    // partial: getViewName("_partial"),
-    // renderFile: getViewName(razor.renderFile.name),
-    // findViewStart: getViewName(razor.findViewStarts.name),
-    // findPartialSync: getViewName(razor.findPartialSync.name),
-}
 
 // It doesn't work with prototype methods.
 function FsError(triggerFileName, errCode) {
@@ -216,6 +209,126 @@ describe("Testing 'Razor' module.", () => {
         });
     }
 
+    ///////////////////
+    // SECTIONS
+    //////////////////
+
+    describe(`SECTIONS`, () => {
+        describe(`[#3 : declare & render section within one view]`, () => {
+            let okPath = "sections/ok/";
+            let errorPath = "sections/error/";
+            // [#3.1] : correct order
+            {
+                let viewName = "oneViewSection.raz";
+                let filePath = joinViewPath(okPath, viewName);
+                it(`[#3.1 | OK: correct order ]`, (done) => {
+                    razor({ h1: "HEADERS" }).renderFile(filePath, (err, html) => {
+                        expect(err).not.to.exist;
+                        expect(html).to.exist;
+                        expect(html).to.have.string("<h1>HEADERS</h1>");
+                        done();
+                    });
+                });
+            }
+            // [#3.1.1] : not found and not required
+            {
+                let viewName = "notRequired.raz";
+                let filePath = joinViewPath(okPath, viewName);
+                it(`[#3.1.1 | OK: not found and not required ]`, (done) => {
+                    razor().renderFile(filePath, (err, html) => {
+                        expect(err).not.to.exist;
+                        expect(html).to.exist;
+                        done();
+                    });
+                });
+            }
+            // [#3.2] : reverse order
+            {
+                let viewName = "oneViewSectionReverseOrder.raz";
+                let filePath = joinViewPath(errorPath, viewName);
+                it(`[#3.2 | ERROR: reverse order ]`, (done) => {
+                    razor({ h1: "STYLES" }).renderFile(filePath, (err, html) => {
+                        expect(html).not.to.exist;
+                        expect(err).to.exist;
+                        expectError2({
+                            err, 
+                            errMes: `You try to render the section 'Headers' from the '${filePath}' view. This section has not been compiled yet. Make sure it is defined before the '@Html.section' method is called.`,
+                        });
+                        done();
+                    });
+                });
+            }
+            // [#3.3] : section is not found
+            {
+                let viewName = "sectionIsNotFound.raz";
+                let filePath = joinViewPath(errorPath, viewName);
+                let sectionName = "Styles";
+                it(`[#3.3 | ERROR: section is not found ]`, (done) => {
+                    razor({ sectionName }).renderFile(filePath, (err, html) => {
+                        expect(html).not.to.exist;
+                        expect(err).to.exist;
+                        expectError2({
+                            err, 
+                            errMes: `View '${filePath}' requires the section '${sectionName}' which cannot be found.`,
+                        });
+                        done();
+                    });
+                });
+            }
+            // [#3.4] : section is already rendered
+            {
+                let viewName = "sectionAlreadyRendered.raz";
+                let filePath = joinViewPath(errorPath, viewName);
+                let sectionName = "Headers";
+                it(`[#3.4 | ERROR: section is already rendered ]`, (done) => {
+                    razor().renderFile(filePath, (err, html) => {
+                        expect(html).not.to.exist;
+                        expect(err).to.exist;
+                        expectError2({
+                            err, 
+                            errMes: `Sections named '${sectionName}' have already been rendered by '${filePath}'. There is an atempt to rendered it again by '${filePath}'.`,
+                        });
+                        done();
+                    });
+                });
+            }
+            // [#3.5] : section is vever rendered
+            {
+                let viewName = "sectionNeverRendered.raz";
+                let filePath = joinViewPath(errorPath, viewName);
+                let sectionName = "Headers";
+                it(`[#3.5 | ERROR: section is vever rendered ]`, (done) => {
+                    razor().renderFile(filePath, (err, html) => {
+                        expect(html).not.to.exist;
+                        expect(err).to.exist;
+                        expectError2({
+                            err, 
+                            errMes: `Section '${sectionName}' in '${filePath}' has never been rendered. If a section exists it must be rendered.`,
+                        });
+                        done();
+                    });
+                });
+            }
+        });
+        // describe(`[#4 : declare & render section in different views]`, () => {
+        //     // [#4.1] : section from partial views is rendered only once
+        //     {
+        //         let viewName = "index.raz";
+        //         let filePath = joinViewPath("sections", viewName);
+        //         it(`[#4.1 | OK: section from partial views is rendered only once ]`, (done) => {
+        //             razor({ h1: "HEADERS" }).renderFile(filePath, (err, html) => {
+        //                 expect(err).not.to.exist;
+        //                 expect(html).to.exist;
+        //                 expect(html).to.have.string("<h1>HEADERS</h1>");
+        //                 done();
+        //             });
+        //         });
+        //     }
+        // });
+    });
+
+
+
     function expectError(err, errorViewName, method, errCode) {
         expect(err).to.exist;
         expect(err).to.be.an.instanceOf(RazorError);
@@ -223,6 +336,18 @@ describe("Testing 'Razor' module.", () => {
         expect(err.inner.code).to.equal(errCode);
         expect(err.inner.stack).to.have.string(`at Razor.${method} `);
         expect(err.data.filename).to.endsWith(errorViewName);
+    }
+
+    function expectError2({err, errMes, method}) {
+        expect(err).to.exist;
+        expect(err).to.be.an.instanceOf(RazorError);
+
+        if (method)
+            expect(err.stack).to.have.string(`at Razor.${method} `);
+
+        if (errMes)
+            expect(err.message).to.have.string(errMes);
+        //expect(err.data.filename).to.endsWith(errorViewName);
     }
 
     function expectPartialViewNotFound(err, errorView, partialView, method) {
@@ -259,6 +384,10 @@ function mockRazor(errorFileName, errCode, model) {
         Object.assign(locals, model);
 
     return new RazorError(locals);
+}
+
+function joinViewPath(viewPath, viewName) {
+    return path.join(viewsPath, viewPath, viewName);
 }
 
 function viewErrorPath(viewName) {

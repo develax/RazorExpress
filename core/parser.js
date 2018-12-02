@@ -99,12 +99,16 @@ module.exports = function (opts) {
         };
 
         this.__sec = function (name) { // in section
-            if (!sectionName)
+            if (!sectionName) {
                 sectionName = name;
-            else if (sectionName === name)
+            }
+            else if (sectionName === name) {
+                sections[sectionName][args.filePath].compiled = true;
                 sectionName = null;
-            else
+            }
+            else {
                 throw new Error(`Unexpected section name = '${name}'.`); // Cannot be tested via user-inputs.
+            }
         };
 
         this.raw = function (val) { // render
@@ -157,6 +161,10 @@ module.exports = function (opts) {
                 for (var key in secGroup) {
                     if (secGroup.hasOwnProperty(key)) {
                         let sec = secGroup[key];
+
+                        if (!sec.compiled)
+                            throw args.er.sectionIsNotCompiled(name, args.filePath); // [#3.2]
+
                         html += sec.html;
                     }
                 }
@@ -166,12 +174,10 @@ module.exports = function (opts) {
             }
             else {
                 if (required)
-                    throw args.er.sectionIsNotFound(name, args.filePath); // TESTME:
-
-                return '';
+                    throw args.er.sectionIsNotFound(name, args.filePath); // [#3.3] 
             }
 
-            // TODO: throw error that section was not rendered.
+            return '';
         };
 
         this.getPartial = function (viewName, viewModel) {
@@ -391,10 +397,12 @@ module.exports = function (opts) {
 
             for (var key in sections) {
                 if (sections.hasOwnProperty(key)) {
-                    let sec = sections[key];
-                    
-                    if (!sec.renderedBy)
-                        throw this.er.sectionNeverRendered(key);
+                    let secGroup = sections[key];
+
+                    if (!secGroup.renderedBy){
+                        let sec = secGroup[Object.keys(secGroup)[0]]; // just any section from the group
+                        throw this.er.sectionNeverRendered(key, sec.filePath);
+                    }
                 }
             }
         }

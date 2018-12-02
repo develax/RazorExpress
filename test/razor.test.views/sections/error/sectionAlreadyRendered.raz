@@ -1,0 +1,6 @@
+@section Headers{
+    <h1>Headers</h1>
+}
+
+@Html.section("Headers")
+@Html.section("Headers")

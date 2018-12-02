@@ -1,0 +1,5 @@
+@Html.section("Headers")
+
+@section Headers{
+    <h1>@Model.h1</h1>
+}

@@ -404,7 +404,7 @@
         <p>&copy; 2018</p>
     </footer>
 }`,
-            expected: '\n<div>test</div>\n'
+            error: `Section 'Footer' in 'Code 49' has never been rendered. If a section exists it must be rendered.`
         },
         {
             name: "Code 50",

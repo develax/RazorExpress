@@ -131,13 +131,18 @@ class ParserErrorFactory {
         return RazorError.new({ message, info: this.info, capture: this.sectionIsNotFound });
     }
 
+    sectionIsNotCompiled(sectionName, filePath) {
+        var message = `You try to render the section '${sectionName}' from the '${filePath}' view. This section has not been compiled yet. Make sure it is defined before the '@Html.section' method is called.`;
+        return RazorError.new({ message, info: this.info, capture: this.sectionIsNotCompiled });
+    }
+
     sectionsAlreadyRendered(sectionName, renderedBy, attemptedBy) {
         var message = `Sections named '${sectionName}' have already been rendered by '${renderedBy}'. There is an atempt to rendered it again by '${attemptedBy}'.`;
         return RazorError.new({ message, info: this.info, capture: this.sectionBeenRendered });
     }
 
-    sectionNeverRendered(sectionName,) {
-        var message = `Section '${sectionName}' has never been rendered. If a section exists it must be rendered.`;
+    sectionNeverRendered(sectionName, viewPath) {
+        var message = `Section '${sectionName}' in '${viewPath}' has never been rendered. If a section exists it must be rendered.`;
         return RazorError.new({ message, info: this.info, capture: this.sectionBeenRendered });
     }
 

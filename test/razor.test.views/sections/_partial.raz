@@ -1,0 +1,3 @@
+@section Partial{
+    <div>This-is-a-partial-section</div>
+}
