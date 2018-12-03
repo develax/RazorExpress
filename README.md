@@ -267,9 +267,9 @@ Razor-Express methods | ASP.NET MVC methods | use
 Html.layout | Layout | specifies a layout
 Html.body | RenderBody | renders the contents of the view
 Html.partial |  Html.RenderPartial & Html.Partial | renders the content of the partial view
-Html.raw | Html.Raw | renders string without encoding
-Html.getPartial | -- | returns a partial view as string (not encoded)
-Html.getEncoded | -- | returns encoded string
+Html.raw | Html.Raw | renders a string without encoding
+Html.getPartial | -- | returns a partial view as a string (not encoded)
+Html.getEncoded | -- | returns an encoded string
 
 
 ### Examples of usage
