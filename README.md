@@ -31,7 +31,7 @@ The closest to *Razor* currently supported library for *NodeJs & Express* I coul
 A brief comparison of Node.JS layout engines
 ---
 
-I may be exaggerating the merits of *ASP.NET MVC Razor* and maybe it's all just a matter of habit, but let's look at a few examples that I found on the web:
+I may be exaggerating the merits of *ASP.NET MVC Razor* and maybe it's all just a matter of habit, but let's look at a few examples that I found on the web ([the question on Quora](https://www.quora.com/What-is-the-best-Node-js-template-engine)):
 
 This is our **data model** represented via a JavaScript object:
 ```JS
