@@ -188,12 +188,15 @@ Razor-Express View API
 Analogues of ASP.NET MVC Razor HtmlHelper methods
 ---
 
-Razor-Express methods | ASP.NET MVC methods
------------- | -------------
-Html.layout | Layout 
-Html.body | RenderBody
-Html.partial |  Html.RenderPartial & Html.Partial
-Html.raw | Html.Raw
+Razor-Express methods | ASP.NET MVC methods | use
+------------ | ------------- |-------------
+Html.layout | Layout | specifies a layout
+Html.body | RenderBody | renders the contents of the view
+Html.partial |  Html.RenderPartial & Html.Partial | renders the content of the partial view
+Html.raw | Html.Raw | renders string without encoding
+Html.getPartial | -- | returns a partial view as string (not encoded)
+Html.getEncoded | -- | returns encoded string
+
 
 ### Examples of usage
 #### @Html.layout
@@ -214,7 +217,6 @@ Html.raw | Html.Raw
 </body>
 </html>
 ```
-
 #### @Html.partial
 ```HTML+RAZOR
 <div>
@@ -226,6 +228,13 @@ or
 @if(Model.showUserForm){
     Html.partial("_userForm");
 }
+```
+#### @Html.getPartial
+```HTML+RAZOR
+@{
+  var userFormHtml = (Model.showUserForm) ? Html.getPartial("_userForm") : null;
+}
+@Html.raw(userFormHtml)
 ```
 #### @Html.raw
 ```HTML+RAZOR
