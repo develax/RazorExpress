@@ -195,17 +195,14 @@ Html.body | RenderBody
 Html.partial |  Html.RenderPartial & Html.Partial
 Html.raw | Html.Raw
 
-Examples of usage
-===
-Html.layout
----
+### Examples of usage
+#### @Html.layout
 ```HTML+RAZOR
 @{
     Html.layout = "_layout";
 }
 ```
-Html.body
----
+#### @Html.body
 ```HTML+RAZOR
 <!DOCTYPE html>
 <html>
@@ -217,8 +214,8 @@ Html.body
 </body>
 </html>
 ```
-Html.partial
----
+
+#### @Html.partial
 ```HTML+RAZOR
 <div>
   @Html.partial("_userForm")
@@ -230,8 +227,7 @@ or
     Html.partial("_userForm");
 }
 ```
-Html.raw
----
+#### @Html.raw
 ```HTML+RAZOR
 @{
   var boldText = "This is an example of <b>bold text</b>.";
