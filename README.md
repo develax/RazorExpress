@@ -23,13 +23,86 @@
 Intro
 ===
 
-When I just started to dive into the world of *Node.js* after years of working with [ASP.NET MVC](https://docs.microsoft.com/en-us/aspnet/core/mvc/overview) I couldn't find any *view template engine* that was as convenient, elegant, concise, and syntactically close to native HTML markup language as [Razor](https://docs.microsoft.com/en-us/aspnet/core/mvc/views/layout) was. And when it comes to code it's also syntactically close to the original C# language. Actually, **ASP.NET MVC Razor markup is a hybrid of HTML markup and C# programming language**. This is exactly what I expected to see in the NodeJS world - **a hybrid of HTML and JavaScript**. 
+When I just started to dive into the world of *Node.js* after years of working with [ASP.NET MVC](https://docs.microsoft.com/en-us/aspnet/core/mvc/overview) I couldn't find any *view template engine* that was as convenient, elegant, concise, and syntactically close to native [HTML](https://developer.mozilla.org/en-US/docs/Learn/Getting_started_with_the_web/HTML_basics) as [ASP.NET MVC Razor syntax](https://docs.microsoft.com/en-us/aspnet/core/mvc/views/razor) was. And when it comes to code it's also syntactically close to the original [C# language](https://docs.microsoft.com/en-us/dotnet/csharp/programming-guide/). Actually, **ASP.NET MVC Razor markup is a hybrid of HTML markup and C# programming language**. This is exactly what I expected to see in the *NodeJS* world - **a hybrid of HTML and JavaScript**. 
 
-The closest to *Razor* currently supported library I could find was [Vash](https://www.npmjs.com/package/vash), but in some points, it was quite different from [ASP.NET MVC Razor syntax](https://docs.microsoft.com/en-us/aspnet/core/mvc/views/razor) which I was used to and it just looked much less concise and convenient to me (the concepts of layouts and partial blocks, for example). In short, it did not suit me completely and what's more important I couldn't see its current development. 
+The closest to *Razor* currently supported library for *NodeJs & Express* I could find was [Vash](https://www.npmjs.com/package/vash). But in some points, it was quite different from *ASP.NET MVC Razor* syntax which I was used to and it just looked much less concise and convenient to me (the concepts of layouts and partial blocks, for example). In short, it did not suit me completely and what's more important I couldn't see its current development. 
 
-I may be exaggerating the merits of *ASP.NET MVC Razor* and maybe it's all just a matter of habit, but whatever it is I decided to create something more similar for using it with [ExpressJS](https://expressjs.com) library.
+A brief comparison of Node.JS layout engines
+---
 
-Although I tried to make my library as close as possible to ASP.NET Razor there are some differences that need to be taken into account.
+I may be exaggerating the merits of *ASP.NET MVC Razor* and maybe it's all just a matter of habit, but let's look at a few examples that I found on the web:
+
+This is our **data model** represented via a JavaScript object:
+```JS
+var model = {
+    subject: "Template Engines",
+    items: [
+        {name: "Mustache"},
+        {name: "HandleBar"},
+        {name: "Dust"},
+        {name: "Jade"},
+        {name: "EJS"},
+        {name: "Razor"},
+    ]
+};
+```
+#### Mustache / HandleBar
+```HTML+Django
+<h1>{{subject}}</h1>
+<ul>
+  {{#items}}
+    <li>{{name}}</li>
+  {{/items}}
+</ul>
+```
+* *([mustache live example](https://codepen.io/develax/pen/wQOpNQ))*
+
+----------------------
+
+#### Pug (Jade)
+```Pug
+h1=model.subject  
+ul
+  each item in model.items
+      li=item.name 
+```
+* *([pug live example](https://codepen.io/develax/pen/dQrJEV))*
+
+----------------------
+
+#### EJS
+```ejs
+<h1><%= model.subject %></h1>
+<ul>
+  <% for(var i = 0; i < model.items.length; i++) {%>
+     <li><%= model.items[i].name %></li>
+  <% } %>
+</ul>
+```
+* *([ejs live example](https://codepen.io/develax/pen/WYmMMv))*
+
+----------------------
+
+#### Razor
+```HTML+RAZOR
+<h1>@Model.subject</h1>
+<ul>
+  @for(var i = 0; i < Model.items.length; i++) {
+     <li>@Model.items[i].name</li>
+  }
+</ul>
+```
+* *([razor live example](https://runkit.com/develax/razor-list-example))*
+
+
+I won't go much into all the aspects I don't like in other engines syntax just say that *"[Mustache](https://www.npmjs.com/package/mustache) / [HandleBar](https://handlebarsjs.com/)"* and *"[Pug](https://pugjs.org)"* look like I have to learn a new syntax while with *Razor* I virtually know it if I'm already familiar with *HTML* and *JavaScript*. *EJS* is very close to Razor but it contains too many additional markup characters that make it difficult to write and read the code.
+
+In these examples I don't compare logic constructions because some of the view engines have logic-less templating syntax.
+With *Razor* you can implement amost any logic that is available with normal *JavaScript* without learning a new syntax.
+
+Given all the mentioned and unmentioned pros and cons, I decided not to part with *Razor-syntax* and create something similar for using with [ExpressJS](https://expressjs.com) library (currently it works only in *NodeJS* environment, not in browsers).
+
+Although I tried to make my library as close as possible to [ASP.NET Razor](https://docs.microsoft.com/en-us/aspnet/core/mvc/views/razor) there are some differences that need to be taken into account.
 
 -----------------------
 
@@ -188,24 +261,24 @@ Razor-Express View API
 Analogues of ASP.NET MVC Razor HtmlHelper methods
 ---
 
-Razor-Express methods | ASP.NET MVC methods
------------- | -------------
-Html.layout | Layout 
-Html.body | RenderBody
-Html.partial |  Html.RenderPartial & Html.Partial
-Html.raw | Html.Raw
+Razor-Express methods | ASP.NET MVC methods | use
+------------ | ------------- |-------------
+Html.layout | Layout | specifies a layout
+Html.body | RenderBody | renders the contents of the view
+Html.partial |  Html.RenderPartial & Html.Partial | renders the content of the partial view
+Html.raw | Html.Raw | renders string without encoding
+Html.getPartial | -- | returns a partial view as string (not encoded)
+Html.getEncoded | -- | returns encoded string
 
-Examples of usage
-===
-Html.layout
----
+
+### Examples of usage
+#### @Html.layout
 ```HTML+RAZOR
 @{
     Html.layout = "_layout";
 }
 ```
-Html.body
----
+#### @Html.body
 ```HTML+RAZOR
 <!DOCTYPE html>
 <html>
@@ -217,8 +290,7 @@ Html.body
 </body>
 </html>
 ```
-Html.partial
----
+#### @Html.partial
 ```HTML+RAZOR
 <div>
   @Html.partial("_userForm")
@@ -230,8 +302,14 @@ or
     Html.partial("_userForm");
 }
 ```
-Html.raw
----
+#### @Html.getPartial
+```HTML+RAZOR
+@{
+  var userFormHtml = (Model.showUserForm) ? Html.getPartial("_userForm") : null;
+}
+@Html.raw(userFormHtml)
+```
+#### @Html.raw
 ```HTML+RAZOR
 @{
   var boldText = "This is an example of <b>bold text</b>.";
@@ -271,8 +349,3 @@ If you run this code you will get the error:
 > RazorError: **The code or section block is missing a closing "}" character.** Make sure you have a matching "}" character for all the "{" characters within this block, and that none of the "}" characters are being interpreted as markup. The block starts at line 3 with text: "@for(var i = 0; i < 10; i++){"
 
 [Test this example with RunKit.](https://runkit.com/develax/razor-pitfalls-semicolon)
-
-
---------------------
-## To be continued soon..
-> `layouts`, `partial views`, `sections` and `viewStarts` are implemented but haven't been documented yet.
