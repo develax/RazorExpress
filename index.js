@@ -26,7 +26,7 @@ function renderFile(filepath, options, done) {
 
 function getParser(){
     if (!parser){
-        var env = process.env.NODE_ENV;
+        var env = process && process.env.NODE_ENV;
         parser = require('./core/parser')({ debug: false, mode: env });
     }
     return parser;
