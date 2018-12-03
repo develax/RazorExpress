@@ -2,6 +2,7 @@
 **(draft)**
 
 - [**Intro**](#intro)
+  - [**Comparison of Node.JS layout engines**](#a-brief-comparison-of-nodejs-layout-engines)
 - [**Quick Start**](#quick-start)
   - [Node.js example](#nodejs-example)
   - [Express web-server example](#express-web-server-example)
