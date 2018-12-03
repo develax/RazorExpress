@@ -23,7 +23,9 @@
 Intro
 ===
 
-When I just started to dive into the world of *Node.js* after years of working with [ASP.NET MVC](https://docs.microsoft.com/en-us/aspnet/core/mvc/overview) I couldn't find any *view template engine* that was as convenient, elegant, concise, and syntactically close to native HTML markup language as [Razor](https://docs.microsoft.com/en-us/aspnet/core/mvc/views/layout) was. And when it comes to code it's also syntactically close to the original C# language. Actually, **ASP.NET MVC Razor markup is a hybrid of HTML markup and C# programming language**. This is exactly what I expected to see in the NodeJS world - **a hybrid of HTML and JavaScript**. 
+When I just started to dive into the world of *Node.js* after years of working with [ASP.NET MVC](https://docs.microsoft.com/en-us/aspnet/core/mvc/overview) I couldn't find any *view template engine* that was as convenient, elegant, concise, and syntactically close to native [HTML](https://developer.mozilla.org/en-US/docs/Learn/Getting_started_with_the_web/HTML_basics) as [ASP.NET MVC Razor syntax](https://docs.microsoft.com/en-us/aspnet/core/mvc/views/razor) was. And when it comes to code it's also syntactically close to the original [C# language](https://docs.microsoft.com/en-us/dotnet/csharp/programming-guide/). Actually, **ASP.NET MVC Razor markup is a hybrid of HTML markup and C# programming language**. This is exactly what I expected to see in the *NodeJS* world - **a hybrid of HTML and JavaScript**. 
+
+The closest to *Razor* currently supported library for *NodeJs & Express* I could find was [Vash](https://www.npmjs.com/package/vash). But in some points, it was quite different from *ASP.NET MVC Razor* syntax which I was used to and it just looked much less concise and convenient to me (the concepts of layouts and partial blocks, for example). In short, it did not suit me completely and what's more important I couldn't see its current development. 
 
 A brief comparison of Node.JS layout engines
 ---
@@ -83,21 +85,22 @@ ul
 
 #### Razor
 ```HTML+RAZOR
-<h1>@model.subject</h1>
+<h1>@Model.subject</h1>
 <ul>
-  @for(var i = 0; i < model.items.length; i++) {
-     <li>@model.items[i].name</li>
+  @for(var i = 0; i < Model.items.length; i++) {
+     <li>@Model.items[i].name</li>
   }
 </ul>
 ```
-I won't go much into all the aspects I do not like in other engines syntax just say that *"Mustache / HandleBar"* and *"Pug"* look like I have to learn a new syntax while with *Razor* I virtually know its syntax if I'm already familiar qith *HTML* and *JavaScript*. EJS is very close to Razor but it contains too many additional markup characters that make it difficult to write and read the code.
+* *([razor live example](https://runkit.com/develax/razor-list-example))*
+
+
+I won't go much into all the aspects I don't like in other engines syntax just say that *"[Mustache](https://www.npmjs.com/package/mustache) / [HandleBar](https://handlebarsjs.com/)"* and *"[Pug](https://pugjs.org)"* look like I have to learn a new syntax while with *Razor* I virtually know it if I'm already familiar with *HTML* and *JavaScript*. *EJS* is very close to Razor but it contains too many additional markup characters that make it difficult to write and read the code.
 
 In these examples I don't compare logic constructions because some of the view engines have logic-less templating syntax.
 With *Razor* you can implement amost any logic that is available with normal *JavaScript* without learning a new syntax.
 
-The closest to *Razor* currently supported library for *NodeJs & Express* I could find was [Vash](https://www.npmjs.com/package/vash). But in some points, it was quite different from [ASP.NET MVC Razor syntax](https://docs.microsoft.com/en-us/aspnet/core/mvc/views/razor) which I was used to and it just looked much less concise and convenient to me (the concepts of layouts and partial blocks, for example). In short, it did not suit me completely and what's more important I couldn't see its current development. 
-
-Given all the mentioned and unmentioned pros and cons, I decided not to part with Razor-syntax and decided to create something similar for using it with [ExpressJS](https://expressjs.com) library (currently it works only in Node environment, not in browsers).
+Given all the mentioned and unmentioned pros and cons, I decided not to part with *Razor-syntax* and create something similar for using with [ExpressJS](https://expressjs.com) library (currently it works only in *NodeJS* environment, not in browsers).
 
 Although I tried to make my library as close as possible to [ASP.NET Razor](https://docs.microsoft.com/en-us/aspnet/core/mvc/views/razor) there are some differences that need to be taken into account.
 
