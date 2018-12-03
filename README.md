@@ -349,8 +349,3 @@ If you run this code you will get the error:
 > RazorError: **The code or section block is missing a closing "}" character.** Make sure you have a matching "}" character for all the "{" characters within this block, and that none of the "}" characters are being interpreted as markup. The block starts at line 3 with text: "@for(var i = 0; i < 10; i++){"
 
 [Test this example with RunKit.](https://runkit.com/develax/razor-pitfalls-semicolon)
-
-
---------------------
-## To be continued soon..
-> `layouts`, `partial views`, `sections` and `viewStarts` are implemented but haven't been documented yet.
