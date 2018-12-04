@@ -211,7 +211,8 @@ module.exports = function (opts) {
         };
 
         this.partial = function (viewName, viewModel) {
-            args.html += this.getPartial(viewName, viewModel);
+            var partialHtml = this.getPartial(viewName, viewModel);
+            this.raw(partialHtml)
         };
     }
 
