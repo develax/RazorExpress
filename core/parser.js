@@ -1373,9 +1373,8 @@ module.exports = function (opts) {
     function toParserError(err, errorFactory) {
         if (err instanceof RazorError) {
             // it could be the 2-nd or most time here from the stack
-            Error.captureStackTrace(err, toParserError);
+            // Error.captureStackTrace(err, toParserError);
 
-            
             // cut everything above (excessive information from the VM in debug mode), for example this:
             // d:\Projects\NodeJS\RazorExpressFullExample\node_modules\raz\core\Razor.js:117
             // throw errorsFactory.partialViewNotFound(path.basename(partialViewName), searchedLocations); // [#2.3]
