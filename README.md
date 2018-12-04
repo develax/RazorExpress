@@ -2,6 +2,7 @@
 **(draft)**
 
 - [**Intro**](#intro)
+  - [A brief comparison of syntax of Node.JS layout engines](#a-brief-comparison-of-syntax-of-nodejs-layout-engines)
 - [**Quick Start**](#quick-start)
   - [Node.js example](#nodejs-example)
   - [Express web-server example](#express-web-server-example)
@@ -9,13 +10,16 @@
   - [What is View Template](https://github.com/DevelAx/RazorExpress/blob/master/docs/overview.md#what-is-view-template)
   - [What is View Template Engine](https://github.com/DevelAx/RazorExpress/blob/master/docs/overview.md#what-is-view-template-engine)
   - [What is Razor-Express](https://github.com/DevelAx/RazorExpress/blob/master/docs/overview.md#what-is-razor-express)
+  - Razor syntax
 - [**Razor-Express View API**](#razor-express-view-api)
   - [Analogues of ASP.NET MVC Razor HtmlHelper methods](#analogues-of-aspnet-mvc-razor-htmlhelper-methods)
   - [Examples of usage](#examples-of-usage)
 - [**Common pitfalls & remarks**](#warning-common-pitfalls)
   - [Missing semicolon](#missing-semicolon)
-- [**Errors handling**](https://github.com/DevelAx/RazorExpress/blob/master/docs/ErrorsHandling.md)
-  - [Custom error handler](https://github.com/DevelAx/RazorExpress/blob/master/docs/ErrorsHandling.md#custom-error-handler)
+- [**Debugging & Errors handling in Razor-Express**](https://github.com/DevelAx/RazorExpress/blob/master/docs/Debugging.md)
+  - **Debugging view templates**
+  - [**Errors handling**](https://github.com/DevelAx/RazorExpress/blob/master/docs/Debugging.md#errors-handling)
+    - [Custom error handler](https://github.com/DevelAx/RazorExpress/blob/master/docs/Debugging.md#custom-error-handler)
   
 -----------------------
 
@@ -27,10 +31,10 @@ When I just started to dive into the world of *Node.js* after years of working w
 
 The closest to *Razor* currently supported library for *NodeJs & Express* I could find was [Vash](https://www.npmjs.com/package/vash). But in some points, it was quite different from *ASP.NET MVC Razor* syntax which I was used to and it just looked much less concise and convenient to me (the concepts of layouts and partial blocks, for example). In short, it did not suit me completely and what's more important I couldn't see its current development. 
 
-A brief comparison of Node.JS layout engines
+A brief comparison of syntax of Node.JS layout engines
 ---
 
-I may be exaggerating the merits of *ASP.NET MVC Razor* and maybe it's all just a matter of habit, but let's look at a few examples that I found on the web:
+I may be exaggerating the merits of *ASP.NET MVC Razor* and maybe it's all just a matter of habit, but let's look at a few examples that I found on the web ([the question on Quora](https://www.quora.com/What-is-the-best-Node-js-template-engine)):
 
 This is our **data model** represented via a JavaScript object:
 ```JS
@@ -266,9 +270,9 @@ Razor-Express methods | ASP.NET MVC methods | use
 Html.layout | Layout | specifies a layout
 Html.body | RenderBody | renders the contents of the view
 Html.partial |  Html.RenderPartial & Html.Partial | renders the content of the partial view
-Html.raw | Html.Raw | renders string without encoding
-Html.getPartial | -- | returns a partial view as string (not encoded)
-Html.getEncoded | -- | returns encoded string
+Html.raw | Html.Raw | renders a string without encoding
+Html.getPartial | -- | returns a partial view as a string (not encoded)
+Html.getEncoded | -- | returns an encoded string
 
 
 ### Examples of usage
