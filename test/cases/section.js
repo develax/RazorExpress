@@ -1,6 +1,16 @@
 ﻿(function () {
     var cases = [
         {
+            name: "Section 0",
+            template: `
+@section Test{
+    <div style="background-color: greenyellow">SECTION TEST</div>
+    @Html.raw("123");
+    @Html.raw("456");
+}`,
+            error: "Unexpected '@' character at line 4 pos 5."
+        },
+        {
             name: "Section 1",
             template: `
 <div>
@@ -10,7 +20,7 @@
     }
 }
 </div>`,
-            error: "unexpected '@' character at line 4 pos 5."
+            error: "Unexpected '@' character at line 4 pos 5."
         },
         {
             name: "Section 1.1",

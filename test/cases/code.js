@@ -389,11 +389,11 @@
             name: "Code 48",
             template: `
 <div>
-@Html.raw("H")
+@Html.raw("H");
 @Html.raw("C")
 </div>
 `,
-            expected: '\n<div>\nH\nC\n</div>\n'
+            expected: '\n<div>\nH;\nC\n</div>\n'
         },
         {
             name: "Code 49",

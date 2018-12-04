@@ -12,13 +12,13 @@ class ParserErrorFactory {
     }
 
     unexpectedCharacter(ch, lineNum, posNum, line) {
-        var message = `unexpected '${ch}' character at line ${lineNum + 1} pos ${posNum + 1} after '${line}'`;
+        var message = `Unexpected '${ch}' character at line ${lineNum + 1} pos ${posNum + 1} after '${line}'`;
         return RazorError.new({ message, info: this.info, line: lineNum, pos: posNum, capture: this.unexpectedCharacter });
     }
 
     unexpectedAtCharacter(lineNum, posNum) {
-        var message = `unexpected '@' character at line ${lineNum + 1} pos ${posNum + 1}. Once inside the body of a code block (@if {}, @{}, etc.) or a section (@section{}) you do not need to use "@{" to switch to code.`;
-        return RazorError.new({ message, info: this.info, line: lineNum, pos: posNum, capture: this.unexpectedCharacter });
+        var message = `Unexpected '@' character at line ${lineNum + 1} pos ${posNum + 1}. Once inside the body of a code block (@if {}, @{}, etc.) or a section (@section{}) you do not need to use "@" character to switch to code.`;
+        return RazorError.new({ message, info: this.info, line: lineNum, pos: posNum, capture: this.unexpectedAtCharacter });
     }
 
     notValidStartOfCodeBlock(ch, lineNum, posNum) {

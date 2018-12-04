@@ -628,12 +628,12 @@ module.exports = function (opts) {
                 else if (ch === '@') {
                     if (String.isWhiteSpace(block.text)) {
                         // In contrast to a base-HTML-block, here it can only start with an HTML-tag.
-                        throw this.er.unexpectedCharacter(ch, this.lineNum, this.linePos(), this.line); // Tests: "Section 1".
+                        throw this.er.unexpectedCharacter(ch, this.lineNum, this.linePos(), this.line); // Cannot be tested.
                     }
                     if (this.pickNextChar() === '@') { // checking for '@@' that means just text '@'
                         ch = this.fetchChar(); // skip the next '@'
                     }
-                    else {
+                    else if (openTagName || tag) { // it must be an expression somewhere inside HTML  
                         this.fetchChar(); // skip current '@'
                         this.parseCode(blocks);
 
@@ -642,6 +642,9 @@ module.exports = function (opts) {
 
                         block = newBlock(type.html, blocks);
                         continue;
+                    }
+                    else{
+                        throw this.er.unexpectedAtCharacter(this.lineNum, this.linePos()); // [Section 0]
                     }
                 }
                 else if (quotes.length) { // In Quotes..
@@ -1061,7 +1064,7 @@ module.exports = function (opts) {
                             inText = true; // put on waits-stack
                         }
                         else if (ch === '@' && (!lastLiteral || Char.isWhiteSpace(lastLiteral))) {
-                            throw this.er.unexpectedAtCharacter(this.lineNum, this.linePos(), this.line);
+                            throw this.er.unexpectedAtCharacter(this.lineNum, this.linePos(), this.line); // [Invalid-HTML 9], [Section 1]
                         }
                         else if (ch === '<') {
                             if (lastLiteral === '' || lastLiteral === '{' || lastLiteral === ';') {
