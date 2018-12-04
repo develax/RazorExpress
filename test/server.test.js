@@ -93,7 +93,14 @@ describe("server routes", () => {
                     expect(layouts, "layouts count").to.have.lengthOf(layoutNames.length);
                     let sharedTests = $('div.shared-data:contains("Test shared object.")');
                     expect(sharedTests, "views shared data test").to.have.lengthOf(3);
-
+                    // Check rendering partials from section with different path styles (they should be siblings).
+                    let sectionTest = $('#section-test');
+                    expect(sectionTest, '#section-test').to.have.lengthOf(1);
+                    let partial1 = sectionTest.next();
+                    expect(partial1.attr('id'), '#partial_1').to.be.equal('partial_1');
+                    let partial2 = partial1.next();
+                    expect(partial2.attr('id'), '#partial_2').to.be.equal('partial_2');
+  
                     for (var i = 0; i < layouts.length; i++) {
                         let layout = layouts[i];
                         let name = layoutNames[i];

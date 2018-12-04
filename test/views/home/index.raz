@@ -12,5 +12,7 @@
 </div>
 
 @section Test{
-    <div style="background-color: greenyellow">SECTION TEST</div>
+    <div id="section-test" style="background-color: greenyellow">SECTION TEST</div>
+    Html.partial("/sections/_partialForSection", 1);
+    Html.partial("../sections/_partialForSection", 2);
 }

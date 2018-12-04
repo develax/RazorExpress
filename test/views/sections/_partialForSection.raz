@@ -1,0 +1,3 @@
+<div id="partial_@Model" style="width: 100px; height: 100px; background-color: yellow; color: violet; font-weight: bold; border: solid 2px blue; word-break: break-all;">
+    @(Model)_partialForSection.raz
+</div>
