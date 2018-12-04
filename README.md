@@ -15,8 +15,10 @@
   - [Examples of usage](#examples-of-usage)
 - [**Common pitfalls & remarks**](#warning-common-pitfalls)
   - [Missing semicolon](#missing-semicolon)
-- [**Errors handling**](https://github.com/DevelAx/RazorExpress/blob/master/docs/ErrorsHandling.md)
-  - [Custom error handler](https://github.com/DevelAx/RazorExpress/blob/master/docs/ErrorsHandling.md#custom-error-handler)
+- [**Debugging & Errors handling in Razor-Express**](https://github.com/DevelAx/RazorExpress/blob/master/docs/Debugging.md)
+  - **Debugging view templates**
+  - [**Errors handling**](https://github.com/DevelAx/RazorExpress/blob/master/docs/Debugging.md#errors-handling)
+    - [Custom error handler](https://github.com/DevelAx/RazorExpress/blob/master/docs/Debugging.md#custom-error-handler)
   
 -----------------------
 
