@@ -5,6 +5,7 @@ Let's look quickly at the key concepts and terms.
 - [**What is View Template Engine?**](#what-is-view-template-engine)
 - [**What is Razor-Express?**](#what-is-razor-express)
 - [**Razor-Express syntax**](#razor-express-syntax-reference-for-nodejs)
+  - [Reserved keywords](#reserved-keywords)
   - [A simple example](#a-simple-example-of-razor-express-markup)
   - [Escaping `@` character](#escaping--character)
   - [Expressions](#expressions)
@@ -29,6 +30,12 @@ Just like the *ASP.NET Razor* syntax, the *Razor-Express* syntax consists of Raz
 
 Since the *Razor-Express* engine must somehow distinguish server-side JavaScript from HTML markup we use the `@` symbol. The `@` just tells the engine's parser that JavaScript server-side code or expression starts after this character. This is the minimum intervention in HTML markup [compared to other existing markup engines](https://github.com/DevelAx/RazorExpress#a-brief-comparison-of-syntax-of-nodejs-layout-engines).
 
+### c
+
+- `Section`
+
+When an `@` symbol is followed by a *Razor-Express reserved keyword*, it transitions into Razor-specific markup. Otherwise, it transitions into plain JavaScript.
+
 ### A simple example of Razor-Express markup
 ```HTML+Razor
 @{ 
@@ -51,11 +58,6 @@ The rendered HTML by Razor-Express will be:
 ```
 <sup>[^ try this code](https://runkit.com/develax/razor-at-escape)</sup>
 
-Reserved keywords
-
-- `Section`
-
-When an `@` symbol is followed by a *Razor-Express reserved keyword*, it transitions into Razor-specific markup. Otherwise, it transitions into plain JavaScript.
 
 ### Expressions
 Razor-Express expressions start with `@` followed by JavaScript code:
