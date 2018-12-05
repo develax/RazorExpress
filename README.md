@@ -10,7 +10,7 @@
   - [What is View Template](https://github.com/DevelAx/RazorExpress/blob/master/docs/overview.md#what-is-view-template)
   - [What is View Template Engine](https://github.com/DevelAx/RazorExpress/blob/master/docs/overview.md#what-is-view-template-engine)
   - [What is Razor-Express](https://github.com/DevelAx/RazorExpress/blob/master/docs/overview.md#what-is-razor-express)
-  - Razor syntax
+  - [Razor-Express syntax](https://github.com/DevelAx/RazorExpress/blob/master/docs/overview.md#razor-express-syntax-reference-for-nodejs)
 - [**Razor-Express View API**](#razor-express-view-api)
   - [Analogues of ASP.NET MVC Razor HtmlHelper methods](#analogues-of-aspnet-mvc-razor-htmlhelper-methods)
   - [Examples of usage](#examples-of-usage)
