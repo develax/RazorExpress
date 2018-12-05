@@ -1,5 +1,5 @@
 # RAZ: Razor-Express view template engine
-**(draft)**
+<sup>*This is a draft version of the manual, although the code itself has already been tested and works.*</sup>
 
 - [**Intro**](#intro)
   - [A brief comparison of syntax of Node.JS layout engines](#a-brief-comparison-of-syntax-of-nodejs-layout-engines)
@@ -59,7 +59,7 @@ var model = {
   {{/items}}
 </ul>
 ```
-* *([mustache live example](https://codepen.io/develax/pen/wQOpNQ))*
+<sup>^ [mustache live example](https://codepen.io/develax/pen/wQOpNQ)</sup>
 
 ----------------------
 
@@ -70,7 +70,7 @@ ul
   each item in model.items
       li=item.name 
 ```
-* *([pug live example](https://codepen.io/develax/pen/dQrJEV))*
+<sup>^ [pug live example](https://codepen.io/develax/pen/dQrJEV)</sup>
 
 ----------------------
 
@@ -83,7 +83,7 @@ ul
   <% } %>
 </ul>
 ```
-* *([ejs live example](https://codepen.io/develax/pen/WYmMMv))*
+<sup>^ [ejs live example](https://codepen.io/develax/pen/WYmMMv)</sup>
 
 ----------------------
 
@@ -96,7 +96,7 @@ ul
   }
 </ul>
 ```
-* *([razor live example](https://runkit.com/develax/razor-list-example))*
+<sup>^ [razor live example](https://runkit.com/develax/razor-list-example)</sup> 
 
 #### Haml
 Or let's consider an example from http://haml.info/tutorial.html
@@ -143,7 +143,7 @@ which is just a *JavaScript object*. And we want to get some HTML displaying the
 </ul>
 ```
 
-As you can see the **view-template** (or just **view**) is nothing more than *HTML markup mixed with JavaScript syntax*. This is exactly what Razor-Express syntax is [!].
+As you can see the **view-template** (or just **view**) is nothing more than *HTML markup mixed with JavaScript syntax*. This is exactly what [Razor-Express syntax](https://github.com/DevelAx/RazorExpress/blob/master/docs/overview.md#razor-express-syntax-reference-for-nodejs) is.
 
 Now we are going to take these two components and "compile" them into pure HTML.   
 
