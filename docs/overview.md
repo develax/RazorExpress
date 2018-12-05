@@ -37,6 +37,7 @@ The rendered HTML by Razor-Express will be:
 ```HTML
 <a href="mailto:webmaster@example.com?Subject=Hello, Webmaster!">Send Email Message to the Webmaster</a>
 ```
+*try this code: https://runkit.com/develax/razor-hello-webmaster*
 
 Razor reserved keywords
 ---
