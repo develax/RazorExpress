@@ -110,7 +110,7 @@ Maybe I'm wrong and this kind of markup really simplifies the development and pe
 ```
 
 
-I won't go much into all the aspects I don't like in other engines syntax just say that *"[Mustache](https://www.npmjs.com/package/mustache) / [HandleBar](https://handlebarsjs.com/)"*, *"[Pug](https://pugjs.org)"*, and *[Haml](http://haml.info/)* look like I have to learn a new syntax while with *Razor* I virtually know it if I'm already familiar with *HTML* and *JavaScript* languages. [EJS](https://www.npmjs.com/package/ejs) is very close to *Razor* but it to verbose that make it difficult to write and read the code.
+I won't go much into all the aspects I don't like in other engines syntax just say that *"[Mustache](https://www.npmjs.com/package/mustache) / [HandleBar](https://handlebarsjs.com/)"*, *"[Pug](https://pugjs.org)"*, and *[Haml](http://haml.info/)* look like I have to learn a new syntax while with *Razor* I virtually know it if I'm already familiar with *HTML* and *JavaScript* languages. [EJS](https://www.npmjs.com/package/ejs) is very close to *Razor* but it is too verbose that makes it difficult to write and read the code.
 
 In these examples I don't compare logic constructions because some of the view engines have logic-less templating syntax.
 With *Razor* you can implement amost any logic that is available with normal *JavaScript* without learning a new syntax.
