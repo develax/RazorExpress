@@ -98,6 +98,18 @@ ul
 ```
 * *([razor live example](https://runkit.com/develax/razor-list-example))*
 
+#### Haml
+Or let's consider an example from http://haml.info/tutorial.html
+```Haml
+.item{:id => "item#{item.id}"}= item.body
+```
+and compare it to the equivalent Razor markup:
+```HTML+Razor
+<div class='item' id='item@item.id'>
+  @item.body
+</div>
+```
+
 
 I won't go much into all the aspects I don't like in other engines syntax just say that *"[Mustache](https://www.npmjs.com/package/mustache) / [HandleBar](https://handlebarsjs.com/)"* and *"[Pug](https://pugjs.org)"* look like I have to learn a new syntax while with *Razor* I virtually know it if I'm already familiar with *HTML* and *JavaScript*. *EJS* is very close to Razor but it contains too many additional markup characters that make it difficult to write and read the code.
 
