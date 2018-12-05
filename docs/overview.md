@@ -1,6 +1,15 @@
 # The overview of Razor-Express View Template Engine
+Let's look quickly at the key concepts and terms.
 
-Let's quickly look at the key concepts and terms.
+- [**What is View Template?**](#what-is-view-template)
+- [**What is View Template Engine?**](#what-is-view-template-engine)
+- [**What is Razor-Express?**](#what-is-razor-express)
+- [**Razor-Express syntax**](#razor-express-syntax-reference-for-nodejs)
+  - [A simple example](#a-simple-example-of-razor-express-markup)
+  - [Escaping `@` character](#escaping--character)
+  - [Expressions](#expressions)
+    - [Expression encoding](#expression-encoding)
+    - [Expression raw-rendering](#expression-raw-rendering)
 
 ## What is View Template?
 Building an HTML page assumes that you want to display some data on it (what else could it be?). To perform this task, you need the **data** itself and the **page template** (that defines the rules through a special markup language for displaying the data in HTML format). The page template is usually referred to simply as a **"view"** and the data is referred to as a **"view model"** or just **"model"**. So, this is what is usually called *"view templating"*. This consept is used for separating concerns within a web application (for more details [read this](https://docs.microsoft.com/en-us/aspnet/core/mvc/overview)).
@@ -8,7 +17,7 @@ Building an HTML page assumes that you want to display some data on it (what els
 ## What is View Template Engine?
 A **template engine** allows you to create HTML pages based on the model data and the view template. In other words the engine can understand the view template markup laguage and it also knows how to apply your model data to it to get the HTML page you need.
 
-## What is Razor-Express
+## What is Razor-Express?
 **Razor-Express** is a view template engine which can understand *Razor-like markup language* syntax. Razor-Express is intended to be used with the [Express library](https://expressjs.com/) but it also can be used with any other library or purpose.
 
 > To get more about using template engines with Express read [their guide](https://expressjs.com/en/guide/using-template-engines.html).
@@ -20,7 +29,7 @@ Just like the *ASP.NET Razor* syntax, the *Razor-Express* syntax consists of Raz
 
 Since the *Razor-Express* engine must somehow distinguish server-side JavaScript from HTML markup we use the `@` symbol. The `@` just tells the engine's parser that JavaScript server-side code or expression starts after this character. This is the minimum intervention in HTML markup [compared to other existing markup engines](https://github.com/DevelAx/RazorExpress#a-brief-comparison-of-syntax-of-nodejs-layout-engines).
 
-### The simplest example of Razor-Express markup
+### A simple example of Razor-Express markup
 ```HTML+Razor
 @{ 
   var email = "webmaster@example.com";
