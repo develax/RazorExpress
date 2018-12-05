@@ -95,8 +95,11 @@ It will render the HTML *"as it is"*:
 ```
 and the browser displays it without tags as just:
 ```
-**Hello Developer!**
+****
 ```
+<pre>
+<b>Hello Developer!</b>
+</pre>
 <sup>[^ try this code](https://runkit.com/develax/razor-expression-encoding)</sup> 
 
 > :warning: Using the `Html.raw` method with a user input which might contain malicious JavaScript or other exploits is a **security risk**. Sanitizing user input is not a trivial task, so you'd better avoid using `Html.raw` with user input. 
