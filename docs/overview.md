@@ -52,14 +52,14 @@ Razor reserved keywords
 
 When an `@` symbol is followed by a *Razor-Express reserved keyword*, it transitions into Razor-specific markup. Otherwise, it transitions into plain JavaScript.
 
-Implicit Razor expressions
+Razor-Express expressions
 ---
-Implicit Razor-Express expressions start with `@` followed by JavaScript code:
+Razor-Express expressions start with `@` followed by JavaScript code:
 ```HTML+Razor
 <p>@Date.now()</p>
 ```
-An implicit expression must not contain spaces and if it does contain you have to enclose such an expression in parentheses:
+An expression must not contain spaces and if it does contain you have to enclose such an expression in parentheses:
 ```HTML+Razor
 <p>@(new Date().toLocaleString()</p>
 ```
-<sup>[^ try this code](https://runkit.com/develax/razor-implicit-expressions))</sup> 
+<sup>[^ try this code](https://runkit.com/develax/razor-expressions))</sup> 
