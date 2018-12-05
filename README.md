@@ -1,5 +1,6 @@
 # RAZ: Razor-Express view template engine
-<sup>*This is a draft version of the manual, although the code itself has already been tested and works.*</sup>
+<sub>* *This is a draft version of the manual, although the code itself has already been tested and works.*</sub>
+<sup>* *While the documentation is under development, use [this repository](https://github.com/DevelAx/RazorExpressFullExample) for more comprehensive examples.*</sup>
 
 - [**Intro**](#intro)
   - [A brief comparison of syntax of Node.JS layout engines](#a-brief-comparison-of-syntax-of-nodejs-layout-engines)
@@ -330,9 +331,6 @@ or
 }
 <span>@Html.raw(boldText)</span>
 ```
-
-**While the documentation is under development, use [this repository](https://github.com/DevelAx/RazorExpressFullExample) for more comprehensive examples.**
-
 
 :warning: Common pitfalls
 ===
