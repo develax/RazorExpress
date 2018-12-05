@@ -94,9 +94,6 @@ It will render the HTML *"as it is"*:
 <strong>Hello Developer!</strong>
 ```
 and the browser displays it without tags as just:
-```
-****
-```
 <pre>
 <b>Hello Developer!</b>
 </pre>
