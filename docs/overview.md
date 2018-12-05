@@ -39,20 +39,20 @@ The rendered HTML by Razor-Express will be:
 ```
 <sup>[^ try this code](https://runkit.com/develax/razor-hello-webmaster)</sup>
 
-#### Escaping Razor-Express `@` character
+#### Escaping `@` character
 **Be careful** while using `@` symbol in HTML attributes and content containing **email addresses** since Razor-Express *does* treat the `@` symbol as a transition character and it will cause an error. To escape an `@` symbol in Razor-Express markup, use double `@@`. For example the next Razor-Express markup won't cause any error:
 ```HTML+Razor
 <a href="mailto:webmaster@@example.com">webmaster@@example.com</a>
 ```
 <sup>[^ try this code](https://runkit.com/develax/razor-at-escape)</sup>
 
-Razor reserved keywords
+Reserved keywords
 ---
 - `Section`
 
 When an `@` symbol is followed by a *Razor-Express reserved keyword*, it transitions into Razor-specific markup. Otherwise, it transitions into plain JavaScript.
 
-Razor-Express expressions
+Expressions
 ---
 Razor-Express expressions start with `@` followed by JavaScript code:
 ```HTML+Razor
