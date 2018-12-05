@@ -17,9 +17,8 @@
 - [**Common pitfalls & remarks**](#warning-common-pitfalls)
   - [Missing semicolon](#missing-semicolon)
 - [**Debugging & Errors handling in Razor-Express**](https://github.com/DevelAx/RazorExpress/blob/master/docs/Debugging.md)
-  - **Debugging view templates**
-  - [**Errors handling**](https://github.com/DevelAx/RazorExpress/blob/master/docs/Debugging.md#errors-handling)
-    - [Custom error handler](https://github.com/DevelAx/RazorExpress/blob/master/docs/Debugging.md#custom-error-handler)
+  - Debugging view templates
+  - [Errors handling](https://github.com/DevelAx/RazorExpress/blob/master/docs/Debugging.md#errors-handling)
   
 -----------------------
 
