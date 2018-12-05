@@ -1,5 +1,5 @@
 # RAZ: Razor-Express view template engine
-<sup>* *This is a draft version of the manual, although the code itself has already been tested and works. While the documentation is under development, use [this repository](https://github.com/DevelAx/RazorExpressFullExample) for more comprehensive examples.*</sup>
+<sup>* *This is a **draft version** of the manual, although the code itself has already been tested and works. While the documentation is under development, use [this repository](https://github.com/DevelAx/RazorExpressFullExample) for more comprehensive examples.*</sup>
 
 - [**Intro**](#intro)
   - [A brief comparison of syntax of Node.JS layout engines](#a-brief-comparison-of-syntax-of-nodejs-layout-engines)
@@ -359,4 +359,4 @@ catch(err){
 If you run this code you will get the error:
 > RazorError: **The code or section block is missing a closing "}" character.** Make sure you have a matching "}" character for all the "{" characters within this block, and that none of the "}" characters are being interpreted as markup. The block starts at line 3 with text: "@for(var i = 0; i < 10; i++){"
 
-[Test this example with RunKit.](https://runkit.com/develax/razor-pitfalls-semicolon)
+<sup>* [Run this code with RunKit.](https://runkit.com/develax/razor-pitfalls-semicolon)</sup>
