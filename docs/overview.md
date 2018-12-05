@@ -62,4 +62,4 @@ An expression must not contain spaces and if it does contain you have to enclose
 ```HTML+Razor
 <p>@(new Date().toLocaleString()</p>
 ```
-<sup>[^ try this code](https://runkit.com/develax/razor-expressions))</sup> 
+<sup>[^ try this code](https://runkit.com/develax/razor-expressions)</sup> 
