@@ -103,7 +103,7 @@ Or let's consider an example from http://haml.info/tutorial.html
 ```Haml
 .item{:id => "item#{item.id}"}= item.body
 ```
-and compare it to the equivalent Razor markup:
+Maybe I'm wrong and this kind of markup really simplifies the development and perception of the code, but to me, it doesn't seem to be so. Let's just compare it to the equivalent Razor markup:
 ```HTML+Razor
 <div class='item' id='item@item.id'>
   @item.body
@@ -111,7 +111,7 @@ and compare it to the equivalent Razor markup:
 ```
 
 
-I won't go much into all the aspects I don't like in other engines syntax just say that *"[Mustache](https://www.npmjs.com/package/mustache) / [HandleBar](https://handlebarsjs.com/)"* and *"[Pug](https://pugjs.org)"* look like I have to learn a new syntax while with *Razor* I virtually know it if I'm already familiar with *HTML* and *JavaScript*. *EJS* is very close to Razor but it contains too many additional markup characters that make it difficult to write and read the code.
+I won't go much into all the aspects I don't like in other engines syntax just say that *"[Mustache](https://www.npmjs.com/package/mustache) / [HandleBar](https://handlebarsjs.com/)"*, *"[Pug](https://pugjs.org)"*, and *[Haml](https://www.npmjs.com/package/haml)* look like I have to learn a new syntax while with *Razor* I virtually know it if I'm already familiar with *HTML* and *JavaScript* languages. *EJS* is very close to *Razor* but it to verbose that make it difficult to write and read the code.
 
 In these examples I don't compare logic constructions because some of the view engines have logic-less templating syntax.
 With *Razor* you can implement amost any logic that is available with normal *JavaScript* without learning a new syntax.
