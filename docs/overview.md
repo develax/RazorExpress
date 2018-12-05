@@ -24,7 +24,7 @@ Just like the *ASP.NET Razor* syntax, the *Razor-Express* syntax consists of Raz
 
 Since the *Razor-Express* engine must somehow distinguish server-side JavaScript from HTML markup we use the `@` symbol. The `@` just tells the engine's parser that JavaScript server-side code or expression starts after this character. This is the minimum intervention in HTML markup [compared to other existing markup engines](https://github.com/DevelAx/RazorExpress#a-brief-comparison-of-syntax-of-nodejs-layout-engines).
 
-#### The simplest example of Razor markup
+#### The simplest example of Razor-Express markup
 ```HTML+Razor
 @{ 
   var email = "webmaster@example.com";
@@ -37,7 +37,14 @@ The rendered HTML by Razor-Express will be:
 ```HTML
 <a href="mailto:webmaster@example.com?Subject=Hello, Webmaster!">Send Email Message to the Webmaster</a>
 ```
-*try this code: https://runkit.com/develax/razor-hello-webmaster*
+* (*[try this code](https://runkit.com/develax/razor-hello-webmaster))*
+
+#### Escaping Razor-Express `@` character
+**Be careful** while using `@` symbol in HTML attributes and content containing **email addresses** since Razor-Express *does* treat the `@` symbol as a transition character and it will cause an error. To escape an `@` symbol in Razor-Express markup, use double `@@`. For example the next Razor-Express markup won't cause any error:
+```HTML+Razor
+<a href="mailto:webmaster@@example.com">webmaster@@example.com</a>
+```
+* (*[try this code](https://runkit.com/develax/razor-at-escape))*
 
 Razor reserved keywords
 ---
