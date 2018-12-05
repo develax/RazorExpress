@@ -552,6 +552,19 @@ els
         var longText = "<div>";
     </script>
 `
+        },
+        {
+            name: "Code 62",
+            template: `
+@{
+    class Test{
+        constructor(){
+            this.name = this.constructor.name;
+        }
+    }
+}
+<span>@(new Test().name)</span>`,
+            expected: "\n<span>Test</span>"
         }
     ];
     module.exports = cases;
