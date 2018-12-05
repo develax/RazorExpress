@@ -30,7 +30,7 @@ Just like the *ASP.NET Razor* syntax, the *Razor-Express* syntax consists of Raz
 
 Since the *Razor-Express* engine must somehow distinguish server-side JavaScript from HTML markup we use the `@` symbol. The `@` just tells the engine's parser that JavaScript server-side code or expression starts after this character. This is the minimum intervention in HTML markup [compared to other existing markup engines](https://github.com/DevelAx/RazorExpress#a-brief-comparison-of-syntax-of-nodejs-layout-engines).
 
-### c
+### Reserved keywords
 
 - `Section`
 
