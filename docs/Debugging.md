@@ -54,8 +54,7 @@ The `handleErrors` method has two additional parameters (`errorCode` and `mode`)
 By default `errorCode` is `500`  and `mode` is `"development"`. This means that by default you'll get an HTML-formatted error and HTTP response with code 500 only if the **NODE_ENV** environment variable has a value equal to `"development"` ([express](https://expressjs.com/en/advanced/best-practice-performance.html#set-node_env-to-production), [stackoverflow](https://stackoverflow.com/a/16979503/1844247)). If the NODE_ENV is not set at all then it's considered (by Express) to be `"development"` by default.
 
 
-Custom error handler
-===
+### Custom error handler
 Where appropriate you can create your own error handler and attach it to the Express app. You just have to make sure the error you get is of `RazorError` type by checking its `name` field. 
 
 Example:
