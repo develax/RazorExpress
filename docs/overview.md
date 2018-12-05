@@ -63,28 +63,29 @@ An expression must not contain spaces and if it does contain you have to enclose
 JavaScript expressions are converted to a string by `.toString` and HTML encoded before they're rendered. 
 The next code:
 ```HTML+Razor
-@("<span>Hello Developer!</span>")
+@("<strong>Hello Developer!</strong>")
 ```
 renders the following HTML:
 ```HTML
-&lt;span&gt;Hello Developer!&lt;/span&gt;
+&lt;strong&gt;Hello Developer!&lt;/strong&gt;
 ```
 and the browser will show it with tags as:
 ```
-<span>Hello Developer!</span>
+<strong>Hello Developer!</strong>
 ```
-
-
+#### Expression raw-rendering
 If you don't want the expression to be encoded use `Html.raw` method:
 ```HTML+Razor
-@Html.raw("<span>Hello Developer!</span>")
+@Html.raw("<strong>Hello Developer!</strong>")
 ```
 It will render the HTML *"as it is"*:
 ```HTML
-<span>Hello Developer!</span>
+<strong>Hello Developer!</strong>
 ```
 and the browser displays it without tags as just:
 ```
-Hello Developer!
+**Hello Developer!**
 ```
 <sup>[^ try this code](https://runkit.com/develax/razor-expression-encoding)</sup> 
+
+> :warning: Using the `Html.raw` method with a user input which might contain malicious JavaScript or other exploits is a **security risk**. Sanitizing user input is not a trivial task, so you'd better avoid using `Html.raw` with user input. 
