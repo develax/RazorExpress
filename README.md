@@ -106,8 +106,6 @@ With *Razor* you can implement amost any logic that is available with normal *Ja
 
 Given all the mentioned and unmentioned pros and cons, I decided not to part with *Razor-syntax* and create something similar for using with [ExpressJS](https://expressjs.com) library (currently it works only in *NodeJS* environment, not in browsers).
 
-Although I tried to make my library as close as possible to [ASP.NET Razor](https://docs.microsoft.com/en-us/aspnet/core/mvc/views/razor) there are some differences that need to be taken into account.
-
 -----------------------
 
 Quick Start
