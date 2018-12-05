@@ -194,7 +194,7 @@ Here's what we can see in the console:
 ```
 That's all! Isn't it simple?
 
-If you'd like to see all these parts working together here is the [playground](https://runkit.com/develax/razor-quick-example) of it.
+<sup>* If you'd like to see all these parts working together here is the [playground](https://runkit.com/develax/razor-quick-example) of it.</sup>
 
 Express web-server example
 ---
@@ -267,7 +267,7 @@ ____
 
 *The Express server app with Razor template engine works!* :thumbsup:
 
-The source code of this example is available in [RazorExpressExample](https://github.com/DevelAx/RazorExpressExample) repository.
+<sup>* The source code of this example is available in [RazorExpressExample](https://github.com/DevelAx/RazorExpressExample) repository.</sup>
 
 
 Razor-Express View API
