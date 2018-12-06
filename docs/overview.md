@@ -120,7 +120,7 @@ Code blocks and expressions share the same scope which is limited to one compile
 
 <div>
   <!-- These expressions use variables data from this view's scope. -->
-  The current year is @currentYear. It's @(isLeap ? '' : 'not') a leap year.
+  The current year is @currentYear. It is @(isLeap ? '' : 'not') a leap year.
 </div>
 
 ```
@@ -132,7 +132,27 @@ The current year is 2018. It is not a leap year.
 </pre>
 <sup>[^ try this code](https://runkit.com/develax/razor-code-blocks)</sup> 
 
-<sub>* *If you want to share some data among all the request rendering views you can do it or through the `Model` (if there is a single model for all of them) either through the `ViewData` objects.*</sub>
+<sub>* *If you want to share some data among all the request rendering views you can do it either through the `Model` (if there is a single model for all of them) or through the `ViewData` objects.*</sub>
 
 
+#### Rendering HTML within JavaScript code blocks
+To render an HTML code within JavaScript code block you can either use implicit transitions or the `Html` object methods.
+
+##### Transitions to HTML
+The default language in a code block is JavaScript, but the Razor-Express engine can transition back to HTML:
+
+```HTML+Razor
+@{
+    var js = "JavaScript";
+    <p>Now in <b>HTML</b>, was in <b>@js</b>.</p>
+    Html.raw("<p>This <b>HTML</b> line is rendered via <b>Html.raw</b> method.</p>");
+    Html.encode("<p>This <b>HTML</b> line is rendered via <b>Html.raw</b> method.</p>");
+}
+```
+The browser output would be:
+<pre><p>Now in <b>HTML</b>, was in <b>JavaScript</b>.</p>
+<p>This <b>HTML</b> line is rendered via <b>Html.raw</b> method.</p>&lt;p&gt;This &lt;b&gt;HTML&lt;/b&gt; line is rendered via &lt;b&gt;Html.raw&lt;/b&gt; method.&lt;/p&gt;</pre>
+<sup>[^ try this code](https://runkit.com/develax/razor-code-blocks-transitions-to-html)</sup> 
+
+*Notice that in code blocks after the HTML line you continue writing JavaScript without explicit transitioning to it via `@` symbol.*
 
