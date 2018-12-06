@@ -132,7 +132,7 @@ The current year is 2018. It is not a leap year.
 </pre>
 <sup>[^ try this code](https://runkit.com/develax/razor-code-blocks)</sup> 
 
-If you want to share some data among all the request rendering views you can do it or through the `Model` (if there is a single model for all of them) either through the `ViewData` objects. 
+<sub>* *If you want to share some data among all the request rendering views you can do it or through the `Model` (if there is a single model for all of them) either through the `ViewData` objects.*</sub>
 
 
 
