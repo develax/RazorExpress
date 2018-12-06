@@ -4,6 +4,11 @@
 
 String.whitespaces = '\r\n\t ';
 
+String.is = function(val){
+    // return typeof val === "string" || val instanceof String;
+    return Object.prototype.toString.call(val) === "[object String]";
+}
+
 String.format = String.format || function (format) {
     var args = Array.prototype.slice.call(arguments, 1);
     return format.replace(/{(\d+)}/g, function (match, number) {

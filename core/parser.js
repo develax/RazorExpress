@@ -126,19 +126,15 @@ module.exports = function (opts) {
         };
 
         this.encode = function (val) {
-            if (!val || typeof val === "number" || val instanceof Number || val instanceof HtmlString)
-                this.raw(val); // not to do excessive work
-            else if (typeof val === "string" || val instanceof String)
-                this.raw(htmlEncode(val));
-            else
-                this.raw(htmlEncode(val.toString()));
+            var encoded = this.getEncoded(val);
+            this.raw(encoded);
         };
 
         this.getEncoded = function (val) {
             if (!val || typeof val === "number" || val instanceof Number || val instanceof HtmlString)
                 return val;
 
-            if (typeof val === "string" || val instanceof String)
+            if (String.is(val))
                 return htmlEncode(val);
 
             return htmlEncode(val.toString());
@@ -302,6 +298,9 @@ module.exports = function (opts) {
     ////////////////
     class Parser {
         constructor(args) {
+            if (String.is(args))
+                args = { template: args };
+
             args.filePath = args.filePath || "default";
             this.args = args;
             this.er = new ErrorsFactory({ filename: args.filePath, jshtml: args.template });
@@ -368,7 +367,7 @@ module.exports = function (opts) {
             let template = this.args.template;
 
             if (!js) {
-                var isString = Object.prototype.toString.call(template) === "[object String]";
+                var isString = String.is(template);
 
                 if (!isString)
                     throw new Error(ErrorsFactory.templateShouldBeString);
@@ -405,7 +404,7 @@ module.exports = function (opts) {
                 if (sections.hasOwnProperty(key)) {
                     let secGroup = sections[key];
 
-                    if (!secGroup.renderedBy){
+                    if (!secGroup.renderedBy) {
                         let sec = secGroup[Object.keys(secGroup)[0]]; // just any section from the group
                         throw this.er.sectionNeverRendered(key, sec.filePath);
                     }
@@ -646,7 +645,7 @@ module.exports = function (opts) {
                         block = newBlock(type.html, blocks);
                         continue;
                     }
-                    else{
+                    else {
                         throw this.er.unexpectedAtCharacter(this.lineNum, this.linePos()); // [Section 0]
                     }
                 }
@@ -829,10 +828,9 @@ module.exports = function (opts) {
             var wait = null;
             var firstScope = null;
             let lastCh = '';
-            this.flushPadding(blocks);// there is no sense to put padding to the expression text since it will be lost while evaluating
-            let block = newBlock(type.expr, blocks);
-            block.text = this.padding;
+            let padding = this.padding;
             this.padding = '';
+            let block = newBlock(type.expr, blocks);
             var checkForBlockCode = false;
             let inText = false;
             let operatorName = '';
@@ -843,7 +841,8 @@ module.exports = function (opts) {
                         this.padding += ch;
                     }
                     else if (ch === '{') {
-                        this.flushPadding(blocks);
+                        //this.flushPadding(blocks);
+                        this.padding = padding;
                         block.type = type.code;
                         return this.parseJsBlock(blocks, block, operatorName);
                     }
@@ -890,27 +889,37 @@ module.exports = function (opts) {
                             inText = true; // put on waits-stack
                         }
                     }
-                    else if (block.text && !canExpressionEndWith(ch)) {
-                        if (Char.isWhiteSpace(ch) || ch === '{') {
-                            if (checkForSection.call(this))
-                                return;
-                            else if (ch === '{') {
-                                var op = block.text.trim();
-                                if (op === "do") {
-                                    operatorName = op;
-                                    checkForBlockCode = true;
-                                    continue;
+                    else if (block.text) {
+                        let nextCh = this.pickNextChar();
+                        
+                        if (Char.isWhiteSpace(lastCh) && !Char.isWhiteSpace(ch)){
+                            let op = block.text.trim();
+                            if (op !== 'function' && op !== 'class')
+                                break;  // [Code 63]: <span>@year is a leap year.</span>
+                        }
+
+                        if (!canExpressionEndWith(ch)){
+                            if (Char.isWhiteSpace(ch) || ch === '{') {
+                                if (checkForSection.call(this))
+                                    return;
+                                else if (ch === '{') {
+                                    let op = block.text.trim();
+                                    if (op === "do") {
+                                        operatorName = op;
+                                        checkForBlockCode = true;
+                                        continue;
+                                    }
+                                    break;
                                 }
+                            }
+                            else if (ch === '.') { // @Model.text
+                                
+                                if (!nextCh || !canExpressionEndWith(nextCh))
+                                    break;
+                            }
+                            else {
                                 break;
                             }
-                        }
-                        else if (ch === '.') { // @Model.text
-                            let nextCh = this.pickNextChar();
-                            if (!nextCh || !canExpressionEndWith(nextCh))
-                                break;
-                        }
-                        else {
-                            break;
                         }
                     }
                 }
@@ -935,6 +944,15 @@ module.exports = function (opts) {
 
             if (!block.text)
                 throw this.er.invalidExpressionChar(ch, this.lineNum, this.linePos(), this.line); // Seems to be impossible.
+
+            flushDeferredPadding(blocks); // there is no sense to put padding to the expression text since it will be lost while evaluating
+
+            function flushDeferredPadding(blocks) {
+                if (!padding)
+                    return;
+                let prevBlock = blocks[blocks.length - 2];
+                prevBlock.text += padding;
+            }
 
             function checkForSection() {
                 let keyword = block.text.trim();

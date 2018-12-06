@@ -166,7 +166,7 @@
             expected: "\n<div>\n    123\n</div>\n"
         },
         {
-            name: "Code 19  (invalid)",
+            name: "Code 19",
             template: `
 @function getValue () {
     return 123;
@@ -565,6 +565,22 @@ els
 }
 <span>@(new Test().name)</span>`,
             expected: "\n<span>Test</span>"
+        },
+        {
+            name: "Code 63",
+            template: `
+@{
+    var year = 2018;
+}
+<div>
+    @if (year % 4 == 0 && year % 100 != 0 || year % 400 == 0){
+        <span>@year is a leap year.</span>
+    }
+    else{
+        <span>@year is not a leap year.</span>
+    }
+</div>`,
+            expected: "\n<div>\n        <span>2018 is not a leap year.</span>\n</div>"
         }
     ];
     module.exports = cases;
