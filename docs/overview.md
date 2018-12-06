@@ -52,7 +52,7 @@ The rendered HTML by Razor-Express will be:
 <sup>[^ try this code](https://runkit.com/develax/razor-hello-webmaster)</sup>
 
 ### Escaping `@` character
-**Be careful** while using `@` symbol in HTML attributes and content containing **email addresses** since Razor-Express *does* treat the `@` symbol as a transition character and it will cause an error. To escape an `@` symbol in Razor-Express markup, use double `@@`. For example the next Razor-Express markup won't cause any error:
+**Be careful** when using `@` symbol in HTML attributes and content containing **email addresses** since Razor-Express *does* treat the `@` symbol as a transition character and it will cause an error. To escape an `@` symbol in Razor-Express markup, use double `@@`. For example the next Razor-Express markup won't cause any error:
 ```HTML+Razor
 <a href="mailto:webmaster@@example.com">webmaster@@example.com</a>
 ```
@@ -99,4 +99,9 @@ and the browser displays it without tags as just:
 </pre>
 <sup>[^ try this code](https://runkit.com/develax/razor-expression-encoding)</sup> 
 
-> :warning: Using the `Html.raw` method with a user input which might contain malicious JavaScript or other exploits is a **security risk**. Sanitizing user input is not a trivial task, so you'd better avoid using `Html.raw` with user input. 
+> :warning: Using the `Html.raw` method with a user input which might contain malicious JavaScript or other exploits is a **security risk**. Sanitizing user input is not a trivial task, so you'd better avoid using `Html.raw` with user input.
+
+### Code blocks
+Razor-Express code blocks, just like any server-side JavaScript code in a view, start with `@` symbol. But unlike expressions they are enclosed by `{}` and JavaScript code result inside code blocks isn't rendered (unless you do it explicitly via `Html.render` or other methods). Code blocks and expressions share the same scope which is limited to one compiled template. This means that a normal view and a partial view that is rendered within that view have different scopes. Although a normal view compiled template also includes `_viewStart.raz` templates if they exists. Any section's sope is the scope of its view. If you need to share data among all the rendered views you can do it through the `Model` (if there is a signle model for all of them) or through the `ViewData` objects. Nothing except the data can be shared among views with different scopes.
+
+
