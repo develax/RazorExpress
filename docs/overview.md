@@ -11,6 +11,7 @@ Let's look quickly at the key concepts and terms.
   - [Expressions](#expressions)
     - [Expression encoding](#expression-encoding)
     - [Expression raw-rendering](#expression-raw-rendering)
+  - [Code blocks](#code-blocks)
 
 ## What is View Template?
 Building an HTML page assumes that you want to display some data on it (what else could it be?). To perform this task, you need the **data** itself and the **page template** (that defines the rules through a special markup language for displaying the data in HTML format). The page template is usually referred to simply as a **"view"** and the data is referred to as a **"view model"** or just **"model"**. So, this is what is usually called *"view templating"*. This consept is used for separating concerns within a web application (for more details [read this](https://docs.microsoft.com/en-us/aspnet/core/mvc/overview)).
@@ -104,7 +105,26 @@ and the browser displays it without tags as just:
 ### Code blocks
 *Razor-Express code blocks* start with `@` symbol just like *expressions*. But unlike expressions code blocks are enclosed by `{}` and JavaScript code result inside code blocks isn't rendered (unless you do it explicitly via `Html.render` or other methods). 
 
-Code blocks and expressions share the same scope which is limited to one compiled view template. This means that a normal view and a partial view that is rendered within that view have different scopes. Although a normal view compiled template also includes `_viewStart.raz` templates if they exists. Any section's sope is the scope of its view. If you need to share data among all the rendered views you can do it through the `Model` (if there is a signle model for all of them) or through the `ViewData` objects. Nothing except the data can be shared among views with different scopes.
+Code blocks and expressions share the same scope which is limited to one compiled view template. This means that a normal view and a partial view that is rendered within that view have different scopes. Although a normal view compiled template also includes `_viewStart.raz` templates if they exists. Any section's sope is the scope of its view. That is, any variable value calculated in a code block as well as any other JavaScript language definition is available within that's view scope later in expressions or other code blocks.
+
+```HTML+Razor
+@function checkLeapYear(year)
+{
+  return ((year % 4 == 0) && (year % 100 != 0)) || (year % 400 == 0);
+}
+
+@{
+  var currentYear = new Date().getFullYear();
+  var isLeap = checkLeapYear(currentYear);
+}
+
+<div>
+  <!-- These expressions use variables data from this view's scope. -->
+  The current year is @currentYear. It's @(isLeap ? '' : 'not') a leap year.
+</div>
+
+```
+If you need to share data among all the rendered views you can do it through the `Model` (if there is a signle model for all of them) or through the `ViewData` objects. Nothing except the data can be shared among views with different scopes.
 
 
 
