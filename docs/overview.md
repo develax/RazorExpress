@@ -105,7 +105,7 @@ and the browser displays it without tags as just:
 ### Code blocks
 *Razor-Express code blocks* start with `@` symbol just like *expressions*. But unlike expressions code blocks are enclosed by `{}` and JavaScript code result inside code blocks isn't rendered (unless you do it explicitly via `Html.render` or other methods). 
 
-Code blocks and expressions share the same scope which is limited to one compiled view template. This means that a normal view and a partial view that is rendered within that view have different scopes. Although a normal view compiled template also includes `_viewStart.raz` templates if they exists. Any section's sope is the scope of its view. That is, any variable value calculated in a code block as well as any other JavaScript language definition is available within that's view scope later in expressions or other code blocks.
+Code blocks and expressions share the same scope which is limited to one compiled view template. This means that a normal view and a partial view that is rendered within that view have different scopes. Although a normal view compiled template also includes `_viewStart.raz` templates if they exists. Any section's sope is the scope of its view. That is, any variable value calculated in a code block as well as any other JavaScript language definition is available within that's view scope later in expressions or other code blocks:
 
 ```HTML+Razor
 @function checkLeapYear(year)
@@ -124,7 +124,15 @@ Code blocks and expressions share the same scope which is limited to one compile
 </div>
 
 ```
-If you need to share data among all the rendered views you can do it through the `Model` (if there is a signle model for all of them) or through the `ViewData` objects. Nothing except the data can be shared among views with different scopes.
+
+The browser will show:
+
+<pre>
+The current year is 2018. It is not a leap year.
+</pre>
+<sup>[^ try this code](https://runkit.com/develax/razor-code-blocks)</sup> 
+
+If you need to share data among all the request rendering views you can do it or through the `Model` (if there is a signle model for all of them) itheer through the `ViewData` objects. Nothing except the data can be shared among views with different scopes.
 
 
 
