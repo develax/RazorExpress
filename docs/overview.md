@@ -108,21 +108,13 @@ and the browser displays it without tags as just:
 Code blocks and expressions share the same scope which is limited to one compiled view template. This means that a normal view and a partial view that is rendered within that view have different scopes. Although a normal view compiled template also includes `_viewStart.raz` templates if they exists. Any section's sope is the scope of its view. That is, any variable value calculated in a code block as well as any other JavaScript language definition is available within that's view scope later in expressions or other code blocks:
 
 ```HTML+Razor
-@function checkLeapYear(year)
-{
-  return ((year % 4 == 0) && (year % 100 != 0)) || (year % 400 == 0);
-}
-
 @{
   var currentYear = new Date().getFullYear();
-  var isLeap = checkLeapYear(currentYear);
 }
-
 <div>
-  <!-- These expressions use variables data from this view's scope. -->
-  The current year is @currentYear. It is @(isLeap ? '' : 'not') a leap year.
+  <!-- These expressions use data from this view's scope. -->
+  The current year is @currentYear.
 </div>
-
 ```
 
 The browser will show:
@@ -155,4 +147,9 @@ The browser output would be:
 <sup>[^ try this code](https://runkit.com/develax/razor-code-blocks-transitions-to-html)</sup> 
 
 *Notice that in code blocks after the HTML line you continue writing JavaScript without explicit transitioning to it via `@` symbol.*
+
+### Control structures
+Control structures are just an extension of code blocks. All aspects of code blocks also apply to the JavaScript structures (`{}` are required). Let's look at some common examples.
+
+#### Conditionals @if, else if, else, and @switch
 
