@@ -102,6 +102,9 @@ and the browser displays it without tags as just:
 > :warning: Using the `Html.raw` method with a user input which might contain malicious JavaScript or other exploits is a **security risk**. Sanitizing user input is not a trivial task, so you'd better avoid using `Html.raw` with user input.
 
 ### Code blocks
-Razor-Express code blocks, just like any server-side JavaScript code in a view, start with `@` symbol. But unlike expressions they are enclosed by `{}` and JavaScript code result inside code blocks isn't rendered (unless you do it explicitly via `Html.render` or other methods). Code blocks and expressions share the same scope which is limited to one compiled template. This means that a normal view and a partial view that is rendered within that view have different scopes. Although a normal view compiled template also includes `_viewStart.raz` templates if they exists. Any section's sope is the scope of its view. If you need to share data among all the rendered views you can do it through the `Model` (if there is a signle model for all of them) or through the `ViewData` objects. Nothing except the data can be shared among views with different scopes.
+*Razor-Express code blocks* start with `@` symbol just like *expressions*. But unlike expressions code blocks are enclosed by `{}` and JavaScript code result inside code blocks isn't rendered (unless you do it explicitly via `Html.render` or other methods). 
+
+Code blocks and expressions share the same scope which is limited to one compiled view template. This means that a normal view and a partial view that is rendered within that view have different scopes. Although a normal view compiled template also includes `_viewStart.raz` templates if they exists. Any section's sope is the scope of its view. If you need to share data among all the rendered views you can do it through the `Model` (if there is a signle model for all of them) or through the `ViewData` objects. Nothing except the data can be shared among views with different scopes.
+
 
 
