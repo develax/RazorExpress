@@ -456,9 +456,8 @@ else{
 @if (a > b) {
     <span>A</span>
 }
-else
-`,
-            error: "'{' character is expected at line 8 pos 5"
+else `,
+            error: `'{' character is expected after 'else' at line 8 pos 6.`
         },
         {
             name: "Code 55.1",
@@ -510,7 +509,7 @@ els
     a++;
 } while;
 `,
-            error: `'(' character is expected at line 8 pos 8.`
+            error: `'(' character is expected after 'while' at line 8 pos 8.`
         },
         {
             name: "Code 59",
@@ -576,7 +575,7 @@ els
     @if (year % 4 == 0 && year % 100 != 0 || year % 400 == 0){
         <span>@year is a leap year.</span>
     }
-    else{
+    else {
         <span>@year is not a leap year.</span>
     }
 </div>`,
@@ -604,6 +603,56 @@ els
     <div>@n</div>
 });`,
             error: "Unexpected token <"
+        },
+        {
+            name: "Code 66",
+            template: `
+@try {
+    throw new Error("Test exception.");
+}
+catch (ex) {
+    <p>The exception message: @ex.message</p>
+}
+<br/>`,
+            expected: "\n    <p>The exception message: Test exception.</p>\n<br/>"
+        },
+        {
+            name: "Code 66.1",
+            template: `
+@try {
+    throw new Error("Test exception.");
+}
+catch 
+<br/>`,
+            error: `'(' character is expected after 'catch' at line 6 pos 1.`
+        },
+        {
+            name: "Code 67",
+            template: `
+@try {
+    throw new Error("try exception");
+}
+catch (ex) {
+    <p>The exception message: @ex.message</p>
+}
+finally {
+    <p>finally</p>
+}
+<br/>`,
+            expected: "\n    <p>The exception message: try exception</p>\n    <p>finally</p>\n<br/>"
+        },
+        {
+            name: "Code 67.1",
+            template: `
+@try {
+    throw new Error("try exception");
+}
+catch (ex) {
+    <p>The exception message: @ex.message</p>
+}
+finally 
+<br/>`,
+            error: `'{' character is expected after 'finally' at line 9 pos 1.`
         }
     ];
     module.exports = cases;

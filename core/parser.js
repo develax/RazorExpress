@@ -891,7 +891,7 @@ module.exports = function (opts) {
 
                         if (Char.isWhiteSpace(lastCh) && !Char.isWhiteSpace(ch)) {
                             let op = block.text.trim();
-                            if (op !== 'function' && op !== 'class')
+                            if (!['function', 'class', 'try'].some(e => e == op))
                                 break;  // [Code 63]: <span>@year is a leap year.</span>
                         }
 
@@ -901,7 +901,7 @@ module.exports = function (opts) {
                                     return;
                                 else if (ch === '{') {
                                     let op = block.text.trim();
-                                    if (op === "do") {
+                                    if (['do', 'try'].some(e => e == op)) {
                                         operatorName = op;
                                         checkForBlockCode = true;
                                         continue;
@@ -984,6 +984,7 @@ module.exports = function (opts) {
             for (var ch = this.pickChar(); !stop && ch; ch = this.pickChar()) { // pick or fetch ??
                 if (trackFirstLine) {
                     trackFirstLine = (ch !== '\n');
+
                     if (trackFirstLine)
                         firstLine += ch;
                 }
@@ -996,14 +997,18 @@ module.exports = function (opts) {
 
                         if (waitOperator.startsWith(waitAcc)) {
                             if (waitOperator === waitAcc) {
+                                operatorName = waitOperator;
                                 waitOperator = null;
-                                if (waitAcc === "while")
+
+                                if (["while", "catch"].some(e => waitAcc === e))
                                     operatorExpectScope = '(';
+                                else if (["else", "finally"].some(e => waitAcc === e))
+                                    operatorExpectScope = '{';
                             }
                         }
                         else {
-                            this.stepBack(blocks, waitAcc.length - 1);
-                            stop = true;
+                            waitOperator = null; // outer html (end of code block)
+                            this.stepBack(blocks, waitAcc.length - 1); // [Code 66]
                             break;
                         }
                     }
@@ -1012,7 +1017,6 @@ module.exports = function (opts) {
                             throw this.er.wordExpected(waitOperator, this.lineNum, this.linePos() - waitAcc.length); // [Code 59]
 
                         this.stepBack(blocks, waitAcc.length);
-                        stop = true;
                         break;
                     }
                 }
@@ -1028,8 +1032,8 @@ module.exports = function (opts) {
                     if (!firstScope && ch !== '{')
                         throw this.er.characterExpected('{', this.lineNum, this.linePos());
 
-                    if (operatorExpectScope && !Char.isWhiteSpace(ch) && ch !== operatorExpectScope) 
-                            throw this.er.characterExpected(operatorExpectScope, this.lineNum, this.linePos());
+                    if (operatorExpectScope && !Char.isWhiteSpace(ch) && ch !== operatorExpectScope)
+                        throw this.er.characterExpectedAfter(operatorExpectScope, this.lineNum, this.linePos(), operatorName); // [Code 58, Code 66.1, Code 67.1]
 
                     let pos = startScopes.indexOf(ch);
                     // IF it's a start-scope literal
@@ -1043,8 +1047,8 @@ module.exports = function (opts) {
                             wait = endScopes[pos];
                         }
 
-                        if (operatorExpectScope == ch){
-                            firstScope = wait;
+                        if (operatorExpectScope == ch) {
+                            //firstScope = wait;
                             operatorExpectScope = null;
                         }
                     }
@@ -1052,22 +1056,32 @@ module.exports = function (opts) {
                         if (endScopes.indexOf(ch) !== -1) { // IF it's an end-scope literal
                             if (wait === ch) {
                                 wait = waits.pop(); // collasping scope..
-                                if (!wait && ch === firstScope) { // the last & closing scope..
-                                    switch (operatorName) {
-                                        case "if":
-                                            waitOperator = "else";
-                                            firstScope = null;
-                                            break;
-                                        case "do":
-                                            waitOperator = "while";
-                                            //firstScope = null; Don't do this for 'while' - it shouldn't expect the '{' char after that.
-                                            break;
-                                        default:
-                                            waitOperator = null;
+                                if (!wait && (operatorName !== "if" || ch === firstScope)) {
+                                    if (ch === '}') { // the last & closing scope..)
+                                        switch (operatorName) {
+                                            case "try":
+                                                waitOperator = "catch";
+                                                break;
+                                            case "catch":
+                                                waitOperator = "finally";
+                                                break;
+                                            case "if":
+                                                waitOperator = "else";
+                                                //firstScope = null;
+                                                break;
+                                            case "do":
+                                                waitOperator = "while";
+                                                //firstScope = null; Don't do this for 'while' - it shouldn't expect the '{' char after that.
+                                                break;
+                                            default:
+                                                waitOperator = null;
+                                        }
+
+                                        operatorName = null;
                                     }
-                                    stop = !waitOperator;
+                                    waitAcc = '';
+                                    stop = !(waitOperator || operatorName);
                                     skipCh = (ch === '}') && !hasOperator;// skip the outer {} of the code-block
-                                    operatorName = null;
                                 }
                             }
                             else {
@@ -1090,6 +1104,9 @@ module.exports = function (opts) {
                                 continue;
                             }
                         }
+                    }
+                    else if (!Char.isWhiteSpace(ch)) {
+                        break;
                     }
                 }
 
@@ -1128,9 +1145,9 @@ module.exports = function (opts) {
                 throw this.er.jsCodeBlockMissingClosingChar(firstLineNum, firstLine); // tests: "Code 29"
 
             if (operatorExpectScope)
-                throw this.er.characterExpected(operatorExpectScope, this.lineNum, this.linePos());
+                throw this.er.characterExpectedAfter(operatorExpectScope, this.lineNum, this.linePos(), operatorName); // [Code 55]
 
-            if (waitOperator === "while")
+            if (waitOperator === "while") // all others are optional
                 throw this.er.wordExpected(waitOperator, this.lineNum, this.linePos() - waitAcc.length); // [Code 60]
 
             if (stop) {

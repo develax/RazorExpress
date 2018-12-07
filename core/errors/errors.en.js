@@ -36,6 +36,11 @@ class ParserErrorFactory {
         return RazorError.new({ message, info: this.info, line, pos, capture: this.characterExpected });
     }
 
+    characterExpectedAfter(ch, line, pos, after) {
+        var message = `'${ch}' character is expected after '${after}' at line ${line + 1} pos ${pos + 1}.`;
+        return RazorError.new({ message, info: this.info, line, pos, capture: this.characterExpected });
+    }
+
     expressionMissingEnd(expr, ch, line, pos) {
         var message = `The explicit expression "${expr}" is missing a closing character "${ch}" at line ${line + 1} pos ${pos + 1}.`;
         return RazorError.new({ message, info: this.info, line, pos, capture: this.expressionMissingEnd });
