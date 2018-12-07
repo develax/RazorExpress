@@ -497,7 +497,7 @@ els
     a++;
 } while (a <= b);
 `,
-            expected: "\n    <span>1</span>\n    <span>2</span>\n"
+            expected: "\n    <span>1</span>\n    <span>2</span>\n;\n"
         },
         {
             name: "Code 58",
@@ -581,6 +581,29 @@ els
     }
 </div>`,
             expected: "\n<div>\n        <span>2018 is not a leap year.</span>\n</div>"
+        },
+        {
+            name: "Code 64",
+            template: `
+@{
+    const numbers = [ 1, 2 ];
+    numbers.forEach((n)=>{
+        <div>@n</div>
+    });
+}`,
+            expected: "\n        <div>1</div>\n        <div>2</div>\n"
+        },
+        // this is parsed as an expression (not code block)
+        {
+            name: "Code 65",
+            template: `
+@{
+    const numbers = [ 1, 2 ];
+}
+@numbers.forEach((n)=>{
+    <div>@n</div>
+});`,
+            error: "Unexpected token <"
         }
     ];
     module.exports = cases;

@@ -1028,12 +1028,8 @@ module.exports = function (opts) {
                     if (!firstScope && ch !== '{')
                         throw this.er.characterExpected('{', this.lineNum, this.linePos());
 
-                    if (operatorExpectScope && !Char.isWhiteSpace(ch)) {
-                        if (ch === operatorExpectScope)
-                            operatorExpectScope = null;
-                        else
+                    if (operatorExpectScope && !Char.isWhiteSpace(ch) && ch !== operatorExpectScope) 
                             throw this.er.characterExpected(operatorExpectScope, this.lineNum, this.linePos());
-                    }
 
                     let pos = startScopes.indexOf(ch);
                     // IF it's a start-scope literal
@@ -1047,8 +1043,10 @@ module.exports = function (opts) {
                             wait = endScopes[pos];
                         }
 
-                        if (operatorExpectScope == wait)
+                        if (operatorExpectScope == ch){
+                            firstScope = wait;
                             operatorExpectScope = null;
+                        }
                     }
                     else if (wait) {
                         if (endScopes.indexOf(ch) !== -1) { // IF it's an end-scope literal
