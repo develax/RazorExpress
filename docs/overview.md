@@ -237,7 +237,7 @@ const countries = [
 ];
 ```
 
-`for`
+`@for`
 ```HTML+Razor
 <table>
   <tr>
@@ -253,3 +253,43 @@ const countries = [
   }
 </table>
 ```
+
+`@Array.prototype.forEach`
+```HTML+Razor
+<table>
+  <tr>
+    <th>Country</th>
+    <th>Area sq.km</th>
+  </tr>
+  @{
+      countries.forEach((c)=>{
+        <tr>
+          <td>@c.name</td>
+          <td>@c.area</td>
+        </tr>
+      });
+  }
+</table>
+```
+**Note** that in this example we have enclosed the construction in `@{...}`, otherwise the parser will consider this statement an expression. The expression is calculated and rendered in HTML as a single value and it cannot render any HTML within itself. When it's wrapped in a code block explicitly, as in this example, it is parsed as part of the code block and therefore can render HTML.
+
+`@while`
+```HTML+Razor
+<table>
+  <tr>
+    <th>Country</th>
+    <th>Area sq.km</th>
+  </tr>
+  @{ var i = 0; }
+  @while(i < countries.length){
+    var country = countries[i++];
+    <tr>
+      <td>@country.name</td>
+      <td>@country.area</td>
+    </tr>
+  }
+</table>
+```
+
+`@do while`
+
