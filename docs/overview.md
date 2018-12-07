@@ -222,4 +222,34 @@ A **switch statement** example:
 ```
 <sup>[^ try these code examples](https://runkit.com/develax/razor-conditional-control-structures)</sup>
 
+#### Looping @for, @while, and @do while
+You can use looping control statements to render a templated HTML. In the following examples, we will use different kinds of loops to render a list of countries. 
 
+```JavaScript
+const countries = [
+ { name: "Russia", area: 17098242 },
+ { name: "Canada", area: 9984670 },
+ { name: "United States", area: 9826675 },
+ { name: "China", area: 9596960 },
+ { name: "Brazil", area: 8514877 },
+ { name: "Australia", area: 7741220 },
+ { name: "India", area: 3287263 }
+];
+```
+
+`for`
+```HTML+Razor
+<table>
+  <tr>
+    <th>Country</th>
+    <th>Area sq.km</th>
+  </tr>
+  @for(var i = 0; i < countries.length; i++){
+    var country = countries[i];
+    <tr>
+      <td>@country.name</td>
+      <td>@country.area</td>
+    </tr>
+  }
+</table>
+```
