@@ -298,9 +298,6 @@ module.exports = function (opts) {
     ////////////////
     class Parser {
         constructor(args) {
-            if (String.is(args))
-                args = { template: args };
-
             args.filePath = args.filePath || "default";
             this.args = args;
             this.er = new ErrorsFactory({ filename: args.filePath, jshtml: args.template });
@@ -891,14 +888,14 @@ module.exports = function (opts) {
                     }
                     else if (block.text) {
                         let nextCh = this.pickNextChar();
-                        
-                        if (Char.isWhiteSpace(lastCh) && !Char.isWhiteSpace(ch)){
+
+                        if (Char.isWhiteSpace(lastCh) && !Char.isWhiteSpace(ch)) {
                             let op = block.text.trim();
                             if (op !== 'function' && op !== 'class')
                                 break;  // [Code 63]: <span>@year is a leap year.</span>
                         }
 
-                        if (!canExpressionEndWith(ch)){
+                        if (!canExpressionEndWith(ch)) {
                             if (Char.isWhiteSpace(ch) || ch === '{') {
                                 if (checkForSection.call(this))
                                     return;
@@ -913,7 +910,7 @@ module.exports = function (opts) {
                                 }
                             }
                             else if (ch === '.') { // @Model.text
-                                
+
                                 if (!nextCh || !canExpressionEndWith(nextCh))
                                     break;
                             }
@@ -1421,14 +1418,22 @@ module.exports = function (opts) {
     // Module/Exports..
     return {
         compile: (args, done) => {
-            args.root = true;
+            args = prepareArgs(args);
             return compile(args, done);
         },
         compileSync: args => {
-            args.root = true;
+            args = prepareArgs(args);
             return compileSync(args).html;
         }
     };
+
+    function prepareArgs(args) {
+        if (String.is(args))
+            args = { template: args };
+
+        args.root = true;
+        return args;
+    }
 
 }; // module.export
 
