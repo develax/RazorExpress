@@ -27,7 +27,10 @@ A **template engine** allows you to create HTML pages based on the model data an
 ## Razor-Express syntax reference for NodeJS
 Razor is a markup syntax for embedding server-based code into webpages based on [ASP.NET Razor syntax](https://docs.microsoft.com/en-us/aspnet/core/mvc/views/razor). Although I tried to make the Razor-Express syntax as close as possible to [ASP.NET Razor](https://docs.microsoft.com/en-us/aspnet/core/mvc/views/razor) there are some differences that need to be taken into account. 
 
-Just like the *ASP.NET Razor* syntax, the *Razor-Express* syntax consists of Razor-Express markup, JavaScript, and HTML. Files with Razor markup generally have a `.raz` file extension. In fact, the *Razor-Express markup is a normal HTML markup with optionally embedded JavaScript server-side code* to manage that HTML-markup. [Don't be confused with client-side JavaScript](https://stackoverflow.com/a/1404400/1844247) embedded in HTML which is interpreted by *Razor-Express* as part of HTML markup and runs on the client side (in browsers) while Razor-Express' JavaScript runs on the server (in NodeJs).
+Just like the *ASP.NET Razor* syntax, the *Razor-Express* syntax consists of Razor-Express markup, JavaScript, and HTML. Files with Razor markup generally have a `.raz` file extension. In fact, the *Razor-Express markup is a normal HTML markup with optionally embedded JavaScript server-side code* to manage that HTML. [Don't be confused with client-side JavaScript](https://stackoverflow.com/a/1404400/1844247) embedded in HTML which is interpreted by *Razor-Express* as part of HTML markup and runs on the client side (in browsers) while Razor-Express' JavaScript runs on the server (in NodeJs). For example, it doesn't make any sense to write this code for server-side JavaScript:
+```JavaScript
+document.getElementsByTagName("body")[0].innerHTML = "<div>This JavaScript will work only in the browser!</div>"
+```
 
 Since the *Razor-Express* engine must somehow distinguish server-side JavaScript from HTML markup we use the `@` symbol. The `@` just tells the engine's parser that JavaScript server-side code or expression starts after this character. This is the minimum intervention in HTML markup [compared to other existing markup engines](https://github.com/DevelAx/RazorExpress#a-brief-comparison-of-syntax-of-nodejs-layout-engines).
 
@@ -149,7 +152,144 @@ The browser output would be:
 *Notice that in code blocks after the HTML line you continue writing JavaScript without explicit transitioning to it via `@` symbol.*
 
 ### Control structures
-Control structures are just an extension of code blocks. All aspects of code blocks also apply to the JavaScript structures (`{}` are required). Let's look at some common examples.
+Control structures are just an extension of code blocks. All aspects of code blocks also apply to the JavaScript structures: `{}` are required and the `@' symbol is placed only at the beginning of the structure. 
 
 #### Conditionals @if, else if, else, and @switch
+In the next example there are a code block and a control structure:
+
+```HTML+Razor
+@{
+  var year = new Date().getFullYear();
+}
+<div>
+  @if (year % 4 == 0 && year % 100 != 0 || year % 400 == 0){
+    <strong>@year is a leap year.</strong>
+  }
+  else{
+    <strong>@year is not a leap year.</strong>
+  }
+</div>
+```
+Rendered HTML:
+```HTML
+<div>
+    <strong>2018 is not a leap year.</strong>
+</div>
+```
+As you can see once you put the `@` character at the beginning of `if` statement, you don't need to repeat it for `else` or `else if`.
+
+The same could be written a little differently:
+```HTML+Razor
+<div>
+  @{
+    var year = new Date().getFullYear();
+    
+    if (year % 4 == 0 && year % 100 != 0 || year % 400 == 0){
+        <strong>@year is a leap year.</strong>
+    }
+    else{
+        <strong>@year is not a leap year.</strong>
+    }
+  }
+</div>
+```
+
+A **switch statement** example:
+```HTML+Razor
+@switch (new Date().getDay()) {
+  case 0:
+    var day = "Sunday";
+    break;
+  case 1:
+    day = "Monday";
+    break;
+  case 2:
+    day = "Tuesday";
+    break;
+  case 3:
+    day = "Wednesday";
+    break;
+  case 4:
+    day = "Thursday";
+    break;
+  case 5:
+    day = "Friday";
+    break;
+  case 6:
+    day = "Saturday";
+}
+<strong>Today is @day</strong>
+```
+<sup>[^ try these code examples](https://runkit.com/develax/razor-conditional-control-structures)</sup>
+
+#### Looping @for, @while, and @do while
+You can use looping control statements to render a templated HTML. In the following examples, we will use different kinds of loops to render a list of countries. 
+
+```JavaScript
+const countries = [
+ { name: "Russia", area: 17098242 },
+ { name: "Canada", area: 9984670 },
+ { name: "United States", area: 9826675 },
+ { name: "China", area: 9596960 },
+ { name: "Brazil", area: 8514877 },
+ { name: "Australia", area: 7741220 },
+ { name: "India", area: 3287263 }
+];
+```
+
+`@for`
+```HTML+Razor
+<table>
+  <tr>
+    <th>Country</th>
+    <th>Area sq.km</th>
+  </tr>
+  @for(var i = 0; i < countries.length; i++){
+    var country = countries[i];
+    <tr>
+      <td>@country.name</td>
+      <td>@country.area</td>
+    </tr>
+  }
+</table>
+```
+
+`@Array.prototype.forEach`
+```HTML+Razor
+<table>
+  <tr>
+    <th>Country</th>
+    <th>Area sq.km</th>
+  </tr>
+  @{
+      countries.forEach((c)=>{
+        <tr>
+          <td>@c.name</td>
+          <td>@c.area</td>
+        </tr>
+      });
+  }
+</table>
+```
+**Note** that in this example we have enclosed the construction in `@{...}`, otherwise the parser will consider this statement an expression. The expression is calculated and rendered in HTML as a single value and it cannot render any HTML within itself. When it's wrapped in a code block explicitly, as in this example, it is parsed as part of the code block and therefore can render HTML.
+
+`@while`
+```HTML+Razor
+<table>
+  <tr>
+    <th>Country</th>
+    <th>Area sq.km</th>
+  </tr>
+  @{ var i = 0; }
+  @while(i < countries.length){
+    var country = countries[i++];
+    <tr>
+      <td>@country.name</td>
+      <td>@country.area</td>
+    </tr>
+  }
+</table>
+```
+
+`@do while`
 
