@@ -16,6 +16,7 @@
   - [Examples of usage](#examples-of-usage)
 - [**Common pitfalls & remarks**](#warning-common-pitfalls)
   - [Missing semicolon](#missing-semicolon)
+  - [Expressions & code blocks confusion](#expressions--code-blocks-confusion)
 - [**Debugging & Errors handling in Razor-Express**](https://github.com/DevelAx/RazorExpress/blob/master/docs/Debugging.md)
   - Debugging view templates
   - [Errors handling](https://github.com/DevelAx/RazorExpress/blob/master/docs/Debugging.md#errors-handling)
@@ -28,7 +29,7 @@ Intro
 
 When I just started to dive into the world of *Node.js* after years of working with [ASP.NET MVC](https://docs.microsoft.com/en-us/aspnet/core/mvc/overview) I couldn't find any *view template engine* that was as convenient, elegant, concise, and syntactically close to native [HTML](https://developer.mozilla.org/en-US/docs/Learn/Getting_started_with_the_web/HTML_basics) as [ASP.NET MVC Razor syntax](https://docs.microsoft.com/en-us/aspnet/core/mvc/views/razor) was. And when it comes to code it's also syntactically close to the original [C# language](https://docs.microsoft.com/en-us/dotnet/csharp/programming-guide/). Actually, **ASP.NET MVC Razor markup is a hybrid of HTML markup and C# programming language**. This is exactly what I expected to see in the *NodeJS* world - **a hybrid of HTML and JavaScript**. 
 
-The closest to *Razor* currently supported library for *NodeJs & Express* I could find was [Vash](https://www.npmjs.com/package/vash). But in some points, it was quite different from *ASP.NET MVC Razor* syntax which I was used to and it just looked much less concise and convenient to me (the concepts of layouts and partial blocks, for example). In short, it did not suit me completely and what's more important I couldn't see its current development. 
+The closest to *Razor* currently supported library for *NodeJs & Express* I could find was [Vash](https://www.npmjs.com/package/vash). But in some points, it was quite different from *ASP.NET MVC Razor* syntax which I was used to and it just looked much less concise and convenient to me (the syntax for rendering layouts and partial blocks, for example). In short, it did not suit me completely and what's more important I couldn't see its current development. 
 
 A brief comparison of syntax of Node.JS layout engines
 ---
@@ -359,3 +360,40 @@ If you run this code you will get the error:
 > RazorError: **The code or section block is missing a closing "}" character.** Make sure you have a matching "}" character for all the "{" characters within this block, and that none of the "}" characters are being interpreted as markup. The block starts at line 3 with text: "@for(var i = 0; i < 10; i++){"
 
 <sup>* [Run this code with RunKit.](https://runkit.com/develax/razor-pitfalls-semicolon)</sup>
+
+Expressions & code blocks confusion
+---
+Try to stick to simple classical language constructs to avoid ambiguous parser or runtime errors. Although almost all JavaScript syntax is correctly parsed by the engine, some language constructs may not work as you expect. For example, you might try to write a loop as follows:
+
+```HTML+Razor
+<table>
+  <tr>
+    <th>Country</th>
+    <th>Area sq.km</th>
+  </tr>
+  @countries.forEach((c)=>{
+    <tr>
+      <td>@c.name</td>
+      <td>@c.area</td>
+    </tr>
+  });
+</table>
+```
+There are no syntax errors in this example and the code intuitively looks quite decent. The parser also won't find any problems. However, a runtime error will occur during execution. The actual problem is that the parser considers this statement an expression. When an expression is detected it is evaluated and the return value of it is rendered in HTML. But the parser does look for HTML within expressions. Therefore the HTML tags you put in the expression will cause the runtime error because the whole expression with these tags (as part of JavaScript code) will be tried to be executed.
+
+To make this code work you need to *wrap it explicitly in a code block* then it will be parsed as part of the code block and HTML within it will be rendered correctly. That is, you need to bring it to the following form:
+```HTML+Razor
+...
+@{
+    countries.forEach((c)=>{
+      <tr>
+        <td>@c.name</td>
+        <td>@c.area</td>
+      </tr>
+    });
+}
+...
+```
+<sup>^ [run this example](https://runkit.com/develax/razor-array-foreach)</sup>
+
+However, the best way to avoid such ambiguities is to stick to a plain JavaScript syntax style while writing your view templates. See ["Looping @for, @while, and @do while"](https://github.com/DevelAx/RazorExpress/blob/master/docs/overview.md#looping-for-while-and-do-while) section for examples of loop structures. 
