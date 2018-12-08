@@ -16,6 +16,7 @@
   - [Examples of usage](#examples-of-usage)
 - [**Common pitfalls & remarks**](#warning-common-pitfalls)
   - [Missing semicolon](#missing-semicolon)
+  - [Expressions & code blocks confusion](#)
 - [**Debugging & Errors handling in Razor-Express**](https://github.com/DevelAx/RazorExpress/blob/master/docs/Debugging.md)
   - Debugging view templates
   - [Errors handling](https://github.com/DevelAx/RazorExpress/blob/master/docs/Debugging.md#errors-handling)
@@ -359,3 +360,37 @@ If you run this code you will get the error:
 > RazorError: **The code or section block is missing a closing "}" character.** Make sure you have a matching "}" character for all the "{" characters within this block, and that none of the "}" characters are being interpreted as markup. The block starts at line 3 with text: "@for(var i = 0; i < 10; i++){"
 
 <sup>* [Run this code with RunKit.](https://runkit.com/develax/razor-pitfalls-semicolon)</sup>
+
+Expressions & code blocks confusion
+---
+Try to stick to simple classical language constructs to avoid ambiguous parser or runtime errors. Although almost all JavaScript syntax is correctly parsed by the engine, some language constructs may not work as you expect. For example, you might try to write a loop as follows:
+
+```HTML+Razor
+<table>
+  <tr>
+    <th>Country</th>
+    <th>Area sq.km</th>
+  </tr>
+  @countries.forEach((c)=>{
+    <tr>
+      <td>@c.name</td>
+      <td>@c.area</td>
+    </tr>
+  });
+</table>
+```
+There are no syntax errors in this example and the code intuitively looks quite decent. The parser also won't find any problems. However, a runtime error will occur during execution. The actual problem is that the parser considers this statement an expression. When an expression is detected it is evaluated and the return value of it is rendered in HTML. But the parser does look for HTML within expressions. Therefore the HTML tags you put in the expression will cause the runtime error because the whole expression with these tags (as part of JavaScript code) will be tried to be executed.
+
+To make this code work you need to *wrap it explicitly in a code block* then it will be parsed as part of the code block and HTML within it will be rendered correctly. That is, you need to bring it to the following form:
+```HTML+Razor
+  @{
+      countries.forEach((c)=>{
+        <tr>
+          <td>@c.name</td>
+          <td>@c.area</td>
+        </tr>
+      });
+  }
+```
+<sup>^ [run this example](https://runkit.com/develax/razor-array-foreach)</sup>
+However, the best way to avoid such ambiguities is to stick to a plain JavaScript syntax style while writing your view templates. 
