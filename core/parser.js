@@ -604,7 +604,7 @@ module.exports = function (opts) {
             let openTagLineNum, openTagPos;
             var block = newBlock(type.html, blocks);
             var lastCh = '';
-            let stop = false, inComments = false;
+            let stop = false, inComments = false, inJs = false;
 
             for (var ch = this.pickChar(); !stop && ch; ch = ch && this.pickChar()) {
                 var nextCh = this.pickNextChar();
@@ -655,17 +655,22 @@ module.exports = function (opts) {
                         }
                     }
                 }
-                else if (textQuotes.indexOf(ch) !== -1) { // Open Quotes..
+                else if ((tag || inJs) && textQuotes.indexOf(ch) !== -1) { // Open Quotes..
                     if (tag) tag += ch;
                     quotes.push(ch);
                 }
                 else if (ch === '-') {
-                    if (tag && tag === '<!-') {
-                        tag = '';
-                        inComments = true;
+                    if (tag.length > 1) { // at least '<!'
+                        if (lastCh === '!') {
+                            tag += ch;
+                        }
+                        else if (tag.startsWith("!-", 1)) {
+                            tag = '';
+                            inComments = true;
+                        }
                     }
                     else {
-                        tag += ch;
+                        tag = '';
                     }
                 }
                 else if (ch === '<') {
@@ -710,6 +715,9 @@ module.exports = function (opts) {
                                     throw this.er.missingMatchingStartTag(tag, this.lineNum, this.linePos() - tag.length + 1); // tested by "Code 22"
 
                                 openTag = openTagName = ''; // open-tag is closed
+
+                                if ("script".equal(tagName, true))
+                                    inJs = false;
                             }
                         }
                         else {
@@ -722,6 +730,7 @@ module.exports = function (opts) {
                                 if (tag[1] === '/') // it's a close-tag, unexpected..
                                     throw this.er.missingMatchingStartTag(tag, this.lineNum, this.linePos() - tag.length + 1); // tested by "Invalid-HTML 5"
 
+                                inJs = "script".equal(tagName, true);
                                 openTag = tag;
                                 openTagName = tagName;
                                 openTagPos = this.linePos() - tag.length + 1;

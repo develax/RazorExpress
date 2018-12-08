@@ -276,6 +276,21 @@
             expected: `<span>1'2</span>`
         },
         {
+            name: "HTML 31.1",
+            template: `@{<span>1'2</span>}`,
+            expected: `<span>1'2</span>`
+        },
+        {
+            name: "HTML 31.2",
+            template: `<span>--1'2--</span>`,
+            expected: `<span>--1'2--</span>`
+        },
+        {
+            name: "HTML 31.3",
+            template: `@{<span>--1'2--</span>}`,
+            expected: `<span>--1'2--</span>`
+        },
+        {
             name: "HTML 32",
             template: `
 <div>JS</div>
