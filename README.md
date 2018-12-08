@@ -383,6 +383,7 @@ There are no syntax errors in this example and the code intuitively looks quite 
 
 To make this code work you need to *wrap it explicitly in a code block* then it will be parsed as part of the code block and HTML within it will be rendered correctly. That is, you need to bring it to the following form:
 ```HTML+Razor
+...
 @{
     countries.forEach((c)=>{
       <tr>
@@ -391,6 +392,7 @@ To make this code work you need to *wrap it explicitly in a code block* then it 
       </tr>
     });
 }
+...
 ```
 <sup>^ [run this example](https://runkit.com/develax/razor-array-foreach)</sup>
 
