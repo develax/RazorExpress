@@ -383,14 +383,15 @@ There are no syntax errors in this example and the code intuitively looks quite 
 
 To make this code work you need to *wrap it explicitly in a code block* then it will be parsed as part of the code block and HTML within it will be rendered correctly. That is, you need to bring it to the following form:
 ```HTML+Razor
-  @{
-      countries.forEach((c)=>{
-        <tr>
-          <td>@c.name</td>
-          <td>@c.area</td>
-        </tr>
-      });
-  }
+@{
+    countries.forEach((c)=>{
+      <tr>
+        <td>@c.name</td>
+        <td>@c.area</td>
+      </tr>
+    });
+}
 ```
 <sup>^ [run this example](https://runkit.com/develax/razor-array-foreach)</sup>
-However, the best way to avoid such ambiguities is to stick to a plain JavaScript syntax style while writing your view templates. 
+
+However, the best way to avoid such ambiguities is to stick to a plain JavaScript syntax style while writing your view templates. See ["Looping @for, @while, and @do while"](https://github.com/DevelAx/RazorExpress/blob/master/docs/overview.md#looping-for-while-and-do-while) section for examples of loop structures. 
