@@ -12,6 +12,10 @@ Let's look quickly at the key concepts and terms.
     - [Expression encoding](#expression-encoding)
     - [Expression raw-rendering](#expression-raw-rendering)
   - [Code blocks](#code-blocks)
+    - [Rendering HTML within JavaScript code blocks](#)
+  - [Control structures](#control-structures)
+    - [Conditionals @if, else if, else, and @switch](#conditionals-if-else-if-else-and-switch)
+    - [Looping @for, @while, and @do while](#)
 
 ## What is View Template?
 Building an HTML page assumes that you want to display some data on it (what else could it be?). To perform this task, you need the **data** itself and the **page template** (that defines the rules through a special markup language for displaying the data in HTML format). The page template is usually referred to simply as a **"view"** and the data is referred to as a **"view model"** or just **"model"**. So, this is what is usually called *"view templating"*. This consept is used for separating concerns within a web application (for more details [read this](https://docs.microsoft.com/en-us/aspnet/core/mvc/overview)).
