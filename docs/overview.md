@@ -12,7 +12,7 @@ Let's look quickly at the key concepts and terms.
     - [Expression encoding](#expression-encoding)
     - [Expression raw-rendering](#expression-raw-rendering)
   - [Code blocks](#code-blocks)
-    - [Rendering HTML within JavaScript code blocks](#)
+    - [Rendering HTML within JavaScript code blocks](#rendering-html-within-javascript-code-blocks)
   - [Control structures](#control-structures)
     - [Conditionals @if, else if, else, and @switch](#conditionals-if-else-if-else-and-switch)
     - [Looping @for, @while, and @do while](#looping-for-while-and-do-while)
@@ -286,7 +286,7 @@ const countries = [
   </tr>
 }while(i < countries.length)
 ```
-<sup>[^ try these code examples](https://runkit.com/develax/razor-conditional-control-structures)</sup>
+<sup>[^ try these code examples](https://runkit.com/develax/razor-looping-structures)</sup>
 
 ##### `@Array.prototype.forEach`
-Using `forEach` structure for looping an array is not recommended. An example of using `forEach` with explanations is given in the [Expressions & code blocks confusion](https://github.com/DevelAx/RazorExpress/blob/master/README.md#expressions--code-blocks-confusion) section.
+Using `forEach` structure for looping an array is not recommended. An example of using `forEach` with explanations is given in the ["Expressions & code blocks confusion"](https://github.com/DevelAx/RazorExpress/blob/master/README.md#expressions--code-blocks-confusion) section.
