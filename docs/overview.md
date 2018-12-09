@@ -290,3 +290,26 @@ const countries = [
 
 ##### `@Array.prototype.forEach`
 Using `forEach` structure for looping an array is not recommended. An example of using `forEach` with explanations is given in the ["Expressions & code blocks confusion"](https://github.com/DevelAx/RazorExpress/blob/master/README.md#expressions--code-blocks-confusion) section.
+
+#### Exception handling: @try, catch, finally
+
+```HTML+Razor
+@try {
+    <div>-------Users Info--------</div>
+    <div>User id: @user.id</div>
+    <div>User name: @user.name</div>
+}
+catch (exc) {
+    <span>Error: @exc</span>
+}
+finally {
+    <div>--------------------------</div>
+}
+```
+HTML output:
+```HTML
+<div>-------Users Info--------</div>
+<span>Error: @exc</span>
+<div>--------------------------</div>
+```
+<sup>[^ try this example](https://runkit.com/develax/razor-exception-handling)</sup>
