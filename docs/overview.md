@@ -375,4 +375,44 @@ After this code is compiled you will get the next HTML:
 </body>
 </html>
 ```
-That may not suit you completely because the link to the `css` file has been placed in the `<body>` but you want it to be in the `<head>`. That's what the sections are for!  
+That may not suit you completely because the link to the `css` file has been placed in the `<body>` but you want it to be in the `<head>`. That's what the sections are for! To fix it you can define a section in the `index.raz` (in and then reference that section from the `_layout.raz`:
+
+**`index.raz`** view
+```HTML+Razor
+<h1>Home Page</h1>
+@section Styles {
+    <link href="/css/site.css" rel="stylesheet" />
+}
+```
+In this case, the section name is 'Styles'. In fact, you can place the definition of the section anywhere you want within your `index.raz` view since it will be rendered only in the `_layout.raz` layout. For that, you have to reference that section by its name in the `_layout.raz` layout: 
+
+**`_layout.raz`** layout view
+```HTML+Razor
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    @Html.section("Styles")
+</head>
+<body>
+   @Html.body()
+</body>
+</html>
+```
+This time you will get the following HTML:
+
+```HTML
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link href="/css/site.css" rel="stylesheet" />
+</head>
+<body>
+  <h1>Home Page</h1>
+</body>
+</html>
+```
+The css `<link>` is placed in the `<head>` - exactly what you wanted.
