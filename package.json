@@ -1,7 +1,7 @@
 {
   "name": "raz",
-  "description": "Razor-like syntax for templating views in NodeJS Express framework by mixing HTML with JavaScript.",
-  "version": "0.0.51",
+  "description": "ASP.NET MVC Razor-like template engine for NodeJS Express library. Template your views by mixing HTML markup with JavaScript server-side code!",
+  "version": "0.0.53",
   "author": {
     "name": "Sergey",
     "email": "develax@gmail.com",
