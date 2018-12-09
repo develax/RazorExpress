@@ -5,7 +5,6 @@ Let's look quickly at the key concepts and terms.
 - [**What is View Template Engine?**](#what-is-view-template-engine)
 - [**What is Razor-Express?**](#what-is-razor-express)
 - [**Razor-Express syntax**](#razor-express-syntax-reference-for-nodejs)
-  - [Reserved keywords](#reserved-keywords)
   - [A simple example](#a-simple-example-of-razor-express-markup)
   - [Escaping `@` character](#escaping--character)
   - [Expressions](#expressions)
@@ -16,6 +15,10 @@ Let's look quickly at the key concepts and terms.
   - [Control structures](#control-structures)
     - [Conditionals @if, else if, else, and @switch](#conditionals-if-else-if-else-and-switch)
     - [Looping @for, @while, and @do while](#looping-for-while-and-do-while)
+    - [Exception handling: @try, catch, finally](#exception-handling-try-catch-finally)
+    - [Comments](#comments)
+  - [Reserved keywords](#reserved-keywords)
+    - [@section](#section)
 
 ## What is View Template?
 Building an HTML page assumes that you want to display some data on it (what else could it be?). To perform this task, you need the **data** itself and the **page template** (that defines the rules through a special markup language for displaying the data in HTML format). The page template is usually referred to simply as a **"view"** and the data is referred to as a **"view model"** or just **"model"**. So, this is what is usually called *"view templating"*. This consept is used for separating concerns within a web application (for more details [read this](https://docs.microsoft.com/en-us/aspnet/core/mvc/overview)).
@@ -37,12 +40,6 @@ document.getElementsByTagName("body")[0].innerHTML = "<div>This JavaScript will 
 ```
 
 Since the *Razor-Express* engine must somehow distinguish server-side JavaScript from HTML markup we use the `@` symbol. The `@` just tells the engine's parser that JavaScript server-side code or expression starts after this character. This is the minimum intervention in HTML markup [compared to other existing markup engines](https://github.com/DevelAx/RazorExpress#a-brief-comparison-of-syntax-of-nodejs-layout-engines).
-
-### Reserved keywords
-
-- `Section`
-
-When an `@` symbol is followed by a *Razor-Express reserved keyword*, it transitions into Razor-specific markup. Otherwise, it transitions into plain JavaScript.
 
 ### A simple example of Razor-Express markup
 ```HTML+Razor
@@ -290,3 +287,149 @@ const countries = [
 
 ##### `@Array.prototype.forEach`
 Using `forEach` structure for looping an array is not recommended. An example of using `forEach` with explanations is given in the ["Expressions & code blocks confusion"](https://github.com/DevelAx/RazorExpress/blob/master/README.md#expressions--code-blocks-confusion) section.
+
+
+#### Exception handling: @try, catch, finally
+
+```HTML+Razor
+@try {
+    <div>-------Users Info--------</div>
+    <div>User id: @user.id</div>
+    <div>User name: @user.name</div>
+}
+catch (exc) {
+    <span>Error: @exc</span>
+}
+finally {
+    <div>--------------------------</div>
+}
+```
+HTML output:
+```HTML
+<div>-------Users Info--------</div>
+<span>Error: @exc</span>
+<div>--------------------------</div>
+```
+<sup>[^ try this example](https://runkit.com/develax/razor-exception-handling)</sup>
+
+#### Comments
+In Razor-Express HTML & JavaScript comments are used in the usual way: just use HTML comments for HTML markup and JavaScript comments for JavaScript code.
+```HTML+Razor
+@{
+    /* JavaScript comment */
+    // Another JavaScript comment
+}
+<!-- HTML comment -->
+```
+The rendered HTML:
+```HTML
+<!-- HTML comment -->
+```
+<sup>[^ try this example](https://runkit.com/develax/razor-comments)</sup>
+
+*The current Razor-Express version doesn't support universal comments for the Razor Razor-Express markup.* So, if you try `@* *@` from ASP.NET MVC Razor it wouldn't work.
+
+
+### Reserved keywords
+
+- `Html`
+- `Model`
+- `@section`
+- `@ViewData`
+
+When an `@` symbol is followed by a *Razor-Express reserved keyword*, it transitions into Razor-specific markup. Otherwise, it transitions into plain JavaScript.
+
+#### `@section`
+Sections are used to organize where certain page elements should be placed within the parent layout or within the same layout. For example, if you want some block of the Razor-Express markup from any rendered view to be placed in a specific place of the layout view, you can define a named section in your view and then define a reference to this section at that specific place of the layout. 
+
+Let's give a markup example:
+
+**`index.raz`** view
+```HTML+Razor
+<link href="/css/site.css" rel="stylesheet" />
+<h1>Home Page</h1>
+```
+
+**`_layout.raz`** layout view
+```HTML+Razor
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+</head>
+<body>
+   @Html.body()
+</body>
+</html>
+```
+
+After this code is compiled you will get the next HTML:
+```HTML
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+</head>
+<body>
+  <link href="/css/site.css" rel="stylesheet" />
+  <h1>Home Page</h1>
+</body>
+</html>
+```
+This may not suit you completely because the link to the `css` file has been placed in the `<body>` but you might want it to be in the `<head>`. That's what the sections are for! To fix it you should define a section in the `index.raz`:
+
+**`index.raz`** view
+```HTML+Razor
+<h1>Home Page</h1>
+@section Styles {
+    <link href="/css/site.css" rel="stylesheet" />
+}
+```
+In this case, the section name is 'Styles'. In fact, you can place the definition of the section anywhere you want within the `index.raz` view since it will be rendered only in the `_layout.raz` layout. For that, you have to reference that section by its name in the `_layout.raz` layout: 
+
+**`_layout.raz`** layout view
+```HTML+Razor
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    @Html.section("Styles")
+</head>
+<body>
+   @Html.body()
+</body>
+</html>
+```
+This time you will get the following HTML:
+
+```HTML
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link href="/css/site.css" rel="stylesheet" />
+</head>
+<body>
+  <h1>Home Page</h1>
+</body>
+</html>
+```
+The css `<link>` is placed in the `<head>` - exactly what you wanted.
+
+Each call to `@Html.section` specifies a section name as the first parameter and whether that section is required or optional as the second one:
+```HTML+Razor
+@Html.section("Scripts", true)
+```
+If a required section isn't found, an exception is thrown. Individual views specify the content to be rendered within a section using the `@section{...}` Razor syntax. If a page or view defines a section, it must be rendered (or an error will occur). An example of `@section` definition:
+```HTML+Razor
+@section Scripts {
+    <script type="text/javascript" src="/scripts/site.js"></script>
+}
+```
+In the preceding code, scripts/site.js is added to the scripts section on a page. Other pages in the same app might not require this script and wouldn't define a scripts section. Sections defined in a page are available in its layout page or parent page for partials views. 
+
+**NOTE:** In *ASP.NET MVC Razor* only the immediate layout page can render a section and they cannot be referenced from partial views. In the current implementation of *Razor-Express* we don't have this limitation. I can't see anything wrong with having some specific script or style in some partial view to be placed in a section. Since partial views can be rendered on a page more than once, each its section is rendered only once. Also, you can have different sections defined in different files (views) with the same name. Then the `@Html.section` method will render all these sections in one specific place. Of course, you should take into account that the order in which the sections will be rendered corresponds to the rendering order of the views, partial views, and layouts. Sections can be defined and rendered even within the same (one) view, in this case the order is also important: definition must go before the reference.
