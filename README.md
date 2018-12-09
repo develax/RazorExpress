@@ -403,7 +403,7 @@ Misc
 ===
 TODO list
 ---
-What will be done soon:
+What is to be done soon:
 
 1. Finish the documentation for the current version.
 2. Implement [Razor-style `@* *@` comments](https://github.com/DevelAx/RazorExpress/blob/master/docs/overview.md#comments).
