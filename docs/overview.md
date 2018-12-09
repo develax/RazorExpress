@@ -5,7 +5,6 @@ Let's look quickly at the key concepts and terms.
 - [**What is View Template Engine?**](#what-is-view-template-engine)
 - [**What is Razor-Express?**](#what-is-razor-express)
 - [**Razor-Express syntax**](#razor-express-syntax-reference-for-nodejs)
-  - [Reserved keywords](#reserved-keywords)
   - [A simple example](#a-simple-example-of-razor-express-markup)
   - [Escaping `@` character](#escaping--character)
   - [Expressions](#expressions)
@@ -18,6 +17,7 @@ Let's look quickly at the key concepts and terms.
     - [Looping @for, @while, and @do while](#looping-for-while-and-do-while)
     - [Exception handling: @try, catch, finally](#exception-handling-try-catch-finally)
     - [Comments](#comments)
+  - [Reserved keywords](#reserved-keywords)
 
 ## What is View Template?
 Building an HTML page assumes that you want to display some data on it (what else could it be?). To perform this task, you need the **data** itself and the **page template** (that defines the rules through a special markup language for displaying the data in HTML format). The page template is usually referred to simply as a **"view"** and the data is referred to as a **"view model"** or just **"model"**. So, this is what is usually called *"view templating"*. This consept is used for separating concerns within a web application (for more details [read this](https://docs.microsoft.com/en-us/aspnet/core/mvc/overview)).
@@ -39,12 +39,6 @@ document.getElementsByTagName("body")[0].innerHTML = "<div>This JavaScript will 
 ```
 
 Since the *Razor-Express* engine must somehow distinguish server-side JavaScript from HTML markup we use the `@` symbol. The `@` just tells the engine's parser that JavaScript server-side code or expression starts after this character. This is the minimum intervention in HTML markup [compared to other existing markup engines](https://github.com/DevelAx/RazorExpress#a-brief-comparison-of-syntax-of-nodejs-layout-engines).
-
-### Reserved keywords
-
-- `Section`
-
-When an `@` symbol is followed by a *Razor-Express reserved keyword*, it transitions into Razor-specific markup. Otherwise, it transitions into plain JavaScript.
 
 ### A simple example of Razor-Express markup
 ```HTML+Razor
@@ -334,3 +328,51 @@ The rendered HTML:
 
 *The current Razor-Express version doesn't support universal comments for the Razor Razor-Express markup.* So, if you try `@* *@` from ASP.NET MVC Razor it wouldn't work.
 
+
+### Reserved keywords
+
+- `Html`
+- `Model`
+- `@section`
+- `@ViewData`
+
+When an `@` symbol is followed by a *Razor-Express reserved keyword*, it transitions into Razor-specific markup. Otherwise, it transitions into plain JavaScript.
+
+#### `@section`
+Sections are used to organize where certain page elements should be placed within the parent layout or within the same layout. For example, if you want some block of Razor-Express markup from any rendered view to be placed in a specific place of the layout view, you can define a named section in your view and then define a reference to this section at that specific place of the layout. Let's give a markup example:
+
+**`index.raz`** view
+```HTML+Razor
+<link href="/css/site.css" rel="stylesheet" />
+<h1>Home Page</h1>
+```
+
+**`_layout.raz`** layout view
+```HTML+Razor
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+</head>
+<body>
+   @Html.body()
+</body>
+</html>
+```
+
+After this code is compiled you will get the next HTML:
+```HTML
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+</head>
+<body>
+  <link href="/css/site.css" rel="stylesheet" />
+  <h1>Home Page</h1>
+</body>
+</html>
+```
+That may not suit you completely because the link to the `css` file has been placed in the `<body>` but you want it to be in the `<head>`. That's what the sections are for!  
