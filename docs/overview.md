@@ -18,6 +18,7 @@ Let's look quickly at the key concepts and terms.
     - [Exception handling: @try, catch, finally](#exception-handling-try-catch-finally)
     - [Comments](#comments)
   - [Reserved keywords](#reserved-keywords)
+    - [@section](#section)
 
 ## What is View Template?
 Building an HTML page assumes that you want to display some data on it (what else could it be?). To perform this task, you need the **data** itself and the **page template** (that defines the rules through a special markup language for displaying the data in HTML format). The page template is usually referred to simply as a **"view"** and the data is referred to as a **"view model"** or just **"model"**. So, this is what is usually called *"view templating"*. This consept is used for separating concerns within a web application (for more details [read this](https://docs.microsoft.com/en-us/aspnet/core/mvc/overview)).
@@ -339,7 +340,7 @@ The rendered HTML:
 When an `@` symbol is followed by a *Razor-Express reserved keyword*, it transitions into Razor-specific markup. Otherwise, it transitions into plain JavaScript.
 
 #### `@section`
-Sections are used to organize where certain page elements should be placed within the parent layout or within the same layout. For example, if you want some block of Razor-Express markup from any rendered view to be placed in a specific place of the layout view, you can define a named section in your view and then define a reference to this section at that specific place of the layout. Let's give a markup example:
+Sections are used to organize where certain page elements should be placed within the parent layout or within the same layout. For example, if you want some block of the Razor-Express markup from any rendered view to be placed in a specific place of the layout view, you can define a named section in your view and then define a reference to this section at that specific place of the layout. Let's give a markup example:
 
 **`index.raz`** view
 ```HTML+Razor
@@ -375,7 +376,7 @@ After this code is compiled you will get the next HTML:
 </body>
 </html>
 ```
-That may not suit you completely because the link to the `css` file has been placed in the `<body>` but you want it to be in the `<head>`. That's what the sections are for! To fix it you can define a section in the `index.raz` (in and then reference that section from the `_layout.raz`:
+This may not suit you completely because the link to the `css` file has been placed in the `<body>` but you might want it to be in the `<head>`. That's what the sections are for! To fix it you should define a section in the `index.raz`:
 
 **`index.raz`** view
 ```HTML+Razor
@@ -384,7 +385,7 @@ That may not suit you completely because the link to the `css` file has been pla
     <link href="/css/site.css" rel="stylesheet" />
 }
 ```
-In this case, the section name is 'Styles'. In fact, you can place the definition of the section anywhere you want within your `index.raz` view since it will be rendered only in the `_layout.raz` layout. For that, you have to reference that section by its name in the `_layout.raz` layout: 
+In this case, the section name is 'Styles'. In fact, you can place the definition of the section anywhere you want within the `index.raz` view since it will be rendered only in the `_layout.raz` layout. For that, you have to reference that section by its name in the `_layout.raz` layout: 
 
 **`_layout.raz`** layout view
 ```HTML+Razor
