@@ -16,6 +16,8 @@ Let's look quickly at the key concepts and terms.
   - [Control structures](#control-structures)
     - [Conditionals @if, else if, else, and @switch](#conditionals-if-else-if-else-and-switch)
     - [Looping @for, @while, and @do while](#looping-for-while-and-do-while)
+    - [Exception handling: @try, catch, finally](#exception-handling-try-catch-finally)
+    - [Comments](#comments)
 
 ## What is View Template?
 Building an HTML page assumes that you want to display some data on it (what else could it be?). To perform this task, you need the **data** itself and the **page template** (that defines the rules through a special markup language for displaying the data in HTML format). The page template is usually referred to simply as a **"view"** and the data is referred to as a **"view model"** or just **"model"**. So, this is what is usually called *"view templating"*. This consept is used for separating concerns within a web application (for more details [read this](https://docs.microsoft.com/en-us/aspnet/core/mvc/overview)).
@@ -291,6 +293,7 @@ const countries = [
 ##### `@Array.prototype.forEach`
 Using `forEach` structure for looping an array is not recommended. An example of using `forEach` with explanations is given in the ["Expressions & code blocks confusion"](https://github.com/DevelAx/RazorExpress/blob/master/README.md#expressions--code-blocks-confusion) section.
 
+
 #### Exception handling: @try, catch, finally
 
 ```HTML+Razor
@@ -313,3 +316,21 @@ HTML output:
 <div>--------------------------</div>
 ```
 <sup>[^ try this example](https://runkit.com/develax/razor-exception-handling)</sup>
+
+#### Comments
+In Razor-Express comments are used the usual way: use HTML comments for HTML markup and JavaScript comments for JavaScript code.
+```HTML+Razor
+@{
+    /* JavaScript comment */
+    // Another JavaScript comment
+}
+<!-- HTML comment -->
+```
+The rendered HTML:
+```HTML
+<!-- HTML comment -->
+```
+<sup>[^ try this example](https://runkit.com/develax/razor-comments)</sup>
+
+*The current Razor-Express version doesn't support universal comments for the Razor Razor-Express markup.* So, if you try `@* *@` from ASP.NET MVC Razor it wouldn't work.
+
