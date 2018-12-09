@@ -318,7 +318,7 @@ HTML output:
 <sup>[^ try this example](https://runkit.com/develax/razor-exception-handling)</sup>
 
 #### Comments
-In Razor-Express comments are used the usual way: use HTML comments for HTML markup and JavaScript comments for JavaScript code.
+In Razor-Express HTML & JavaScript comments are used in the usual way: just use HTML comments for HTML markup and JavaScript comments for JavaScript code.
 ```HTML+Razor
 @{
     /* JavaScript comment */
