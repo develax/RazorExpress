@@ -13,7 +13,7 @@ module.exports = class RazorError extends Error {
         this.name = this.constructor.name;
         this.data = Object.assign({ line, pos, len }, templateInfo);
 
-        if (captureFrame && Error.captureStackTrace)
+        if (Error.captureStackTrace)
             Error.captureStackTrace(this, captureFrame || this.constructor);
     }
 

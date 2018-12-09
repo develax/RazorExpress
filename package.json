@@ -8,15 +8,16 @@
     "url": "https://www.npmjs.com/package/raz"
   },
   "keywords": [
-    "raz",
     "razor",
     "engine",
-    "template-engine",
-    "mvc",
+    "template",
+    "engine",
+    "asp.net mvc",
     "parser",
     "view",
     "template",
     "express",
+    "raz",
     "vash"
   ],
   "engines": {
