@@ -340,7 +340,9 @@ The rendered HTML:
 When an `@` symbol is followed by a *Razor-Express reserved keyword*, it transitions into Razor-specific markup. Otherwise, it transitions into plain JavaScript.
 
 #### `@section`
-Sections are used to organize where certain page elements should be placed within the parent layout or within the same layout. For example, if you want some block of the Razor-Express markup from any rendered view to be placed in a specific place of the layout view, you can define a named section in your view and then define a reference to this section at that specific place of the layout. Let's give a markup example:
+Sections are used to organize where certain page elements should be placed within the parent layout or within the same layout. For example, if you want some block of the Razor-Express markup from any rendered view to be placed in a specific place of the layout view, you can define a named section in your view and then define a reference to this section at that specific place of the layout. 
+
+Let's give a markup example:
 
 **`index.raz`** view
 ```HTML+Razor
@@ -417,3 +419,17 @@ This time you will get the following HTML:
 </html>
 ```
 The css `<link>` is placed in the `<head>` - exactly what you wanted.
+
+Each call to `@Html.section` specifies a section name as the first parameter and whether that section is required or optional as the second one:
+```HTML+Razor
+@Html.section("Scripts", true)
+```
+If a required section isn't found, an exception is thrown. Individual views specify the content to be rendered within a section using the `@section{...}` Razor syntax. If a page or view defines a section, it must be rendered (or an error will occur). An example of `@section` definition:
+```HTML+Razor
+@section Scripts {
+    <script type="text/javascript" src="/scripts/site.js"></script>
+}
+```
+In the preceding code, scripts/site.js is added to the scripts section on a page. Other pages in the same app might not require this script and wouldn't define a scripts section. Sections defined in a page are available in its layout page or parent page for partials views. 
+
+**NOTE:** In *ASP.NET MVC Razor* only immediate layout page can render a section and they cannot be referenced from partial views. In the current implementation of *Razor-Express* we don't have this limitation. I can't see anything wrong with having some specific script or style in some partial view to be placed in a section. Since partial views can be rendered on a page more than once, each its section is rendered only once. Also, you can have different sections defined in different files (views) with the same name. Then the `@Html.section` method will render all these sections in one specific place. Of course, you should take into account that the order in which the sections will be rendered corresponds to the rendering order of the views, partial views, and layouts. Sections can be defined and rendered even within the same (one) view, in this case the order is also important: definition must go before the reference.
