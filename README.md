@@ -20,7 +20,8 @@
 - [**Debugging & Errors handling in Razor-Express**](https://github.com/DevelAx/RazorExpress/blob/master/docs/Debugging.md)
   - Debugging view templates
   - [Errors handling](https://github.com/DevelAx/RazorExpress/blob/master/docs/Debugging.md#errors-handling)
-  
+- [**Misc**](#misc)
+  - [TODO list](#todo-list)
 -----------------------
 
 
@@ -397,3 +398,16 @@ To make this code work you need to *wrap it explicitly in a code block* then it 
 <sup>^ [run this example](https://runkit.com/develax/razor-array-foreach)</sup>
 
 However, the best way to avoid such ambiguities is to stick to a plain JavaScript syntax style while writing your view templates. See ["Looping @for, @while, and @do while"](https://github.com/DevelAx/RazorExpress/blob/master/docs/overview.md#looping-for-while-and-do-while) section for examples of loop structures. 
+
+Misc
+===
+TODO list
+---
+What will be done soon:
+
+1. Finish the documentation for the current version.
+2. Implement [Razor-style `@* *@` comments](https://github.com/DevelAx/RazorExpress/blob/master/docs/overview.md#comments).
+3. Implement the *"_viewEnd.raz"* concept.
+4. Improve debugging info.
+5. Make the library available for use on the client side (in the browser).
+6. Implement caching compiled templates.
