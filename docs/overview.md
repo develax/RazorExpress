@@ -26,8 +26,10 @@ When you have a *NodeJS Express web app* set up (an example is [here](https://gi
 
 This is a very simplified description of the request handling to understand the role of the Razor-Express engine in this process. Now let's take a closer look at what happens in the Razor-Express engine while processing the *view template* and *data*.
 
+### Processing a view template
+When the Razor-Express gets to control, it also gets the full filename of the template and the data model passed as parameters. The data model is optional. In case of success the engine returns HTML. If a failure occurs while reading, parsing, or rendering the file template it returns an error. At this stage, its work ends.
 
-
+After the file is found and read, the parser starts to analyze it. It's worth noting that the parser is not trying to fully analyze the validity of HTML. For example, it is not much concerned about mistakes in the attributes of the HTML tags. It only checks the integrity of the HTML tag tree and extracts snippets of the JavaScript control code.
 
 
 
