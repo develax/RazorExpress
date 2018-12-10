@@ -29,7 +29,11 @@ This is a very simplified description of the request handling to understand the 
 ### Processing a view template
 When the Razor-Express gets to control, it also gets the full filename of the template and the data model passed as parameters. The data model is optional. In case of success the engine returns HTML. If a failure occurs while reading, parsing, or rendering the file template it returns an error. At this stage, its work ends.
 
-After the file is found and read, the parser starts to analyze it. It's worth noting that the parser is not trying to fully analyze the validity of HTML. For example, it is not much concerned about mistakes in the attributes of the HTML tags. It only checks the integrity of the HTML tag tree and extracts snippets of the JavaScript control code.
+After the file is found and read, the engine tries to find all files *"_viewStart.raz"* starting from the current directory up to the view's root folder. If they are found they are added to the current file from its beginning in the order the search sequence (each next found is added to the very beginning of the current file and so on).
+
+When this process is finished the parser starts analyzing the resulting template. It's worth noting that *the parser doesn't trying to fully analyze the validity of its HTML*. For example, it is not much concerned about mistakes in the attributes of the HTML tags. It only checks the integrity of the HTML tag tree and extracts snippets of the JavaScript control code.
+
+After parsing is done the execution process begins. At this point, the template placeholders are substituted with the appropriate values from the data model and all the server-side JavaScript code found in this template is executed.
 
 
 
