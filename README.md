@@ -200,13 +200,13 @@ That's all! Isn't it simple?
 
 Express web-server example
 ---
-1. [Create a new NodeJS project](https://docs.npmjs.com/creating-a-package-json-file) (set in *app.js* in as default JavaScript file).
-2. Install Express & Razor-Express libraries:
+1. [Create a new NodeJS project](https://docs.npmjs.com/creating-a-package-json-file) (set in *server.js* in as an entry point).
+2. Install *Express* & *Razor-Express* libraries:
 > <pre>$ npm install raz --save</pre>
 > <pre>$ npm install express --save</pre>
-3. In the project folder create *"app.js"* file (read js-comments inside):
+3. In the project folder create *"server.js"* file (read js-comments inside):
 
-**app.js** file:
+**server.js** file:
 ```js
 // Create Express web server app.
 const app = require('express')();
@@ -242,7 +242,7 @@ server.on('error', function (e) {
 });
 ```
 4. Create the *"views"* folder. This is the directory defined in Express by default where the template files are located. If you want to use another folder you can change it with `app.set('views', './another-views-folder')` method.
-5. Create a *view-template* file in that folder named *index.raz*. It would have pretty much the same content as in the [previous example](#nodejs-example) except we have to add some basic HTML markup. Notice that the *view-template* file has **'.raz'** extension which every Razor-Express *view* file must have.
+5. Create a *view-template* file in that folder named *"index.raz"*. It would have pretty much the same content as in the [previous example](#nodejs-example) except we have to add some basic HTML markup. Notice that the *view-template* file has **'.raz'** extension which every Razor-Express *view* file must have.
 
 **index.raz** file:
 ```HTML+Razor
@@ -263,7 +263,7 @@ server.on('error', function (e) {
   </body>
 </html>
 ```
-Now you when run the '**node app.js**' command in the console (or terminal) and open http://localhost:8080/ URL in your browser you will see the HTML page showing something like this:
+Now you when run the '**node server.js**' command in the console (or terminal) and open http://localhost:8080/ URL in your browser you will see the HTML page showing something like this:
 ___
 > ### Names of the Days of the Week
 > * Sunday
@@ -279,6 +279,10 @@ ____
 
 <sup>* The source code of this example is available in [RazorExpressExample](https://github.com/DevelAx/RazorExpressExample) repository.</sup>
 
+> For a more comprehensive understanding of how the Razor-Express Template Engine works and what Razor-Express syntax is, follow these links:
+> * [The overview of Razor-Express View Template Engine](https://github.com/DevelAx/RazorExpress/blob/master/docs/overview.md)
+> * [Razor-Express syntax reference for NodeJS & Express](https://github.com/DevelAx/RazorExpress/blob/master/docs/syntax.md)
+> * [Using template engines with Express](https://expressjs.com/en/guide/using-template-engines.html)
 
 Razor-Express View API
 ===
