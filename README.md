@@ -420,7 +420,6 @@ What is to be done soon:
 
 1. Finish the documentation for the current version.
 2. Implement [Razor-style `@* *@` comments](https://github.com/DevelAx/RazorExpress/blob/master/docs/syntax.md#comments).
-3. Implement the *"_viewEnd.raz"* concept.
-4. Improve debugging info.
-5. Make the library available for use on the client side (in the browser).
-6. Implement caching compiled templates.
+3. Improve debugging info.
+4. Make the library available for use on the client side (in the browser).
+5. Implement caching compiled templates.
