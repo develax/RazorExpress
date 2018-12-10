@@ -331,11 +331,7 @@ The rendered HTML:
 
 
 ### Reserved keywords
-
-- `Html`
-- `Model`
 - `@section`
-- `@ViewData`
 
 When an `@` symbol is followed by a *Razor-Express reserved keyword*, it transitions into Razor-specific markup. Otherwise, it transitions into plain JavaScript.
 
@@ -430,6 +426,8 @@ If a required section isn't found, an exception is thrown. Individual views spec
     <script type="text/javascript" src="/scripts/site.js"></script>
 }
 ```
-In the preceding code, scripts/site.js is added to the scripts section on a page. Other pages in the same app might not require this script and wouldn't define a scripts section. Sections defined in a page are available in its layout page or parent page for partials views. 
+In the preceding code, *"/scripts/site.js"* is added to the scripts section on a page. Other pages in the same app might not require this script and wouldn't define a scripts section. Sections defined in a page are available in its layout page or parent page for partials views. 
 
 **NOTE:** In *ASP.NET MVC Razor* only the immediate layout page can render a section and they cannot be referenced from partial views. In the current implementation of *Razor-Express* we don't have this limitation. I can't see anything wrong with having some specific script or style in some partial view to be placed in a section. Since partial views can be rendered on a page more than once, each its section is rendered only once. Also, you can have different sections defined in different files (views) with the same name. Then the `@Html.section` method will render all these sections in one specific place. Of course, you should take into account that the order in which the sections will be rendered corresponds to the rendering order of the views, partial views, and layouts. Sections can be defined and rendered even within the same (one) view, in this case the order is also important: definition must go before the reference.
+
+
