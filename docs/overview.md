@@ -43,7 +43,7 @@ There are two types of templates, which can be referenced by the main template.
 
 **Partial view** is a regular template that is rendered within the template that has a reference to it. It can have a reference to other partial views, but it **_can't have a reference to a layout_**.
 
-> :warning: It's worth emphasizing once again that **only the main template is processed together with the starting templates** as one whole template (they are joined before being parsing and executing). All other templates are parsed and executed separately, and only then included in each other in the form of ready-made HTML.
+> :warning: It's worth emphasizing once again that **only the main template is processed together with the starting templates** as one whole template (they are joined before being parsed and executed). All other templates are parsed and executed separately, and only then included in each other in the form of ready-made HTML.
 
 #### The views processing order
 
