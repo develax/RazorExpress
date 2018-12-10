@@ -1,4 +1,4 @@
-# Getting started with RAZ (Razor-Express View Template Engine)
+# Getting started with Razor-Express View Template Engine
 <sup>* *This is a **draft version** of the manual, although the code itself has already been tested and works. While the documentation is under development, use [this repository](https://github.com/DevelAx/RazorExpressFullExample) for more comprehensive examples.*</sup>
 
 - [**Intro**](#intro)
