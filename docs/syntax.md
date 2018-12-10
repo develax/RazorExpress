@@ -1,4 +1,4 @@
-# Razor-Express syntax reference for NodeJS
+# Razor-Express syntax reference for NodeJS & Express
 - [**A simple example**](#a-simple-example-of-razor-express-markup)
 - [**Escaping `@` character**](#escaping--character)
 - [**Expressions**](#expressions)
