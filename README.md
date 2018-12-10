@@ -7,7 +7,7 @@
 - [**Intro**](#intro)
   - [A brief comparison of syntax of Node.JS template engines](#a-brief-comparison-of-syntax-of-nodejs-template-engines)
 - [**Quick Start**](#quick-start)
-  - [Node.js example](#nodejs-example)
+  - [Node.js example](cccccccccccccccccc)
   - [Express web-server example](#express-web-server-example)
 - [**The overview of Razor-Express View Template Engine**](https://github.com/DevelAx/RazorExpress/blob/master/docs/overview.md)
   - [What is View Template](https://github.com/DevelAx/RazorExpress/blob/master/docs/overview.md#what-is-view-tempate-and-view-template-engine)
@@ -200,13 +200,19 @@ That's all! Isn't it simple?
 
 Express web-server example
 ---
-**server.js** file with comments:
+1. [Create a new NodeJS project](https://docs.npmjs.com/creating-a-package-json-file) (set in *app.js* in as default JavaScript file).
+2. Install Express & Razor-Express libraries:
+> <pre>$ npm install raz --save</pre>
+> <pre>$ npm install express --save</pre>
+3. In the project folder create *"app.js"* file (read js-comments inside):
+
+**app.js** file:
 ```js
 // Create Express web server app.
 const app = require('express')();
 
-// Register 'Razor' template engine and the default extesnion for the view-template files.
-// 'Express' will automatically find the Razor module (within the `node-modules` folder) using this extension. 
+// Register 'Razor-Express' template engine and the default extesnion (raz) for the view-template files.
+// 'Express' will automatically find the Razor-Express module (within the `node-modules` folder) using this extension. 
 // If you decide to skip registering the engine then you will have to explicitly specify the file extension in the route handler.
 app.set('view engine', "raz");
 
@@ -235,8 +241,10 @@ server.on('error', function (e) {
     }
 });
 ```
+4. Create the *"views"* folder. This is the directory defined in Express by default where the template files are located. If you want to use another folder you can change it with `app.set('views', './another-views-folder')` method.
+5. Create a *view-template* file in that folder named *index.raz*. It would have pretty much the same content as in the [previous example](#nodejs-example) except we have to add some basic HTML markup. Notice that the *view-template* file has **'.raz'** extension which every Razor-Express *view* file must have.
 
-**index.raz** file is just a *view-template* which is pretty much the same as in the previous example except we have to add some basic HTML markup. We put this file into the *"views"* folder which is a default folder for the Express app. Notice that the file has **'.raz'** extension which every Razor *view* file must have.
+**index.raz** file:
 ```HTML+Razor
 <!DOCTYPE html>
 <html>
@@ -255,7 +263,7 @@ server.on('error', function (e) {
   </body>
 </html>
 ```
-Now you if run the '**node server.js**' command in console (or terminal) and open http://localhost:8080/ URL in your browser you will see the HTML page showing something like this:
+Now you when run the '**node app.js**' command in the console (or terminal) and open http://localhost:8080/ URL in your browser you will see the HTML page showing something like this:
 ___
 > ### Names of the Days of the Week
 > * Sunday
