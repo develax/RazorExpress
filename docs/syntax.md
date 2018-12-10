@@ -1,18 +1,18 @@
 # Razor-Express syntax reference for NodeJS
 
-- [A simple example](#a-simple-example-of-razor-express-markup)
-- [Escaping `@` character](#escaping--character)
-- [Expressions](#expressions)
+- **[A simple example]**(#a-simple-example-of-razor-express-markup)
+- **[Escaping `@` character]**(#escaping--character)
+- **[Expressions]**(#expressions)
   - [Expression encoding](#expression-encoding)
   - [Expression raw-rendering](#expression-raw-rendering)
-- [Code blocks](#code-blocks)
+- **[Code blocks]**(#code-blocks)
   - [Rendering HTML within JavaScript code blocks](#rendering-html-within-javascript-code-blocks)
-- [Control structures](#control-structures)
+- **[Control structures]**(#control-structures)
   - [Conditionals @if, else if, else, and @switch](#conditionals-if-else-if-else-and-switch)
   - [Looping @for, @while, and @do while](#looping-for-while-and-do-while)
   - [Exception handling: @try, catch, finally](#exception-handling-try-catch-finally)
   - [Comments](#comments)
-- [Reserved keywords](#reserved-keywords)
+- **[Reserved keywords]**(#reserved-keywords)
   - [@section](#section)
 
 Razor is a markup syntax for embedding server-based code into webpages based on [ASP.NET Razor syntax](https://docs.microsoft.com/en-us/aspnet/core/mvc/views/razor). Although I tried to make the Razor-Express syntax as close as possible to [ASP.NET Razor](https://docs.microsoft.com/en-us/aspnet/core/mvc/views/razor) there are some differences that need to be taken into account. 
