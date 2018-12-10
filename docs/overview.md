@@ -33,7 +33,7 @@ After the file is found and read, the engine tries to find all files *"_viewStar
 
 When this process is finished the parser starts analyzing the resulting template. It's worth noting that *the parser doesn't trying to fully analyze the validity of its HTML*. For example, it is not much concerned about mistakes in the attributes of the HTML tags. It only checks the integrity of the HTML tag tree and extracts snippets of the JavaScript control code.
 
-After parsing is done the execution process begins. At this point, the template placeholders are substituted with the appropriate values from the data model and all the server-side JavaScript code found in this template is executed.
+After parsing is done the execution process begins. At this point, the template placeholders are substituted with the appropriate values from the data model and all the server-side JavaScript code found in this template is executed. In this process, the references to other view templates could be found. If so, each referenced template file is read and processed the same way as the main view (with which the engine has started) with the exception that the *"_viewStart.raz"* files are not considered anymore. Each referenced template file is processed separately from the main one and from the others. This means that if you declare a variable in one template it won't be available in any referenced template because each processed file is run in its own scope (and in its own moment). If you need to share some data between those views it is possible to do as will be discussed later. However, the data model is the same for all of them by default (unless it's explicitly set otherwise).
 
 
 
