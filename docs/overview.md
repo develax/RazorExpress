@@ -16,7 +16,19 @@ The Razor-Express engine is one of [many](https://github.com/expressjs/express/w
 
 
 ## Views rendering and Layout system in Razor-Express
-To render template files with Razor-Express you have to install the Razor-Exress and Express libraries first:
+When you have a *NodeJS Express web app* set up (an example is [here](https://github.com/DevelAx/RazorExpress/blob/master/README.md#express-web-server-example)) and run the Express framework starts to use the Razor-Express Engine as a service to read the *view templates* and process them into HTML. This happens as follows:
+
+1. Your app receives a request from the browser.
+2. The Express application analyzes the request URL, finds an appropriate route which determines the file to return in response to the browser request. 
+3. Express makes sure that the file actually exists and then transfers control to the Razor-Express engine. Also the Express can pass some data (or model) to the engine to render it with that HTML-template file content.
+4. Razor-Express reads this template file, renders HTML, and returns it back to Express.
+5. Having control back the library sends that HTML to the browser.
+
+This is a very simplified description of the request handling to understand the role of the Razor-Express engine in this process. Now let's take a closer look at what happens in the Razor-Express engine while processing the *view template* and *data*.
+
+
+
+
 
 
 
