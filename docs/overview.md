@@ -41,9 +41,11 @@ There are two types of templates, which can be referenced by the main template.
 
 **A layout view** is just a regular template with the only difference being that it is the base template for the current view. It can have a reference to another layout and partial views.
 
-**Partial view** is a regular template that is rendered within the template that has a reference to it. It can have a reference to other partial views, but **_can't_** have a reference to a layout.
+**Partial view** is a regular template that is rendered within the template that has a reference to it. It can have a reference to other partial views, but it **_can't have a reference to a layout_**.
 
 > :warning: It's worth emphasizing once again that **only the main template is processed together with the starting templates** as one whole template (they are joined before parsing and executing). All other templates are parsed and executed separately, and only then included in each other in the form of ready-made HTML.
+
+#### The views processing order
 
 *The order in which views are processed is also important to remember* in case you decide to change some data in the model, for example, in one view and then use it in another. The **main template** with all the start views are processed first, as you already know. Then the **layout** (of that view) is processed. And only then all **partial views** are processed in the order they are referenced. 
 Actually, it is not different from *ASP.NET MVC Razor*.
