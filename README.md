@@ -2,7 +2,7 @@
 <sup>* *This is a **draft version** of the manual, although the code itself has already been tested and works. While the documentation is under development, use [this repository](https://github.com/DevelAx/RazorExpressFullExample) for more comprehensive examples.*</sup>
 
 - [**Intro**](#intro)
-  - [A brief comparison of syntax of Node.JS layout engines](#a-brief-comparison-of-syntax-of-nodejs-layout-engines)
+  - [A brief comparison of syntax of Node.JS template engines](#a-brief-comparison-of-syntax-of-nodejs-template-engines)
 - [**Quick Start**](#quick-start)
   - [Node.js example](#nodejs-example)
   - [Express web-server example](#express-web-server-example)
@@ -32,7 +32,7 @@ When I just started to dive into the world of *Node.js* after years of working w
 
 The closest to *Razor* currently supported library for *NodeJs & Express* I could find was [Vash](https://www.npmjs.com/package/vash). But in some points, it was quite different from *ASP.NET MVC Razor* syntax which I was used to and it just looked much less concise and convenient to me (the syntax for rendering layouts and partial blocks, for example). In short, it did not suit me completely and what's more important I couldn't see its current development. 
 
-A brief comparison of syntax of Node.JS layout engines
+A brief comparison of syntax of Node.JS template engines
 ---
 
 I may be exaggerating the merits of *ASP.NET MVC Razor* and maybe it's all just a matter of habit, but let's look at a few examples that I found on the web ([the question on Quora](https://www.quora.com/What-is-the-best-Node-js-template-engine)):
