@@ -6,11 +6,9 @@
 - [**Quick Start**](#quick-start)
   - [Node.js example](#nodejs-example)
   - [Express web-server example](#express-web-server-example)
-- [**Overview**](https://github.com/DevelAx/RazorExpress/blob/master/docs/overview.md)
-  - [What is View Template](https://github.com/DevelAx/RazorExpress/blob/master/docs/overview.md#what-is-view-template)
-  - [What is View Template Engine](https://github.com/DevelAx/RazorExpress/blob/master/docs/overview.md#what-is-view-template-engine)
-  - [What is Razor-Express](https://github.com/DevelAx/RazorExpress/blob/master/docs/overview.md#what-is-razor-express)
-  - [Razor-Express syntax](https://github.com/DevelAx/RazorExpress/blob/master/docs/overview.md#razor-express-syntax-reference-for-nodejs)
+- [**The overview of Razor-Express View Template Engine**](https://github.com/DevelAx/RazorExpress/blob/master/docs/overview.md)
+  - [What is View Template](https://github.com/DevelAx/RazorExpress/blob/master/docs/overview.md#what-is-view-tempate-and-view-template-engine)
+- [**Razor-Express syntax**](https://github.com/DevelAx/RazorExpress/blob/master/docs/syntax.md)
 - [**Razor-Express View API**](#razor-express-view-api)
   - [Analogues of ASP.NET MVC Razor HtmlHelper methods](#analogues-of-aspnet-mvc-razor-htmlhelper-methods)
   - [Examples of usage](#examples-of-usage)
@@ -124,7 +122,7 @@ Given all the mentioned and unmentioned pros and cons, I decided not to part wit
 Quick Start
 ===
 
-Assuming that you are already familiar with the [basic idea](https://github.com/DevelAx/RazorExpress/blob/master/docs/overview.md#the-overview-of-razor-express) let's look at a simple example. 
+Assuming that you are already familiar with the [basic idea](https://github.com/DevelAx/RazorExpress/blob/master/docs/overview.md) let's look at a simple example. 
 
 Our **first component** is a **model**:
 ```js
@@ -144,7 +142,7 @@ which is just a *JavaScript object*. And we want to get some HTML displaying the
 </ul>
 ```
 
-As you can see the **view-template** (or just **view**) is nothing more than *HTML markup mixed with JavaScript syntax*. This is exactly what [Razor-Express syntax](https://github.com/DevelAx/RazorExpress/blob/master/docs/overview.md#razor-express-syntax-reference-for-nodejs) is.
+As you can see the **view-template** (or just **view**) is nothing more than *HTML markup mixed with JavaScript syntax*. This is exactly what [Razor-Express syntax](https://github.com/DevelAx/RazorExpress/blob/master/docs/syntax.md) is.
 
 Now we are going to take these two components and "compile" them into pure HTML.   
 
@@ -397,7 +395,7 @@ To make this code work you need to *wrap it explicitly in a code block* then it 
 ```
 <sup>^ [run this example](https://runkit.com/develax/razor-array-foreach)</sup>
 
-However, the best way to avoid such ambiguities is to stick to a plain JavaScript syntax style while writing your view templates. See ["Looping @for, @while, and @do while"](https://github.com/DevelAx/RazorExpress/blob/master/docs/overview.md#looping-for-while-and-do-while) section for examples of loop structures. 
+However, the best way to avoid such ambiguities is to stick to a plain JavaScript syntax style while writing your view templates. See ["Looping @for, @while, and @do while"](https://github.com/DevelAx/RazorExpress/blob/master/docs/syntax.md#looping-for-while-and-do-while) section for examples of loop structures. 
 
 Misc
 ===
@@ -406,7 +404,7 @@ TODO list
 What is to be done soon:
 
 1. Finish the documentation for the current version.
-2. Implement [Razor-style `@* *@` comments](https://github.com/DevelAx/RazorExpress/blob/master/docs/overview.md#comments).
+2. Implement [Razor-style `@* *@` comments](https://github.com/DevelAx/RazorExpress/blob/master/docs/syntax.md#comments).
 3. Implement the *"_viewEnd.raz"* concept.
 4. Improve debugging info.
 5. Make the library available for use on the client side (in the browser).
