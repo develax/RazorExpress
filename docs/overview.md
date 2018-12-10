@@ -35,6 +35,15 @@ When this process is finished the parser starts analyzing the resulting template
 
 After parsing is done the execution process begins. At this point, the template placeholders are substituted with the appropriate values from the data model and all the server-side JavaScript code found in this template is executed. In this process, the references to other view templates could be found. If so, each referenced template file is read and processed the same way as the main view (with which the engine has started) with the exception that the *"_viewStart.raz"* files are not considered anymore. Each referenced template file is processed separately from the main one and from the others. This means that if you declare a variable in one template it won't be available in any referenced template because each processed file is run in its own scope (and in its own moment). If you need to share some data between those views it is possible to do as will be discussed later. However, the data model is the same for all of them by default (unless it's explicitly set otherwise).
 
+There are two types of templates, which can be referenced by the main template.
+1. Layout.
+2. Partial views.
 
+**A layout view** is just a regular template with the only difference being that it is the base template for the current view. It can have a reference to another layout and partial views.
 
+**Partial view** is a regular template that is rendered within the template that has a reference to it. It can have a reference to other partial views, but **_can't_** have a reference to a layout.
 
+> :warning: It's worth emphasizing once again that **only the main template is processed together with the starting templates** as one whole template (they are joined before parsing and executing). All other templates are parsed and executed separately, and only then included in each other in the form of ready-made HTML.
+
+*The order in which views are processed is also important to remember* in case you decide to change some data in the model, for example, in one view and then use it in another. The **main template** with all the start views are processed first, as you already know. Then the **layout** (of that view) is processed. And only then all **partial views** are processed in the order they are referenced. 
+Actually, it is not different from *ASP.NET MVC Razor*.
