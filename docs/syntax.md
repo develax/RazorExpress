@@ -1,37 +1,20 @@
-# The overview of Razor-Express View Template Engine
-Let's look quickly at the key concepts and terms.
+# Razor-Express syntax reference for NodeJS
 
-- [**What is View Template?**](#what-is-view-template)
-- [**What is View Template Engine?**](#what-is-view-template-engine)
-- [**What is Razor-Express?**](#what-is-razor-express)
-- [**Razor-Express syntax**](#razor-express-syntax-reference-for-nodejs)
-  - [A simple example](#a-simple-example-of-razor-express-markup)
-  - [Escaping `@` character](#escaping--character)
-  - [Expressions](#expressions)
-    - [Expression encoding](#expression-encoding)
-    - [Expression raw-rendering](#expression-raw-rendering)
-  - [Code blocks](#code-blocks)
-    - [Rendering HTML within JavaScript code blocks](#rendering-html-within-javascript-code-blocks)
-  - [Control structures](#control-structures)
-    - [Conditionals @if, else if, else, and @switch](#conditionals-if-else-if-else-and-switch)
-    - [Looping @for, @while, and @do while](#looping-for-while-and-do-while)
-    - [Exception handling: @try, catch, finally](#exception-handling-try-catch-finally)
-    - [Comments](#comments)
-  - [Reserved keywords](#reserved-keywords)
-    - [@section](#section)
+- [A simple example](#a-simple-example-of-razor-express-markup)
+- [Escaping `@` character](#escaping--character)
+- [Expressions](#expressions)
+  - [Expression encoding](#expression-encoding)
+  - [Expression raw-rendering](#expression-raw-rendering)
+- [Code blocks](#code-blocks)
+  - [Rendering HTML within JavaScript code blocks](#rendering-html-within-javascript-code-blocks)
+- [Control structures](#control-structures)
+  - [Conditionals @if, else if, else, and @switch](#conditionals-if-else-if-else-and-switch)
+  - [Looping @for, @while, and @do while](#looping-for-while-and-do-while)
+  - [Exception handling: @try, catch, finally](#exception-handling-try-catch-finally)
+  - [Comments](#comments)
+- [Reserved keywords](#reserved-keywords)
+  - [@section](#section)
 
-## What is View Template?
-Building an HTML page assumes that you want to display some data on it (what else could it be?). To perform this task, you need the **data** itself and the **page template** (that defines the rules through a special markup language for displaying the data in HTML format). The page template is usually referred to simply as a **"view"** and the data is referred to as a **"view model"** or just **"model"**. So, this is what is usually called *"view templating"*. This consept is used for separating concerns within a web application (for more details [read this](https://docs.microsoft.com/en-us/aspnet/core/mvc/overview)).
-
-## What is View Template Engine?
-A **template engine** allows you to create HTML pages based on the model data and the view template. In other words the engine can understand the view template markup laguage and it also knows how to apply your model data to it to get the HTML page you need.
-
-## What is Razor-Express?
-**Razor-Express** is a view template engine which can understand *Razor-like markup language* syntax. Razor-Express is intended to be used with the [Express library](https://expressjs.com/) but it also can be used with any other library or purpose.
-
-> To get more about using template engines with Express read [their guide](https://expressjs.com/en/guide/using-template-engines.html).
-
-## Razor-Express syntax reference for NodeJS
 Razor is a markup syntax for embedding server-based code into webpages based on [ASP.NET Razor syntax](https://docs.microsoft.com/en-us/aspnet/core/mvc/views/razor). Although I tried to make the Razor-Express syntax as close as possible to [ASP.NET Razor](https://docs.microsoft.com/en-us/aspnet/core/mvc/views/razor) there are some differences that need to be taken into account. 
 
 Just like the *ASP.NET Razor* syntax, the *Razor-Express* syntax consists of Razor-Express markup, JavaScript, and HTML. Files with Razor markup generally have a `.raz` file extension. In fact, the *Razor-Express markup is a normal HTML markup with optionally embedded JavaScript server-side code* to manage that HTML. [Don't be confused with client-side JavaScript](https://stackoverflow.com/a/1404400/1844247) embedded in HTML which is interpreted by *Razor-Express* as part of HTML markup and runs on the client side (in browsers) while Razor-Express' JavaScript runs on the server (in NodeJs). For example, it doesn't make any sense to write this code for server-side JavaScript:
@@ -41,7 +24,7 @@ document.getElementsByTagName("body")[0].innerHTML = "<div>This JavaScript will 
 
 Since the *Razor-Express* engine must somehow distinguish server-side JavaScript from HTML markup we use the `@` symbol. The `@` just tells the engine's parser that JavaScript server-side code or expression starts after this character. This is the minimum intervention in HTML markup [compared to other existing markup engines](https://github.com/DevelAx/RazorExpress#a-brief-comparison-of-syntax-of-nodejs-layout-engines).
 
-### A simple example of Razor-Express markup
+## A simple example of Razor-Express markup
 ```HTML+Razor
 @{ 
   var email = "webmaster@example.com";
@@ -56,7 +39,7 @@ The rendered HTML by Razor-Express will be:
 ```
 <sup>[^ try this code](https://runkit.com/develax/razor-hello-webmaster)</sup>
 
-### Escaping `@` character
+## Escaping `@` character
 **Be careful** when using `@` symbol in HTML attributes and content containing **email addresses** since Razor-Express *does* treat the `@` symbol as a transition character and it will cause an error. To escape an `@` symbol in Razor-Express markup, use double `@@`. For example the next Razor-Express markup won't cause any error:
 ```HTML+Razor
 <a href="mailto:webmaster@@example.com">webmaster@@example.com</a>
@@ -64,7 +47,7 @@ The rendered HTML by Razor-Express will be:
 <sup>[^ try this code](https://runkit.com/develax/razor-at-escape)</sup>
 
 
-### Expressions
+## Expressions
 Razor-Express expressions start with `@` followed by JavaScript code:
 ```HTML+Razor
 <p>@Date.now()</p>
@@ -75,7 +58,7 @@ An expression must not contain spaces and if it does contain you have to enclose
 ```
 <sup>[^ try this code](https://runkit.com/develax/razor-expressions)</sup> 
 
-#### Expression encoding
+### Expression encoding
 JavaScript expressions are converted to a string by `.toString` and HTML encoded before they're rendered. 
 The next code:
 ```HTML+Razor
@@ -89,7 +72,7 @@ and the browser will show it with tags as:
 ```
 <strong>Hello Developer!</strong>
 ```
-#### Expression raw-rendering
+### Expression raw-rendering
 If you don't want the expression to be encoded use `Html.raw` method:
 ```HTML+Razor
 @Html.raw("<strong>Hello Developer!</strong>")
@@ -106,7 +89,7 @@ and the browser displays it without tags as just:
 
 > :warning: Using the `Html.raw` method with a user input which might contain malicious JavaScript or other exploits is a **security risk**. Sanitizing user input is not a trivial task, so you'd better avoid using `Html.raw` with user input.
 
-### Code blocks
+## Code blocks
 *Razor-Express code blocks* start with `@` symbol just like *expressions*. But unlike expressions code blocks are enclosed by `{}` and JavaScript code result inside code blocks isn't rendered (unless you do it explicitly via `Html.render` or other methods). 
 
 Code blocks and expressions share the same scope which is limited to one compiled view template. This means that a normal view and a partial view that is rendered within that view have different scopes. Although a normal view compiled template also includes `_viewStart.raz` templates if they exists. Any section's sope is the scope of its view. That is, any variable value calculated in a code block as well as any other JavaScript language definition is available within that's view scope later in expressions or other code blocks:
@@ -131,10 +114,10 @@ The current year is 2018. It is not a leap year.
 <sub>* *If you want to share some data among all the request rendering views you can do it either through the `Model` (if there is a single model for all of them) or through the `ViewData` objects.*</sub>
 
 
-#### Rendering HTML within JavaScript code blocks
+### Rendering HTML within JavaScript code blocks
 To render an HTML code within JavaScript code block you can either use implicit transitions or the `Html` object methods.
 
-##### Transitions to HTML
+#### Transitions to HTML
 The default language in a code block is JavaScript, but the Razor-Express engine can transition back to HTML:
 
 ```HTML+Razor
@@ -152,10 +135,10 @@ The browser output would be:
 
 *Notice that in code blocks after the HTML line you continue writing JavaScript without explicit transitioning to it via `@` symbol.*
 
-### Control structures
-Control structures are just an extension of code blocks. All aspects of code blocks also apply to the JavaScript structures: `{}` are required and the `@' symbol is placed only at the beginning of the structure. 
+## Control structures
+Control structures are just an extension of code blocks. All aspects of code blocks also apply to the JavaScript structures: `{}` are required and the `@` symbol is placed only at the beginning of the structure. 
 
-#### Conditionals @if, else if, else, and @switch
+### Conditionals @if, else if, else, and @switch
 In the next example there are a code block and a control structure:
 
 ```HTML+Razor
@@ -223,7 +206,7 @@ A **switch statement** example:
 ```
 <sup>[^ try these code examples](https://runkit.com/develax/razor-conditional-control-structures)</sup>
 
-#### Looping @for, @while, and @do while
+### Looping @for, @while, and @do while
 You can use looping control statements to render a templated HTML. In the following examples, we will use different kinds of loops to render a list of countries. 
 
 ```JavaScript
@@ -238,7 +221,7 @@ const countries = [
 ];
 ```
 
-##### `@for`
+#### `@for`
 ```HTML+Razor
 <table>
   <tr>
@@ -255,7 +238,7 @@ const countries = [
 </table>
 ```
 
-##### `@while`
+#### `@while`
 ```HTML+Razor
 <table>
   <tr>
@@ -273,7 +256,7 @@ const countries = [
 </table>
 ```
 
-##### `@do while`
+#### `@do while`
 ```HTML+Razor
 @do{
   var country = countries[i++];
@@ -285,11 +268,11 @@ const countries = [
 ```
 <sup>[^ try these code examples](https://runkit.com/develax/razor-looping-structures)</sup>
 
-##### `@Array.prototype.forEach`
+#### `@Array.prototype.forEach`
 Using `forEach` structure for looping an array is not recommended. An example of using `forEach` with explanations is given in the ["Expressions & code blocks confusion"](https://github.com/DevelAx/RazorExpress/blob/master/README.md#expressions--code-blocks-confusion) section.
 
 
-#### Exception handling: @try, catch, finally
+### Exception handling: @try, catch, finally
 
 ```HTML+Razor
 @try {
@@ -312,7 +295,7 @@ HTML output:
 ```
 <sup>[^ try this example](https://runkit.com/develax/razor-exception-handling)</sup>
 
-#### Comments
+### Comments
 In Razor-Express HTML & JavaScript comments are used in the usual way: just use HTML comments for HTML markup and JavaScript comments for JavaScript code.
 ```HTML+Razor
 @{
@@ -330,12 +313,12 @@ The rendered HTML:
 *The current Razor-Express version doesn't support universal comments for the Razor Razor-Express markup.* So, if you try `@* *@` from ASP.NET MVC Razor it wouldn't work.
 
 
-### Reserved keywords
+## Reserved keywords
 - `@section`
 
 When an `@` symbol is followed by a *Razor-Express reserved keyword*, it transitions into Razor-specific markup. Otherwise, it transitions into plain JavaScript.
 
-#### `@section`
+### `@section`
 Sections are used to organize where certain page elements should be placed within the parent layout or within the same layout. For example, if you want some block of the Razor-Express markup from any rendered view to be placed in a specific place of the layout view, you can define a named section in your view and then define a reference to this section at that specific place of the layout. 
 
 Let's give a markup example:
