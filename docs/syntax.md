@@ -275,22 +275,28 @@ Using `forEach` structure for looping an array is not recommended. An example of
 
 ```HTML+Razor
 @try {
-    <div>-------Users Info--------</div>
-    <div>User id: @user.id</div>
-    <div>User name: @user.name</div>
+    <div>------- User Info --------</div>
+    <div>
+        User id: @user.id
+        <br/>
+        User name: @user.name
+    </div>
 }
 catch (exc) {
     <span>Error: @exc</span>
+    Html.raw("    </div>\\n");// to maintain the integrity of the HTML after the exception
 }
 finally {
-    <div>--------------------------</div>
+    <div>------- The End --------</div>
 }
 ```
 HTML output:
 ```HTML
-<div>-------Users Info--------</div>
-<span>Error: @exc</span>
-<div>--------------------------</div>
+<div>------- User Info --------</div>
+<div>
+    User id:     <span>Error: ReferenceError: user is not defined</span>
+</div>
+<div>------- The End --------</div>
 ```
 <sup>[^ try this example](https://runkit.com/develax/razor-exception-handling)</sup>
 
