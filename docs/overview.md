@@ -76,7 +76,7 @@ Partial views are supposed to reuse the same code snippets from different views 
 
 By convention, partial view file names begin with an underscore (`_`). It's not strictly required, although it helps to visually differentiate them from page views.
 
-To reference a partial view from any view use `Html.partial` method:
+To reference a partial view from any view use the `Html.partial` method:
 ```HTML+Razor
 @Html.partial("_partial")
 ```
