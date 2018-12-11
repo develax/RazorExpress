@@ -18,8 +18,8 @@ The Razor-Express engine is one of [many](https://github.com/expressjs/express/w
 ## Views rendering and Layout system in Razor-Express
 When you have a *NodeJS Express web app* set up (an example is [here](https://github.com/DevelAx/RazorExpress/blob/master/README.md#express-web-server-example)) and run the Express framework starts to use the Razor-Express Engine as a service to read the *view templates* and process them into HTML. This happens as follows:
 
-1. Your app receives a request from the browser.
-2. The Express application analyzes the request URL, finds an appropriate route which determines the file to return in response to the browser request. 
+1. The app receives a request from the browser.
+2. The Express application analyzes the request URL and finds an appropriate route which determines a file to return in response to the browser request. 
 3. Express makes sure that the file actually exists and then transfers control to the Razor-Express engine. Also the Express can pass some data (or model) to the engine to render it with that HTML-template file content.
 4. Razor-Express reads this template file, renders HTML, and returns it back to Express.
 5. Having control back the library sends that HTML to the browser.
@@ -35,9 +35,12 @@ When this process is finished the parser starts analyzing the resulting template
 
 After parsing is done the execution process begins. At this point, the template placeholders are substituted with the appropriate values from the data model and all the server-side JavaScript code found in this template is executed. In this process, the references to other view templates could be found. If so, each referenced template file is read and processed the same way as the main view (with which the engine has started) with the exception that the *"_viewStart.raz"* files are not considered anymore. Each referenced template file is processed separately from the main one and from the others. This means that if you declare a variable in one template it won't be available in any referenced template because each processed file is run in its own scope (and in its own moment). If you need to share some data between those views it is possible to do as will be discussed later. However, the data model is the same for all of them by default (unless it's explicitly set otherwise).
 
-There are two types of view templates, which can be explicitly referenced from the rendering page template. 
-1. Partial views
+There are two types of view templates, which can be explicitly referenced from the rendering page template:
+1. Partial view
 2. Layout
+
+#### Partial view
+The term *"partial view"* clearly implies that HTML received as a result of processing this partial view template will become a part of the page view which has a reference to it. Partial view can have a reference to other partial views, but it **_can't have a reference to a layout_**.
 
 #### Layout
 Layout is a common markup for a group of site pages that have some common elements, such as header, footer, menu, as well as other structures such as scripts, stylesheets, etc. Using layouts helps to reduce duplicate code in views. From the *Razor-Express engine* point of view, a layout is just a normal view template with the only difference being that the layout defines a top level template for other views. Using the layout is optional. Apps can define more than one layout, with different views specifying different layouts. A layout can have a reference to another layout and so forth which means that layouts can be nested (see an example [here](https://github.com/DevelAx/RazorExpressFullExample)). Layouts can have references to partial views as well.
@@ -58,10 +61,7 @@ The layout file extension is optional in both cases. When a partial name is prov
 
 Each layout is supposed to call `@Html.body()` within itself where the contents of the current view have to be rendered. (As you remember, the page template is processed before the layout template, so this call renderers an already compiled page template.) 
 
-
-**Partial view** is a regular template that is rendered within the template that has a reference to it. It can have a reference to other partial views, but it **_can't have a reference to a layout_**.
-
-> :warning: It's worth emphasizing once again that **only the main template is processed together with the starting templates** as one whole template (they are joined before being parsed and executed). All other templates are parsed and executed separately, and only then included in each other in the form of ready-made HTML.
+> :warning: It's worth emphasizing once again that **only a page template is processed together with starting templates** as one whole template (they are joined before being parsed and executed). All other templates are parsed and executed separately, and only then included in each other in the form of ready-made HTML.
 
 #### The views processing order
 
