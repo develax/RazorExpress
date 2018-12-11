@@ -423,3 +423,4 @@ What is to be done soon:
 3. Improve debugging info.
 4. Make the library available for use on the client side (in the browser).
 5. Implement caching compiled templates.
+6. Async partial views.
