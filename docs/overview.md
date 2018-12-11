@@ -1,12 +1,12 @@
 # The overview of Razor-Express View Template Engine
 
-- [**What is View Tempate and View Template Engine**](#)
-- [**Views rendering and Layout system in Razor-Express**](#)
-  - [Processing a view template]()
-    - [The views processing order]()
-  - [Layouts]()
-  - [Partial views]()
-    - [Partial view search algorithm]()
+- [**What is View Tempate and View Template Engine**](#what-is-view-tempate-and-view-template-engine)
+- [**Views rendering and Layout system in Razor-Express**](#views-rendering-and-layout-system-in-razor-express)
+  - [Processing a view template](#processing-a-view-template)
+    - [The views processing order](#the-views-processing-order)
+  - [Layouts](#layouts)
+  - [Partial views](#partial-views)
+    - [Partial view search algorithm](#partial-view-search-algorithm)
 
 ## What is View Tempate and View Template Engine?
 Most likely you already know that the simplest [NodeJS](https://nodejs.org/) web server built with [Express library](https://expressjs.com/) can work without any template engine. Express library can just [serve static files](https://expressjs.com/en/starter/static-files.html) in response to a browser request. It can be any staic file including a file with HTML markup (which is essentially a regular text file). Although this method is still quite often used for simple small websites, it contains a number of disadvantages and is not suitable for more complex websites.
