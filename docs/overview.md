@@ -33,7 +33,7 @@ This is a very simplified description of the request handling to understand the 
 ### Processing a view template
 When the Razor-Express gets to control, it also gets the full filename of the template and the data model passed as parameters. The data model is optional. In case of success the engine returns HTML. If a failure occurs while reading, parsing, or rendering the file template it returns an error. At this stage, its work ends.
 
-After the file is found and read, the engine tries to find all files *"_viewStart.raz"* following the *partial views standard search algorithm logic*. If they are found they are added to the current file from its beginning in the order the search sequence (each next found is added to the very beginning of the current file and so on).
+After the file is found and read, the engine tries to find all files *"_viewStart.raz"* following the [partial views standard search algorithm logic](#partial-view-search-algorithm). If they are found they are added to the current file from its beginning in the order the search sequence (each next found is added to the very beginning of the current file and so on).
 
 When this process is finished the parser starts analyzing the resulting template. It's worth noting that *the parser doesn't trying to fully analyze the validity of its HTML*. For example, it is not much concerned about mistakes in the attributes of the HTML tags. It only checks the integrity of the HTML tag tree and extracts snippets of the JavaScript control code.
 
@@ -65,7 +65,7 @@ You can use either a partial name like in the example above or a full path:
     Html.layout = "/admin/_layout";
 }
 ```
-The layout file extension is optional in both cases. When a partial name is provided, the Razor-Express view engine searches for the layout file using its standard for *partial views* discovery process.
+The layout file extension is optional in both cases. When a partial name is provided, the Razor-Express view engine searches for the layout file using its standard for [partial views discovery process](#partial-view-search-algorithm).
 
 Each layout is supposed to call `@Html.body()` within itself where the contents of the current view have to be rendered. (As you remember, the page template is processed before the layout template, so this call renderers an already compiled page template.) 
 
@@ -80,7 +80,7 @@ To reference a partial view from any view use `Html.partial` method:
 ```HTML+Razor
 @Html.partial("_partial")
 ```
-This method initiates a search procedure using *partial views search algorithm*.
+This method initiates a search procedure using [partial views search algorithm](#partial-view-search-algorithm).
 
 ### Partial view search algorithm
 
@@ -88,6 +88,7 @@ This method initiates a search procedure using *partial views search algorithm*.
 * In the case where the *full path relative to the root views directory* is specified the file will be searched only in this directory. Never include the views root folder name in the full path!
 * To make the search take place *only in the current directory*, use the form like `'./_partialView'`.
 
+Different partial views with the same file name are allowed when the partial views are in different folders.
 
-
+Partial views can be chained — a partial view can call another partial view and so on(be careful not to create circular references).
 
