@@ -6,7 +6,7 @@
     - [The views processing order](#the-views-processing-order)
   - [Layouts](#layouts)
   - [Partial views](#partial-views)
-    - [Partial view search algorithm](#partial-view-search-algorithm)
+  - [Partial view search algorithm](#partial-view-search-algorithm)
 
 ## What is View Tempate and View Template Engine?
 Most likely you already know that the simplest [NodeJS](https://nodejs.org/) web server built with [Express library](https://expressjs.com/) can work without any template engine. Express library can just [serve static files](https://expressjs.com/en/starter/static-files.html) in response to a browser request. It can be any staic file including a file with HTML markup (which is essentially a regular text file). Although this method is still quite often used for simple small websites, it contains a number of disadvantages and is not suitable for more complex websites.
@@ -82,6 +82,12 @@ To reference a partial view from any view use `Html.partial` method:
 ```
 This method initiates a search procedure using *partial views search algorithm*.
 
-#### Partial view search algorithm
-If a partial view is specified *only by a file name* with or without an extension (as in the [Partial views section](#partial-views) example above) then the search begins with the directory in which the view that initiates the search is located. If the partial view is not found in the current directory the search goes on up the directory tree until it reaches the root views folder specified in the [Express app](https://expressjs.com/en/guide/using-template-engines.html) (which is set as `app.set('views', './views')` by default). If the file is still not found an error is returned.
+### Partial view search algorithm
+
+* If a partial view is specified *only by a file name* with or without an extension (as in the [Partial views section](#partial-views) example above) then the search begins with the directory in which the view that initiates the search is located. If the partial view is not found in the current directory the search goes on up the directory tree until it reaches the root views folder specified in the [Express app](https://expressjs.com/en/guide/using-template-engines.html) (which is set as `app.set('views', './views')` by default). If the file is still not found an error is returned.
+* In the case where the *full path relative to the root views directory* is specified the file will be searched only in this directory. Never include the views root folder name in the full path!
+* To make the search take place *only in the current directory*, use the form like `'./_partialView'`.
+
+
+
 
