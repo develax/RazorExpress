@@ -4,7 +4,7 @@
 - [**Views rendering and Layout system in Razor-Express**](#)
 
 ## What is View Tempate and View Template Engine?
-Most likely you already know that the [NodeJS](https://nodejs.org/) simplest web server built with [Express library](https://expressjs.com/) can work without any template engine. Express library can just [serve static files](https://expressjs.com/en/starter/static-files.html) in response to a browser request. It can be any staic file including a file with HTML markup (which is essentially a regular text file). Although this method is still quite often used for simple small websites, it contains a number of disadvantages and is not suitable for more complex websites.
+Most likely you already know that the simplest [NodeJS](https://nodejs.org/) web server built with [Express library](https://expressjs.com/) can work without any template engine. Express library can just [serve static files](https://expressjs.com/en/starter/static-files.html) in response to a browser request. It can be any staic file including a file with HTML markup (which is essentially a regular text file). Although this method is still quite often used for simple small websites, it contains a number of disadvantages and is not suitable for more complex websites.
 
 The main disadvantage is that your HTML file stores not only the structure of the document but also its data. When the data is mixed with HTML code you can't easily edit the data if you are not familiar with HTML. And when you need to edit HTML you have to wade through tons of text that have nothing to do with HTML itself. This is where the idea of separating *markup* and *data* comes in. 
 
@@ -35,11 +35,29 @@ When this process is finished the parser starts analyzing the resulting template
 
 After parsing is done the execution process begins. At this point, the template placeholders are substituted with the appropriate values from the data model and all the server-side JavaScript code found in this template is executed. In this process, the references to other view templates could be found. If so, each referenced template file is read and processed the same way as the main view (with which the engine has started) with the exception that the *"_viewStart.raz"* files are not considered anymore. Each referenced template file is processed separately from the main one and from the others. This means that if you declare a variable in one template it won't be available in any referenced template because each processed file is run in its own scope (and in its own moment). If you need to share some data between those views it is possible to do as will be discussed later. However, the data model is the same for all of them by default (unless it's explicitly set otherwise).
 
-There are two types of templates, which can be referenced by the main template.
-1. Layout.
-2. Partial views.
+There are two types of view templates, which can be explicitly referenced from the rendering page template. 
+1. Partial views
+2. Layout
 
-**A layout view** is just a regular template with the only difference being that it is the base template for the current view. It can have a reference to another layout and partial views.
+#### Layout
+Layout is a common markup for a group of site pages that have some common elements, such as header, footer, menu, as well as other structures such as scripts, stylesheets, etc. Using layouts helps to reduce duplicate code in views. From the *Razor-Express engine* point of view, a layout is just a normal view template with the only difference being that the layout defines a top level template for other views. Using the layout is optional. Apps can define more than one layout, with different views specifying different layouts. A layout can have a reference to another layout and so forth which means that layouts can be nested (see an example [here](https://github.com/DevelAx/RazorExpressFullExample)). Layouts can have references to partial views as well.
+
+Conventionally the default layout is named *"_layout.raz"*. **To specify a layout** for a view an `Html.layout` property must be set in that view:
+```HTML+Razor
+@{
+    Html.layout = "_layout";
+}
+```
+You can use either a partial name like in the example above or a full path:
+```HTML+Razor
+@{
+    Html.layout = "/admin/_layout";
+}
+```
+The layout file extension is optional in both cases. When a partial name is provided, the Razor-Express view engine searches for the layout file using its standard for *partial views* discovery process.
+
+Each layout is supposed to call `@Html.body()` within itself where the contents of the current view have to be rendered. (As you remember, the page template is processed before the layout template, so this call renderers an already compiled page template.) 
+
 
 **Partial view** is a regular template that is rendered within the template that has a reference to it. It can have a reference to other partial views, but it **_can't have a reference to a layout_**.
 
