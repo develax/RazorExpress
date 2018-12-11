@@ -86,7 +86,7 @@ This method initiates a search procedure using [partial views search algorithm](
 
 * If a partial view is specified *only by a file name* with or without an extension (as in the [Partial views section](#partial-views) example above) then the search begins with the directory in which the view that initiates the search is located. If the partial view is not found in the current directory the search goes on up the directory tree until it reaches the root views folder specified in the [Express app](https://expressjs.com/en/guide/using-template-engines.html) (which is set as `app.set('views', './views')` by default). If the file is still not found an error is returned.
 * In the case where the *full path relative to the root views directory* is specified the file will be searched only in this directory. Never include the views root folder name in the full path!
-* To make the search take place *only in the current directory*, use the form like `'./_partialView'`.
+* To make the search take place *only in the current directory*, use the the form `'./_partialView'`.
 
 Different partial views with the same file name are allowed when the partial views are in different folders.
 
