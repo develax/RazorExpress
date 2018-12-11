@@ -1,4 +1,4 @@
-# Getting started with Razor-Express View Template Engine
+# RAZ: Razor-Express view template engine
 
 > <pre>$ npm install <b>raz</b> --save</pre>
 
@@ -9,7 +9,7 @@
 - [**Quick Start**](#quick-start)
   - [Node.js example](#nodejs-example)
   - [Express web-server example](#express-web-server-example)
-- [**The overview of Razor-Express View Template Engine**](https://github.com/DevelAx/RazorExpress/blob/master/docs/overview.md)
+- [**The overview of Razor-Express view template engine**](https://github.com/DevelAx/RazorExpress/blob/master/docs/overview.md)
   - [What is View Template](https://github.com/DevelAx/RazorExpress/blob/master/docs/overview.md#what-is-view-tempate-and-view-template-engine)
 - [**Razor-Express syntax**](https://github.com/DevelAx/RazorExpress/blob/master/docs/syntax.md)
 - [**Razor-Express View API**](#razor-express-view-api)
