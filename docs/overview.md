@@ -39,10 +39,20 @@ There are two types of view templates, which can be explicitly referenced from t
 1. Partial view
 2. Layout
 
-#### Partial view
-The term *"partial view"* clearly implies that HTML received as a result of processing this partial view template will become a part of the page view which has a reference to it. Partial view can have a reference to other partial views, but it **_can't have a reference to a layout_**.
+#### Partial views
+The term *"partial view"* clearly implies that HTML received as a result of processing this partial view template will become a part of the page view which has a reference to it. Partial view can have a reference to other partial views, but it _can't have a reference to a layout_.
 
-#### Layout
+Partial views are supposed to reuse the same code snippets from different views thus avoiding duplication. Also there is an advantage split large, complex markup file into sereveral logical pieces and work with each piece isolated within a partial view. 
+
+By convention, partial view file names begin with an underscore (`_`). It's not strictly required, although it helps to visually differentiate them from page views.
+
+To reference a partial view from any view use `Html.partial` method:
+```HTML+Razor
+@Html.partial("_partial")
+```
+This method initiates a search procedure using *partial views discovery algorithm*.
+
+#### Layouts
 Layout is a common markup for a group of site pages that have some common elements, such as header, footer, menu, as well as other structures such as scripts, stylesheets, etc. Using layouts helps to reduce duplicate code in views. From the *Razor-Express engine* point of view, a layout is just a normal view template with the only difference being that the layout defines a top level template for other views. Using the layout is optional. Apps can define more than one layout, with different views specifying different layouts. A layout can have a reference to another layout and so forth which means that layouts can be nested (see an example [here](https://github.com/DevelAx/RazorExpressFullExample)). Layouts can have references to partial views as well.
 
 Conventionally the default layout is named *"_layout.raz"*. **To specify a layout** for a view an `Html.layout` property must be set in that view:
