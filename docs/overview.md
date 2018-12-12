@@ -70,6 +70,8 @@ The layout file extension is optional in both cases. When a partial name is prov
 
 Each layout is supposed to call `@Html.body()` within itself where the contents of the current view have to be rendered. (As you remember, the page template is processed before the layout template, so this call renderers an already compiled page template.) 
 
+A layout has access to the current view `Model` object. It is passed implicitly and there is no way to pass any other object. One possible way to transfer some data to the layout other than the view `Model` is to use the `ViewData` object. 
+
 ### Partial views
 The term *"partial view"* clearly implies that HTML received as a result of processing a partial view template will become a part of another view which references it. Partial view can reference other partial views, but it _can't reference a layout_.
 
@@ -94,7 +96,7 @@ If this argument is omitted the `Model` of the parent view is passed by default 
 
 * If a partial view is specified *only by a file name* with or without an extension (as in the [Partial views section](#partial-views) example above) then the search begins with the directory in which the view that initiates the search is located. If the partial view is not found in the current directory the search goes on up the directory tree until it reaches the root views folder specified in the [Express app](https://expressjs.com/en/guide/using-template-engines.html) (which is set as `app.set('views', './views')` by default). If the file is still not found an error is returned.
 * In the case where the *full path relative to the root views directory* is specified the file will be searched only in this directory. Never include the views root folder name in the full path!
-* To make the search take place *only in the current directory*, use the the form `'./_partialView'`.
+* To make the search take place *only in the current directory*, use relative to the current directory path format `'./_partialView'`.
 
 Different partial views with the same file name are allowed when the partial views are in different folders.
 
