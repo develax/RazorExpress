@@ -70,9 +70,9 @@ The layout file extension is optional in both cases. When a partial name is prov
 Each layout is supposed to call `@Html.body()` within itself where the contents of the current view have to be rendered. (As you remember, the page template is processed before the layout template, so this call renderers an already compiled page template.) 
 
 ### Partial views
-The term *"partial view"* clearly implies that HTML received as a result of processing this partial view template will become a part of the page view which has a reference to it. Partial view can have a reference to other partial views, but it _can't have a reference to a layout_.
+The term *"partial view"* clearly implies that HTML received as a result of processing a partial view template will become a part of another view which references it. Partial view can reference other partial views, but it _can't reference a layout_.
 
-Partial views are supposed to reuse the same code snippets from different views thus avoiding duplication. Also there is an advantage split large, complex markup file into sereveral logical pieces and work with each piece isolated within a partial view. 
+Partial views are supposed to be a means to reuse the same code snippets from different views thus avoiding duplication. Also there is another advantage where large, complex markup file can be split into sereveral logical pieces and each one can be isolated within a partial view for easier perception and work with them.
 
 By convention, partial view file names begin with an underscore (`_`). It's not strictly required, although it helps to visually differentiate them from page views.
 
@@ -80,7 +80,7 @@ To reference a partial view from any view use the `Html.partial` method:
 ```HTML+Razor
 @Html.partial("_partial")
 ```
-This method initiates a search procedure using [partial views search algorithm](#partial-view-search-algorithm).
+This method initiates [search](#partial-view-search-algorithm) the `_partial.raz` view file, compiling it into HTML, and then rendering this HTML in where this method is placed.
 
 ### Partial view search algorithm
 
