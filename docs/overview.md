@@ -44,7 +44,7 @@ After parsing is done the execution process begins. At this point, the template 
 
 There are two types of view templates, which can be explicitly referenced from the rendering page template:
 * [Layout](#layouts)
-* [Partial view]
+* [Partial view](#partial-views)
 
 and one type of view that is referenced implicitly from any page view:
 * [Starting view](#starting-views-_viewstartraz)
