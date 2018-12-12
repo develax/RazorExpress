@@ -1,4 +1,4 @@
-# The overview of Razor-Express
+# The overview of Razor-Express template engine
 
 - [**What is View Tempate and View Template Engine**](#what-is-view-tempate-and-view-template-engine)
 - [**Views rendering and Layout system in Razor-Express**](#views-rendering-and-layout-system-in-razor-express)
@@ -35,7 +35,7 @@ This is a very simplified description of the request handling to understand the 
 ### Processing a view template
 When the Razor-Express gets to control, it also gets the full filename of the template and the data model passed as parameters. The data model is optional. In case of success the engine returns HTML. If a failure occurs while reading, parsing, or rendering the file template it returns an error. At this stage, its work ends.
 
-After the file is found and read, the engine tries to find all files *"_viewStart.raz"* following the [partial views standard search algorithm logic](#partial-view-search-algorithm). If they are found they are added to the current file from its beginning in the order the search sequence (each next found is added to the very beginning of the current file and so on).
+After the file is found and read, the engine tries to find all [starting view files](#) named *"_viewStart.raz"* following the [partial views standard search algorithm logic](#partial-view-search-algorithm). If they are found they are added to the current file from its beginning in the order the search sequence (each next found is added to the very beginning of the current file and so on).
 
 When this process is finished the parser starts analyzing the resulting template. It's worth noting that *the parser doesn't trying to fully analyze the validity of its HTML*. For example, it is not much concerned about mistakes in the attributes of the HTML tags. It only checks the integrity of the HTML tag tree and extracts snippets of the JavaScript control code.
 
@@ -44,6 +44,8 @@ After parsing is done the execution process begins. At this point, the template 
 There are two types of view templates, which can be explicitly referenced from the rendering page template:
 1. Partial view
 2. Layout
+and one that is referenced by default from any page view:
+3. Starting view
 
 > :warning: It's worth emphasizing once again that *only a page template is processed together with starting template* as one whole template (they are joined before being parsed and executed). All other templates are parsed and executed separately, and only then included in each other in the form of ready-made HTML.
 
@@ -104,3 +106,13 @@ Different partial views with the same file name are allowed when the partial vie
 
 Partial views can be chained — a partial view can call another partial view and so on(be careful not to create circular references).
 
+### Starting views (`_viewStart.raz`)
+Starting views named *"_viewStart.raz"* are intended to contain code that needs to run before the code of the main view of the page is executed (not before layouts or partial views). Starting views are hierarchical -  if a `_viewStart.raz` file is defined in the current folder, it will be run after the one defined in the root views folder (if any).
+
+Usually `_viewStart.raz` file is used to specify a layout for a group of views (located in a specific folder or several folders). For example, you can define a `_viewStart.raz` file in a folder with other views with the next code:
+```HTML+Razor
+@{
+    Html.layout = "_layout";
+}
+```
+instead of adding this code in the beginning of each of these views.
