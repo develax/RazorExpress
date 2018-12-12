@@ -9,6 +9,7 @@
   - [Partial views](#partial-views)
     - [Access data from partial views](#access-data-from-partial-views)
   - [Partial view search algorithm](#partial-view-search-algorithm)
+  - [Starting views](#starting-views-_viewstartraz)
 
 ## What is View Tempate and View Template Engine?
 Most likely you already know that the simplest [NodeJS](https://nodejs.org/) web server built with [Express library](https://expressjs.com/) can work without any template engine. Express library can just [serve static files](https://expressjs.com/en/starter/static-files.html) in response to a browser request. It can be any staic file including a file with HTML markup (which is essentially a regular text file). Although this method is still quite often used for simple small websites, it contains a number of disadvantages and is not suitable for more complex websites.
@@ -107,12 +108,12 @@ Different partial views with the same file name are allowed when the partial vie
 Partial views can be chained — a partial view can call another partial view and so on(be careful not to create circular references).
 
 ### Starting views (`_viewStart.raz`)
-Starting views named *"_viewStart.raz"* are intended to contain code that needs to run before the code of the main view of the page is executed (not before layouts or partial views). Starting views are hierarchical -  if a `_viewStart.raz` file is defined in the current folder, it will be run after the one defined in the root views folder (if any).
+Starting views named *"_viewStart.raz"* are intended to contain code that needs to run before the code of the main view of the page is executed (not before layouts or partial views). Starting views are hierarchical -  if a `_viewStart.raz` file is defined in the current view folder, it will be run after the one defined in the root views folder (if any).
 
-Usually `_viewStart.raz` file is used to specify a layout for a group of views (located in a specific folder or several folders). For example, you can define a `_viewStart.raz` file in a folder with other views with the next code:
+Usually, the `_viewStart.raz` file is used to specify a [layout](#layouts) for a group of views (located in a specific folder or several folders). For example, you can define a `_viewStart.raz` file with the next code:
 ```HTML+Razor
 @{
     Html.layout = "_layout";
 }
 ```
-instead of adding this code in the beginning of each of these views.
+in a folder with other views instead of adding this code in the beginning of each of these views.
