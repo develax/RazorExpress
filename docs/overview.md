@@ -6,6 +6,7 @@
     - [The views processing order](#the-views-processing-order)
   - [Layouts](#layouts)
   - [Partial views](#partial-views)
+    - [Passing data to partial views](#passing-data-to-partial-views)
   - [Partial view search algorithm](#partial-view-search-algorithm)
 
 ## What is View Tempate and View Template Engine?
@@ -80,7 +81,14 @@ To reference a partial view from any view use the `Html.partial` method:
 ```HTML+Razor
 @Html.partial("_partial")
 ```
-This method initiates [search](#partial-view-search-algorithm) the `_partial.raz` view file, compiling it into HTML, and then rendering this HTML in where this method is placed.
+This method initiates [search](#partial-view-search-algorithm) the `_partial.raz` view file, compiling it into HTML, and then rendering this HTML in the parent view where this method is placed.
+
+#### Passing data to partial views
+The `Html.partial` method also can take a second parameter through which you can pass the `Model`. 
+```HTML+Razor
+@Html.partial("_partial", { text: "This is an explicit model passing to the partial view." })
+```
+If this argument is omitted the `Model` of the parent view is passed by default implicitly. Also partial views have access to the `ViewData` object as every view template does.
 
 ### Partial view search algorithm
 
