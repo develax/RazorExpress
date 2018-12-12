@@ -2,7 +2,7 @@
 
 - [**What is View and View Template Engine**](#what-is-view-and-view-template-engine)
 - [**Views rendering and Layout system in Razor-Express**](#views-rendering-and-layout-system-in-razor-express)
-  - [Processing a view template](#processing-a-view-template)
+  - [Processing a view](#processing-a-view)
     - [The views processing order](#the-views-processing-order)
   - [Layouts](#layouts)
     - [Access data from a layout](#access-data-from-a-layout)
@@ -20,7 +20,7 @@ With this idea of separation, such terms as *"data"* and *"view"* are usually in
 
 So, when the data is stored separately you need some mechanism that can correctly place it in HTML markup. To do this the HTML file must contain special fields or placeholders that have to be replaced with the appropriate data chunks. This file is usually called a *"view template"*, *"template"*, or just a *"view"*. And the mechanism which looks for the placeholders and fill them out with data chunks is usually called  *"View Template Engine"*. Different engines [have their differences](https://github.com/DevelAx/RazorExpress/blob/master/README.md#a-brief-comparison-of-syntax-of-nodejs-template-engines) but the basic idea is the same. 
 
-The Razor-Express engine is one of [many](https://github.com/expressjs/express/wiki#template-engines) working with Express. Razor-Express uses [Razor-like syntax](https://github.com/DevelAx/RazorExpress/blob/master/docs/syntax.md) based on the [ASP.NET MVC Razor concept](https://docs.microsoft.com/en-us/aspnet/core/mvc/views/razor) which allows you to template views by mixing HTML markup with real server-side JavaScript code.
+Razor-Express engine is one of [many](https://github.com/expressjs/express/wiki#template-engines) working with Express. Razor-Express uses [Razor-like syntax](https://github.com/DevelAx/RazorExpress/blob/master/docs/syntax.md) based on the [ASP.NET MVC Razor concept](https://docs.microsoft.com/en-us/aspnet/core/mvc/views/razor) which allows you to template views by mixing HTML markup with real server-side JavaScript code.
 
 ## Views rendering and Layout system in Razor-Express
 When you have a *NodeJS Express web app* set up (an example is [here](https://github.com/DevelAx/RazorExpress/blob/master/README.md#express-web-server-example)) and run the Express framework starts to use the Razor-Express Engine as a service to read the *view templates* and process them into HTML. This happens as follows:
@@ -33,22 +33,21 @@ When you have a *NodeJS Express web app* set up (an example is [here](https://gi
 
 It is a quite simplified description of the request handling to understand the role of the Razor-Express engine in this process. Now let's take a closer look at what happens in the Razor-Express engine while processing a *view template* and *data model*.
 
-### Processing a view template
-When the Razor-Express gets to control, it also gets the full filename of the template and the data model passed as parameters. The data model is optional. In case of success the engine returns HTML. If a failure occurs while reading, parsing, or rendering the file template it returns an error. At this stage, its work ends.
+### Processing a view
+When Razor-Express gets control, it also gets the full filename of a *view template* file and the *data model* both passed as parameters. The data model is optional though. If the template is successfully processed the engine returns HTML. If a failure occurs while reading, parsing, or rendering the file template it returns an error. In any case at this point, its work is done.  
 
-After the file is found and read, the engine tries to find all [starting view files](#) named *"_viewStart.raz"* following the [partial views standard search algorithm logic](#partial-view-search-algorithm). If they are found they are added to the current file from its beginning in the order the search sequence (each next found is added to the very beginning of the current file and so on).
+After the file is found and read, the engine tries to find all [starting view files](#starting-views-_viewstartraz) named *"_viewStart.raz"* following the [partial views standard search algorithm logic](#partial-view-search-algorithm). If they are found they are added to the current file from its beginning in the order the search sequence (each next found is added to the very beginning of the current file and so on).
 
-When this process is finished the parser starts analyzing the resulting template. It's worth noting that *the parser doesn't trying to fully analyze the validity of its HTML*. For example, it is not much concerned about mistakes in the attributes of the HTML tags. It only checks the integrity of the HTML tag tree and extracts snippets of the JavaScript control code.
+When this process is finished the parser starts analyzing the resulting template. It's worth noting that *the parser doesn't try to fully analyze the validity of its HTML*. For example, it is not much concerned about mistakes in the attributes of the HTML tags. It only checks the integrity of the HTML tags tree and extracts snippets of server-side JavaScript code.
 
-After parsing is done the execution process begins. At this point, the template placeholders are substituted with the appropriate values from the data model and all the server-side JavaScript code found in this template is executed. In this process, the references to other view templates could be found. If so, each referenced template file is read and processed the same way as the main view (with which the engine has started) with the exception that the *"_viewStart.raz"* files are not considered anymore. Each referenced template file is processed separately from the main one and from the others. This means that if you declare a variable in one template it won't be available in any referenced template because each processed file is run in its own scope (and in its own moment). If you need to share some data between those views it is possible to do as will be discussed later. However, the data model is the same for all of them by default (unless it's explicitly set otherwise).
+After parsing is done the execution process begins. At this point, the template placeholders are substituted with the appropriate values from the *data model* and all the server-side JavaScript code found in this template is executed. In this process, the references to other view templates could be found. If so, each referenced template file is read and processed the same way as the main view (with which the engine has started) with the exception that the *"_viewStart.raz"* files are not considered anymore. Each referenced template file is processed separately from the main one and from the others. This means that if you declare a variable in one template it won't be available in any referenced template because each processed file is run in its own scope (and in its own moment). If you need to share some data between those views it is possible to do as will be discussed later. However, the *data model* is the same for all of them by default (unless it's explicitly set otherwise).
 
 There are two types of view templates, which can be explicitly referenced from the rendering page template:
-1. Partial view
-2. Layout
-and one that is referenced by default from any page view:
-3. Starting view
+* [Layout](#layouts)
+* [Partial view]
 
-> :warning: It's worth emphasizing once again that *only a page template is processed together with starting template* as one whole template (they are joined before being parsed and executed). All other templates are parsed and executed separately, and only then included in each other in the form of ready-made HTML.
+and one type of view that is referenced implicitly from any page view:
+* [Starting view](#starting-views-_viewstartraz)
 
 #### The views processing order
 
@@ -89,6 +88,8 @@ To reference a partial view from any view use the `Html.partial` method:
 @Html.partial("_partial")
 ```
 This method initiates [search](#partial-view-search-algorithm) the `_partial.raz` view file, compiling it into HTML, and then rendering this HTML in the parent view where this method is placed.
+
+> :warning: It's worth emphasizing once again that *only a page template is processed together with starting template* as one whole template (they are joined before being parsed and executed). All other templates are parsed and executed separately, and only then included in each other in the form of ready-made HTML.
 
 #### Access data from partial views
 The `Html.partial` method also can take a second parameter through which you can pass the `Model`. 
