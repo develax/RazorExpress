@@ -5,8 +5,9 @@
   - [Processing a view template](#processing-a-view-template)
     - [The views processing order](#the-views-processing-order)
   - [Layouts](#layouts)
+    - [Access data from a layout](#access-data-from-a-layout)
   - [Partial views](#partial-views)
-    - [Passing data to partial views](#passing-data-to-partial-views)
+    - [Access data from partial views](#access-data-from-partial-views)
   - [Partial view search algorithm](#partial-view-search-algorithm)
 
 ## What is View Tempate and View Template Engine?
@@ -70,6 +71,7 @@ The layout file extension is optional in both cases. When a partial name is prov
 
 Each layout is supposed to call `@Html.body()` within itself where the contents of the current view have to be rendered. (As you remember, the page template is processed before the layout template, so this call renderers an already compiled page template.) 
 
+#### Access data from a layout
 A layout has access to the current view `Model` object. It is passed implicitly and there is no way to pass any other object. One possible way to transfer some data to the layout other than the view `Model` is to use the `ViewData` object. 
 
 ### Partial views
@@ -85,7 +87,7 @@ To reference a partial view from any view use the `Html.partial` method:
 ```
 This method initiates [search](#partial-view-search-algorithm) the `_partial.raz` view file, compiling it into HTML, and then rendering this HTML in the parent view where this method is placed.
 
-#### Passing data to partial views
+#### Access data from partial views
 The `Html.partial` method also can take a second parameter through which you can pass the `Model`. 
 ```HTML+Razor
 @Html.partial("_partial", { text: "This is an explicit model passing to the partial view." })
