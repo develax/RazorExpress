@@ -347,8 +347,6 @@ describe("Testing 'Razor' module.", () => {
         });
     });
 
-
-
     function expectError(err, errorViewName, method, errCode) {
         expect(err).to.exist;
         expect(err).to.be.an.instanceOf(RazorError);
