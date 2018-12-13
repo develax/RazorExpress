@@ -1,435 +1,127 @@
-# The overview of Razor-Express View Template Engine
-Let's look quickly at the key concepts and terms.
+# The overview of Razor-Express template engine (RAZ)
 
-- [**What is View Template?**](#what-is-view-template)
-- [**What is View Template Engine?**](#what-is-view-template-engine)
-- [**What is Razor-Express?**](#what-is-razor-express)
-- [**Razor-Express syntax**](#razor-express-syntax-reference-for-nodejs)
-  - [A simple example](#a-simple-example-of-razor-express-markup)
-  - [Escaping `@` character](#escaping--character)
-  - [Expressions](#expressions)
-    - [Expression encoding](#expression-encoding)
-    - [Expression raw-rendering](#expression-raw-rendering)
-  - [Code blocks](#code-blocks)
-    - [Rendering HTML within JavaScript code blocks](#rendering-html-within-javascript-code-blocks)
-  - [Control structures](#control-structures)
-    - [Conditionals @if, else if, else, and @switch](#conditionals-if-else-if-else-and-switch)
-    - [Looping @for, @while, and @do while](#looping-for-while-and-do-while)
-    - [Exception handling: @try, catch, finally](#exception-handling-try-catch-finally)
-    - [Comments](#comments)
-  - [Reserved keywords](#reserved-keywords)
-    - [@section](#section)
+- [**View and View Template Engine**](#views-and-view-template-engine)
+- [**Rendering layout system**](#rendering-layout-system)
+  - [Processing a view](#processing-a-view)
+    - [The order of processing](#the-order-of-processing)
+  - [Layouts](#layouts)
+    - [Access data from a layout](#access-data-from-a-layout)
+  - [Partial views](#partial-views)
+    - [Access data from partial views](#access-data-from-partial-views)
+  - [Partial view search algorithm](#partial-view-search-algorithm)
+  - [Starting views](#starting-views-_viewstartraz)
 
-## What is View Template?
-Building an HTML page assumes that you want to display some data on it (what else could it be?). To perform this task, you need the **data** itself and the **page template** (that defines the rules through a special markup language for displaying the data in HTML format). The page template is usually referred to simply as a **"view"** and the data is referred to as a **"view model"** or just **"model"**. So, this is what is usually called *"view templating"*. This consept is used for separating concerns within a web application (for more details [read this](https://docs.microsoft.com/en-us/aspnet/core/mvc/overview)).
+## Views and View Template Engine
+Most likely you know that the simplest [NodeJS](https://nodejs.org/) web server built with [Express library](https://expressjs.com/) can work without any template engine. Express library can just [serve static files](https://expressjs.com/en/starter/static-files.html) in response to a browser request. It can be any staic file including a file with HTML markup (which is essentially a regular text file). Although this method is still quite often used for simple small websites, it contains a number of disadvantages and is not suitable for more complex websites.
 
-## What is View Template Engine?
-A **template engine** allows you to create HTML pages based on the model data and the view template. In other words the engine can understand the view template markup laguage and it also knows how to apply your model data to it to get the HTML page you need.
+The main disadvantage is that your HTML file stores not only the structure of the document but also some data. When the data is mixed with HTML code you can't easily edit the data if you are not familiar with HTML and if you need to edit HTML you have to wade through tons of text that have nothing to do with HTML itself. This is where the idea of separating *markup* and *data* comes in. 
 
-## What is Razor-Express?
-**Razor-Express** is a view template engine which can understand *Razor-like markup language* syntax. Razor-Express is intended to be used with the [Express library](https://expressjs.com/) but it also can be used with any other library or purpose.
+With this idea of separation, such terms as *"data"* and *"view"* are usually involved. Also, there are another two terms like *"Model-View"* or just *"Model"* which quite often mean the same thing and typically used in the context of [MVC pattern](https://docs.microsoft.com/en-us/aspnet/core/mvc/overview).
 
-> To get more about using template engines with Express read [their guide](https://expressjs.com/en/guide/using-template-engines.html).
+So, when the data is stored separately you need some mechanism that can correctly place it in HTML markup. To do this the HTML file must contain special fields or placeholders that have to be replaced with the appropriate data chunks. This file is usually called a *"view template"*, *"template"*, or just a *"view"*. And the mechanism which looks for the placeholders and fill them out with data chunks is usually called  *"View Template Engine"*. Different engines [have their differences](https://github.com/DevelAx/RazorExpress/blob/master/README.md#a-brief-comparison-of-syntax-of-nodejs-template-engines) but the basic idea is the same. 
 
-## Razor-Express syntax reference for NodeJS
-Razor is a markup syntax for embedding server-based code into webpages based on [ASP.NET Razor syntax](https://docs.microsoft.com/en-us/aspnet/core/mvc/views/razor). Although I tried to make the Razor-Express syntax as close as possible to [ASP.NET Razor](https://docs.microsoft.com/en-us/aspnet/core/mvc/views/razor) there are some differences that need to be taken into account. 
+Razor-Express engine is one of [many](https://github.com/expressjs/express/wiki#template-engines) working with Express. Razor-Express uses [Razor-like syntax](https://github.com/DevelAx/RazorExpress/blob/master/docs/syntax.md) based on the [ASP.NET MVC Razor concept](https://docs.microsoft.com/en-us/aspnet/core/mvc/views/razor) which allows you to template views by mixing HTML markup with real server-side JavaScript code.
 
-Just like the *ASP.NET Razor* syntax, the *Razor-Express* syntax consists of Razor-Express markup, JavaScript, and HTML. Files with Razor markup generally have a `.raz` file extension. In fact, the *Razor-Express markup is a normal HTML markup with optionally embedded JavaScript server-side code* to manage that HTML. [Don't be confused with client-side JavaScript](https://stackoverflow.com/a/1404400/1844247) embedded in HTML which is interpreted by *Razor-Express* as part of HTML markup and runs on the client side (in browsers) while Razor-Express' JavaScript runs on the server (in NodeJs). For example, it doesn't make any sense to write this code for server-side JavaScript:
-```JavaScript
-document.getElementsByTagName("body")[0].innerHTML = "<div>This JavaScript will work only in the browser!</div>"
-```
+## Rendering layout system
+When you have a *NodeJS Express web app* set up ([Express web-server example](https://github.com/DevelAx/RazorExpress/blob/master/README.md#express-web-server-example)) and run the *Express framework* starts to use the *Razor-Express engine* as a service to read *view template* files and process them into HTML. This process includes the following steps:
 
-Since the *Razor-Express* engine must somehow distinguish server-side JavaScript from HTML markup we use the `@` symbol. The `@` just tells the engine's parser that JavaScript server-side code or expression starts after this character. This is the minimum intervention in HTML markup [compared to other existing markup engines](https://github.com/DevelAx/RazorExpress#a-brief-comparison-of-syntax-of-nodejs-layout-engines).
+1. Express app receives a request from the browser.
+2. The Express application analyzes the request URL and finds an appropriate route which determines a file to return in response to the browser request. 
+3. Express makes sure that the file actually exists and then transfers control to the Razor-Express engine. Also Express may pass some *data (or model)* as a parameter to the engine to render it with the *view template* file content.
+4. Razor-Express reads the *view template* file, runs server-side JavaScript incorporated in it, replaces placeholders with data from *model*, and finally renders HTML which is then returned back to Express.
+5. Having control back the Express library sends that HTML to the browser.
 
-### A simple example of Razor-Express markup
-```HTML+Razor
-@{ 
-  var email = "webmaster@example.com";
-  var user = "Webmaster";
-  var subject = "Hello, " + user + "!";
-}
-<a href="mailto:@email?Subject=@subject">Send email to @user</a>
-```
-The rendered HTML by Razor-Express will be:
-```HTML
-<a href="mailto:webmaster@example.com?Subject=Hello, Webmaster!">Send Email Message to the Webmaster</a>
-```
-<sup>[^ try this code](https://runkit.com/develax/razor-hello-webmaster)</sup>
+It is a quite simplified description of the request handling to understand the role of the Razor-Express engine in this process. Now let's take a closer look at what happens in the Razor-Express engine while processing a *view template* and *data model*.
 
-### Escaping `@` character
-**Be careful** when using `@` symbol in HTML attributes and content containing **email addresses** since Razor-Express *does* treat the `@` symbol as a transition character and it will cause an error. To escape an `@` symbol in Razor-Express markup, use double `@@`. For example the next Razor-Express markup won't cause any error:
-```HTML+Razor
-<a href="mailto:webmaster@@example.com">webmaster@@example.com</a>
-```
-<sup>[^ try this code](https://runkit.com/develax/razor-at-escape)</sup>
+### Processing a view
+When Razor-Express gets control, it also gets the full filename of a *view template* file and *data model* both passed as parameters. The *data model* is optional though. If the *template* is successfully processed the engine returns HTML. If a failure occurs while reading, parsing, or rendering the file RAZ returns an error. In any case at this point, its work is done.  
 
+After the file is found and read, the engine tries to find all [starting view files](#starting-views-_viewstartraz) named [*"_viewStart.raz"*](#starting-views-_viewstartraz) following the [partial views standard search algorithm logic](#partial-view-search-algorithm). If they are found they are added to the current file from its beginning in the order the search sequence goes (each next found is added to the very beginning of the current file and so on).
 
-### Expressions
-Razor-Express expressions start with `@` followed by JavaScript code:
-```HTML+Razor
-<p>@Date.now()</p>
-```
-An expression must not contain spaces and if it does contain you have to enclose such an expression in parentheses:
-```HTML+Razor
-<p>@(new Date().toLocaleString()</p>
-```
-<sup>[^ try this code](https://runkit.com/develax/razor-expressions)</sup> 
+When this process is finished the parser starts analyzing that assembled template (if no *"_viewStart.raz"* files are found it contains only the main view template). 
 
-#### Expression encoding
-JavaScript expressions are converted to a string by `.toString` and HTML encoded before they're rendered. 
-The next code:
-```HTML+Razor
-@("<strong>Hello Developer!</strong>")
-```
-renders the following HTML:
-```HTML
-&lt;strong&gt;Hello Developer!&lt;/strong&gt;
-```
-and the browser will show it with tags as:
-```
-<strong>Hello Developer!</strong>
-```
-#### Expression raw-rendering
-If you don't want the expression to be encoded use `Html.raw` method:
-```HTML+Razor
-@Html.raw("<strong>Hello Developer!</strong>")
-```
-It will render the HTML *"as it is"*:
-```HTML
-<strong>Hello Developer!</strong>
-```
-and the browser displays it without tags as just:
-<pre>
-<b>Hello Developer!</b>
-</pre>
-<sup>[^ try this code](https://runkit.com/develax/razor-expression-encoding)</sup> 
+> It's worth noting that the *parser doesn't try to fully analyze the validity of HTML* in a template. For example, it is not much concerned about mistakes in the attributes of HTML tags. *Neither it checks the correctness of JavaScript syntax*, except for the base constructs. It only checks the integrity of the HTML tags tree and extracts snippets of server-side JavaScript code to perform it in the next step. 
 
-> :warning: Using the `Html.raw` method with a user input which might contain malicious JavaScript or other exploits is a **security risk**. Sanitizing user input is not a trivial task, so you'd better avoid using `Html.raw` with user input.
+After parsing is done the execution process begins. At this point, the template placeholders are substituted with the appropriate values from the *data model* and all the server-side JavaScript code found in this template is executed. In this process, the references to other view templates could be found. If so, each referenced template file is read and processed the same way as the main view (with which the engine has started) with the exception that the *"_viewStart.raz"* files are not considered anymore. *Each referenced template file is processed separately from the main one and from the others.* This means that if you declare a variable in one template it won't be available in any referenced template because each processed file is run in its own scope (and in its own moment). If you need to share some data between those views it is possible to do via the `Model` and `ViewData` objects as will be discussed later [^]. However, the *data model* (represented by the `Model` object in views) is the same for all the view (unless it's explicitly set otherwise).
 
-### Code blocks
-*Razor-Express code blocks* start with `@` symbol just like *expressions*. But unlike expressions code blocks are enclosed by `{}` and JavaScript code result inside code blocks isn't rendered (unless you do it explicitly via `Html.render` or other methods). 
+There are two types of view templates, which can be explicitly referenced from the rendering page template:
+* [Layout](#layouts)
+* [Partial view](#partial-views)
 
-Code blocks and expressions share the same scope which is limited to one compiled view template. This means that a normal view and a partial view that is rendered within that view have different scopes. Although a normal view compiled template also includes `_viewStart.raz` templates if they exists. Any section's sope is the scope of its view. That is, any variable value calculated in a code block as well as any other JavaScript language definition is available within that's view scope later in expressions or other code blocks:
+and one type that is referenced implicitly from any page view:
+* [Starting view](#starting-views-_viewstartraz)
 
+#### The order of processing
+
+*The order in which views are processed is important to remember* in case you decide to change some data in the model, for example, in one view and then use it in another. The **main template with all the [*"_viewStart.raz"*](#starting-views-_viewstartraz) views is processed first**, as already mentioned. **Then all partial views are processed** in the order they are referenced and all **[sections](https://github.com/DevelAx/RazorExpress/blob/master/docs/syntax.md#section) are rendered**. **The last step is to find and render layouts**. Actually, it is not different from *ASP.NET MVC Razor* algorithm.
+
+### Layouts
+*Layout* is just a base markup for a group of website pages that have some common elements, such as header, footer, menu, as well as other structures such as scripts, stylesheets, etc. The use of layouts helps to reduce code duplication in views. From the Razor-Express engine's perspective, a layout is just a *normal view template* with the only difference being that the layout defines a top-level template for the other views.  Using the layout is optional. Apps can define more than one layout, with different views specifying different layouts. A layout can have a reference to another layout and so forth, which means that the layouts can be nested (an example can be found in [this repository](https://github.com/DevelAx/RazorExpressFullExample)). Layouts can have references to partial views as well.
+
+Conventionally the default layout is named *"_layout.raz"*. To specify a layout for a view an `Html.layout` property must be set in that view (or in one of its [*"_viewStart.raz"*](#starting-views-_viewstartraz)):
 ```HTML+Razor
 @{
-  var currentYear = new Date().getFullYear();
+    Html.layout = "_layout";
 }
-<div>
-  <!-- These expressions use data from this view's scope. -->
-  The current year is @currentYear.
-</div>
 ```
-
-The browser will show:
-
-<pre>
-The current year is 2018. It is not a leap year.
-</pre>
-<sup>[^ try this code](https://runkit.com/develax/razor-code-blocks)</sup> 
-
-<sub>* *If you want to share some data among all the request rendering views you can do it either through the `Model` (if there is a single model for all of them) or through the `ViewData` objects.*</sub>
-
-
-#### Rendering HTML within JavaScript code blocks
-To render an HTML code within JavaScript code block you can either use implicit transitions or the `Html` object methods.
-
-##### Transitions to HTML
-The default language in a code block is JavaScript, but the Razor-Express engine can transition back to HTML:
-
+You can use either a partial name like in the example above or a full path (relative to the *"views"* folder):
 ```HTML+Razor
 @{
-    var js = "JavaScript";
-    <p>Now in <b>HTML</b>, was in <b>@js</b>.</p>
-    Html.raw("<p>This <b>HTML</b> line is rendered via <b>Html.raw</b> method.</p>");
-    Html.encode("<p>This <b>HTML</b> line is rendered via <b>Html.raw</b> method.</p>");
+    Html.layout = "/admin/_layout";
 }
 ```
-The browser output would be:
-<pre><p>Now in <b>HTML</b>, was in <b>JavaScript</b>.</p>
-<p>This <b>HTML</b> line is rendered via <b>Html.raw</b> method.</p>&lt;p&gt;This &lt;b&gt;HTML&lt;/b&gt; line is rendered via &lt;b&gt;Html.raw&lt;/b&gt; method.&lt;/p&gt;</pre>
-<sup>[^ try this code](https://runkit.com/develax/razor-code-blocks-transitions-to-html)</sup> 
-
-*Notice that in code blocks after the HTML line you continue writing JavaScript without explicit transitioning to it via `@` symbol.*
-
-### Control structures
-Control structures are just an extension of code blocks. All aspects of code blocks also apply to the JavaScript structures: `{}` are required and the `@' symbol is placed only at the beginning of the structure. 
-
-#### Conditionals @if, else if, else, and @switch
-In the next example there are a code block and a control structure:
-
+or relative to the current view directory path:
 ```HTML+Razor
 @{
-  var year = new Date().getFullYear();
-}
-<div>
-  @if (year % 4 == 0 && year % 100 != 0 || year % 400 == 0){
-    <strong>@year is a leap year.</strong>
-  }
-  else{
-    <strong>@year is not a leap year.</strong>
-  }
-</div>
-```
-Rendered HTML:
-```HTML
-<div>
-    <strong>2018 is not a leap year.</strong>
-</div>
-```
-As you can see once you put the `@` character at the beginning of `if` statement, you don't need to repeat it for `else` or `else if`.
-
-The same could be written a little differently:
-```HTML+Razor
-<div>
-  @{
-    var year = new Date().getFullYear();
-    
-    if (year % 4 == 0 && year % 100 != 0 || year % 400 == 0){
-        <strong>@year is a leap year.</strong>
-    }
-    else{
-        <strong>@year is not a leap year.</strong>
-    }
-  }
-</div>
-```
-
-A **switch statement** example:
-```HTML+Razor
-@switch (new Date().getDay()) {
-  case 0:
-    var day = "Sunday";
-    break;
-  case 1:
-    day = "Monday";
-    break;
-  case 2:
-    day = "Tuesday";
-    break;
-  case 3:
-    day = "Wednesday";
-    break;
-  case 4:
-    day = "Thursday";
-    break;
-  case 5:
-    day = "Friday";
-    break;
-  case 6:
-    day = "Saturday";
-}
-<strong>Today is @day</strong>
-```
-<sup>[^ try these code examples](https://runkit.com/develax/razor-conditional-control-structures)</sup>
-
-#### Looping @for, @while, and @do while
-You can use looping control statements to render a templated HTML. In the following examples, we will use different kinds of loops to render a list of countries. 
-
-```JavaScript
-const countries = [
- { name: "Russia", area: 17098242 },
- { name: "Canada", area: 9984670 },
- { name: "United States", area: 9826675 },
- { name: "China", area: 9596960 },
- { name: "Brazil", area: 8514877 },
- { name: "Australia", area: 7741220 },
- { name: "India", area: 3287263 }
-];
-```
-
-##### `@for`
-```HTML+Razor
-<table>
-  <tr>
-    <th>Country</th>
-    <th>Area sq.km</th>
-  </tr>
-  @for(var i = 0; i < countries.length; i++){
-    var country = countries[i];
-    <tr>
-      <td>@country.name</td>
-      <td>@country.area</td>
-    </tr>
-  }
-</table>
-```
-
-##### `@while`
-```HTML+Razor
-<table>
-  <tr>
-    <th>Country</th>
-    <th>Area sq.km</th>
-  </tr>
-  @{ var i = 0; }
-  @while(i < countries.length){
-    var country = countries[i++];
-    <tr>
-      <td>@country.name</td>
-      <td>@country.area</td>
-    </tr>
-  }
-</table>
-```
-
-##### `@do while`
-```HTML+Razor
-@do{
-  var country = countries[i++];
-  <tr>
-    <td>@country.name</td>
-    <td>@country.area</td>
-  </tr>
-}while(i < countries.length)
-```
-<sup>[^ try these code examples](https://runkit.com/develax/razor-looping-structures)</sup>
-
-##### `@Array.prototype.forEach`
-Using `forEach` structure for looping an array is not recommended. An example of using `forEach` with explanations is given in the ["Expressions & code blocks confusion"](https://github.com/DevelAx/RazorExpress/blob/master/README.md#expressions--code-blocks-confusion) section.
-
-
-#### Exception handling: @try, catch, finally
-
-```HTML+Razor
-@try {
-    <div>-------Users Info--------</div>
-    <div>User id: @user.id</div>
-    <div>User name: @user.name</div>
-}
-catch (exc) {
-    <span>Error: @exc</span>
-}
-finally {
-    <div>--------------------------</div>
+    Html.layout = "./_layout";
 }
 ```
-HTML output:
-```HTML
-<div>-------Users Info--------</div>
-<span>Error: @exc</span>
-<div>--------------------------</div>
-```
-<sup>[^ try this example](https://runkit.com/develax/razor-exception-handling)</sup>
+The layout file extension is optional in all these cases. When only the partial name is provided, the Razor-Express view engine searches for the layout file using its standard for [partial views discovery process](#partial-view-search-algorithm).
 
-#### Comments
-In Razor-Express HTML & JavaScript comments are used in the usual way: just use HTML comments for HTML markup and JavaScript comments for JavaScript code.
+Each layout is supposed to call the `@Html.body()` method within itself where the contents of the current view have to be rendered. (As you remember, the page template is processed before the layout template, so this call will renderer an already compiled page HTML.) 
+
+#### Access data from a layout
+A layout has access to the current view `Model` object. It is passed implicitly and there is no way to pass any other object. One possible way to transfer some data to the layout other than the view `Model` is to use the `ViewData` object. 
+
+### Partial views
+The term *"partial view"* clearly implies that HTML received as a result of processing a partial view template will become a part of another view which references it. Partial view can reference other partial views, but it _can't reference a layout_.
+
+Partial views are supposed to be a means to reuse the same code snippets from different views thus avoiding duplication. Also there is another advantage where large, complex markup file can be split into sereveral logical pieces and each one can be isolated within a partial view for easier perception and work with them.
+
+By convention, partial view file names begin with an underscore (`_`). It's not strictly required, although it helps to visually differentiate them from page views.
+
+To reference a partial view from any view use the `Html.partial` method:
+```HTML+Razor
+@Html.partial("_partial")
+```
+This method initiates [search](#partial-view-search-algorithm) the `_partial.raz` view file, compiling it into HTML, and then rendering this HTML in the parent view where this method is placed.
+
+> :warning: It's worth emphasizing once again that *only a page template is processed together with starting template* as one whole template (they are joined before being parsed and executed). All other templates are parsed and executed separately, and only then included in each other in the form of ready-made HTML.
+
+#### Access data from partial views
+The `Html.partial` method also can take a second parameter through which you can pass the `Model`. 
+```HTML+Razor
+@Html.partial("_partial", { text: "This is an explicit model passing to the partial view." })
+```
+If this argument is omitted the `Model` of the parent view is passed by default implicitly. Also partial views have access to the `ViewData` object as every view template does.
+
+### Partial view search algorithm
+
+* If a partial view is specified *only by a file name* with or without an extension (as in the [Partial views section](#partial-views) example above) then the search begins with the directory in which the view that initiates the search is located. If the partial view is not found in the current directory the search goes on up the directory tree until it reaches the root views folder specified in the [Express app](https://expressjs.com/en/guide/using-template-engines.html) (which is set as `app.set('views', './views')` by default). If the file is still not found an error is returned.
+* In the case where the *full path relative to the root views directory* is specified the file will be searched only in this directory. Never include the views root folder name in the full path!
+* To make the search take place *only in the current directory*, use relative to the current directory path format `'./_partialView'`.
+
+Different partial views with the same file name are allowed when the partial views are in different folders.
+
+Partial views can be chained — a partial view can call another partial view and so on(be careful not to create circular references).
+
+### Starting views (`_viewStart.raz`)
+Starting views named *"_viewStart.raz"* are intended to contain code that needs to run before the code of the main view of the page is executed (not before layouts or partial views). Starting views are hierarchical -  if a `_viewStart.raz` file is defined in the current view folder, it will be run after the one defined in the root views folder (if any).
+
+Usually, the `_viewStart.raz` file is used to specify a [layout](#layouts) for a group of views (located in a specific folder or several folders). For example, you can define a `_viewStart.raz` file with the next code:
 ```HTML+Razor
 @{
-    /* JavaScript comment */
-    // Another JavaScript comment
-}
-<!-- HTML comment -->
-```
-The rendered HTML:
-```HTML
-<!-- HTML comment -->
-```
-<sup>[^ try this example](https://runkit.com/develax/razor-comments)</sup>
-
-*The current Razor-Express version doesn't support universal comments for the Razor Razor-Express markup.* So, if you try `@* *@` from ASP.NET MVC Razor it wouldn't work.
-
-
-### Reserved keywords
-
-- `Html`
-- `Model`
-- `@section`
-- `@ViewData`
-
-When an `@` symbol is followed by a *Razor-Express reserved keyword*, it transitions into Razor-specific markup. Otherwise, it transitions into plain JavaScript.
-
-#### `@section`
-Sections are used to organize where certain page elements should be placed within the parent layout or within the same layout. For example, if you want some block of the Razor-Express markup from any rendered view to be placed in a specific place of the layout view, you can define a named section in your view and then define a reference to this section at that specific place of the layout. 
-
-Let's give a markup example:
-
-**`index.raz`** view
-```HTML+Razor
-<link href="/css/site.css" rel="stylesheet" />
-<h1>Home Page</h1>
-```
-
-**`_layout.raz`** layout view
-```HTML+Razor
-<!DOCTYPE html>
-<html>
-<head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-</head>
-<body>
-   @Html.body()
-</body>
-</html>
-```
-
-After this code is compiled you will get the next HTML:
-```HTML
-<!DOCTYPE html>
-<html>
-<head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-</head>
-<body>
-  <link href="/css/site.css" rel="stylesheet" />
-  <h1>Home Page</h1>
-</body>
-</html>
-```
-This may not suit you completely because the link to the `css` file has been placed in the `<body>` but you might want it to be in the `<head>`. That's what the sections are for! To fix it you should define a section in the `index.raz`:
-
-**`index.raz`** view
-```HTML+Razor
-<h1>Home Page</h1>
-@section Styles {
-    <link href="/css/site.css" rel="stylesheet" />
+    Html.layout = "_layout";
 }
 ```
-In this case, the section name is 'Styles'. In fact, you can place the definition of the section anywhere you want within the `index.raz` view since it will be rendered only in the `_layout.raz` layout. For that, you have to reference that section by its name in the `_layout.raz` layout: 
-
-**`_layout.raz`** layout view
-```HTML+Razor
-<!DOCTYPE html>
-<html>
-<head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    @Html.section("Styles")
-</head>
-<body>
-   @Html.body()
-</body>
-</html>
-```
-This time you will get the following HTML:
-
-```HTML
-<!DOCTYPE html>
-<html>
-<head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link href="/css/site.css" rel="stylesheet" />
-</head>
-<body>
-  <h1>Home Page</h1>
-</body>
-</html>
-```
-The css `<link>` is placed in the `<head>` - exactly what you wanted.
-
-Each call to `@Html.section` specifies a section name as the first parameter and whether that section is required or optional as the second one:
-```HTML+Razor
-@Html.section("Scripts", true)
-```
-If a required section isn't found, an exception is thrown. Individual views specify the content to be rendered within a section using the `@section{...}` Razor syntax. If a page or view defines a section, it must be rendered (or an error will occur). An example of `@section` definition:
-```HTML+Razor
-@section Scripts {
-    <script type="text/javascript" src="/scripts/site.js"></script>
-}
-```
-In the preceding code, scripts/site.js is added to the scripts section on a page. Other pages in the same app might not require this script and wouldn't define a scripts section. Sections defined in a page are available in its layout page or parent page for partials views. 
-
-**NOTE:** In *ASP.NET MVC Razor* only the immediate layout page can render a section and they cannot be referenced from partial views. In the current implementation of *Razor-Express* we don't have this limitation. I can't see anything wrong with having some specific script or style in some partial view to be placed in a section. Since partial views can be rendered on a page more than once, each its section is rendered only once. Also, you can have different sections defined in different files (views) with the same name. Then the `@Html.section` method will render all these sections in one specific place. Of course, you should take into account that the order in which the sections will be rendered corresponds to the rendering order of the views, partial views, and layouts. Sections can be defined and rendered even within the same (one) view, in this case the order is also important: definition must go before the reference.
+in a folder with other views instead of adding this code in the beginning of each of these views.

@@ -1,16 +1,17 @@
-# RAZ: Razor-Express View Template Engine
+# RAZ: Razor-Express view template engine
+
+> <pre>$ npm install <b>raz</b> --save</pre>
+
 <sup>* *This is a **draft version** of the manual, although the code itself has already been tested and works. While the documentation is under development, use [this repository](https://github.com/DevelAx/RazorExpressFullExample) for more comprehensive examples.*</sup>
 
 - [**Intro**](#intro)
-  - [A brief comparison of syntax of Node.JS layout engines](#a-brief-comparison-of-syntax-of-nodejs-layout-engines)
+  - [A brief comparison of syntax of Node.JS template engines](#a-brief-comparison-of-syntax-of-nodejs-template-engines)
 - [**Quick Start**](#quick-start)
   - [Node.js example](#nodejs-example)
   - [Express web-server example](#express-web-server-example)
-- [**Overview**](https://github.com/DevelAx/RazorExpress/blob/master/docs/overview.md)
-  - [What is View Template](https://github.com/DevelAx/RazorExpress/blob/master/docs/overview.md#what-is-view-template)
-  - [What is View Template Engine](https://github.com/DevelAx/RazorExpress/blob/master/docs/overview.md#what-is-view-template-engine)
-  - [What is Razor-Express](https://github.com/DevelAx/RazorExpress/blob/master/docs/overview.md#what-is-razor-express)
-  - [Razor-Express syntax](https://github.com/DevelAx/RazorExpress/blob/master/docs/overview.md#razor-express-syntax-reference-for-nodejs)
+- [**The overview of Razor-Express view template engine**](https://github.com/DevelAx/RazorExpress/blob/master/docs/overview.md)
+  - [What is View Template](https://github.com/DevelAx/RazorExpress/blob/master/docs/overview.md#what-is-view-tempate-and-view-template-engine)
+- [**Razor-Express syntax**](https://github.com/DevelAx/RazorExpress/blob/master/docs/syntax.md)
 - [**Razor-Express View API**](#razor-express-view-api)
   - [Analogues of ASP.NET MVC Razor HtmlHelper methods](#analogues-of-aspnet-mvc-razor-htmlhelper-methods)
   - [Examples of usage](#examples-of-usage)
@@ -32,7 +33,7 @@ When I just started to dive into the world of *Node.js* after years of working w
 
 The closest to *Razor* currently supported library for *NodeJs & Express* I could find was [Vash](https://www.npmjs.com/package/vash). But in some points, it was quite different from *ASP.NET MVC Razor* syntax which I was used to and it just looked much less concise and convenient to me (the syntax for rendering layouts and partial blocks, for example). In short, it did not suit me completely and what's more important I couldn't see its current development. 
 
-A brief comparison of syntax of Node.JS layout engines
+A brief comparison of syntax of Node.JS template engines
 ---
 
 I may be exaggerating the merits of *ASP.NET MVC Razor* and maybe it's all just a matter of habit, but let's look at a few examples that I found on the web ([the question on Quora](https://www.quora.com/What-is-the-best-Node-js-template-engine)):
@@ -124,7 +125,7 @@ Given all the mentioned and unmentioned pros and cons, I decided not to part wit
 Quick Start
 ===
 
-Assuming that you are already familiar with the [basic idea](https://github.com/DevelAx/RazorExpress/blob/master/docs/overview.md#the-overview-of-razor-express) let's look at a simple example. 
+Assuming that you are already familiar with the [basic idea](https://github.com/DevelAx/RazorExpress/blob/master/docs/overview.md) let's look at a simple example. 
 
 Our **first component** is a **model**:
 ```js
@@ -144,7 +145,7 @@ which is just a *JavaScript object*. And we want to get some HTML displaying the
 </ul>
 ```
 
-As you can see the **view-template** (or just **view**) is nothing more than *HTML markup mixed with JavaScript syntax*. This is exactly what [Razor-Express syntax](https://github.com/DevelAx/RazorExpress/blob/master/docs/overview.md#razor-express-syntax-reference-for-nodejs) is.
+As you can see the **view-template** (or just **view**) is nothing more than *HTML markup mixed with JavaScript syntax*. This is exactly what [Razor-Express syntax](https://github.com/DevelAx/RazorExpress/blob/master/docs/syntax.md) is.
 
 Now we are going to take these two components and "compile" them into pure HTML.   
 
@@ -199,13 +200,19 @@ That's all! Isn't it simple?
 
 Express web-server example
 ---
-**server.js** file with comments:
+1. [Create a new NodeJS project](https://docs.npmjs.com/creating-a-package-json-file) (set in *server.js* in as an entry point).
+2. Install *Express* & *Razor-Express* libraries:
+> <pre>$ npm install raz --save</pre>
+> <pre>$ npm install express --save</pre>
+3. In the project folder create *"server.js"* file (read js-comments inside):
+
+**server.js** file:
 ```js
 // Create Express web server app.
 const app = require('express')();
 
-// Register 'Razor' template engine and the default extesnion for the view-template files.
-// 'Express' will automatically find the Razor module (within the `node-modules` folder) using this extension. 
+// Register 'Razor-Express' template engine and the default extesnion (raz) for the view-template files.
+// 'Express' will automatically find the Razor-Express module (within the `node-modules` folder) using this extension. 
 // If you decide to skip registering the engine then you will have to explicitly specify the file extension in the route handler.
 app.set('view engine', "raz");
 
@@ -234,8 +241,10 @@ server.on('error', function (e) {
     }
 });
 ```
+4. Create the *"views"* folder. This is the directory defined in Express by default where the template files are located. If you want to use another folder you can change it with `app.set('views', './another-views-folder')` method.
+5. Create a *view-template* file in that folder named *"index.raz"*. It would have pretty much the same content as in the [previous example](#nodejs-example) except we have to add some basic HTML markup. Notice that the *view-template* file has **'.raz'** extension which every Razor-Express *view* file must have.
 
-**index.raz** file is just a *view-template* which is pretty much the same as in the previous example except we have to add some basic HTML markup. We put this file into the *"views"* folder which is a default folder for the Express app. Notice that the file has **'.raz'** extension which every Razor *view* file must have.
+**index.raz** file:
 ```HTML+Razor
 <!DOCTYPE html>
 <html>
@@ -254,7 +263,7 @@ server.on('error', function (e) {
   </body>
 </html>
 ```
-Now you if run the '**node server.js**' command in console (or terminal) and open http://localhost:8080/ URL in your browser you will see the HTML page showing something like this:
+Now you when run the '**node server.js**' command in the console (or terminal) and open http://localhost:8080/ URL in your browser you will see the HTML page showing something like this:
 ___
 > ### Names of the Days of the Week
 > * Sunday
@@ -270,6 +279,10 @@ ____
 
 <sup>* The source code of this example is available in [RazorExpressExample](https://github.com/DevelAx/RazorExpressExample) repository.</sup>
 
+> For a more comprehensive understanding of how the Razor-Express Template Engine works and what Razor-Express syntax is, follow these links:
+> * [The overview of Razor-Express View Template Engine](https://github.com/DevelAx/RazorExpress/blob/master/docs/overview.md)
+> * [Razor-Express syntax reference for NodeJS & Express](https://github.com/DevelAx/RazorExpress/blob/master/docs/syntax.md)
+> * [Using template engines with Express](https://expressjs.com/en/guide/using-template-engines.html)
 
 Razor-Express View API
 ===
@@ -397,7 +410,7 @@ To make this code work you need to *wrap it explicitly in a code block* then it 
 ```
 <sup>^ [run this example](https://runkit.com/develax/razor-array-foreach)</sup>
 
-However, the best way to avoid such ambiguities is to stick to a plain JavaScript syntax style while writing your view templates. See ["Looping @for, @while, and @do while"](https://github.com/DevelAx/RazorExpress/blob/master/docs/overview.md#looping-for-while-and-do-while) section for examples of loop structures. 
+However, the best way to avoid such ambiguities is to stick to a plain JavaScript syntax style while writing your view templates. See ["Looping @for, @while, and @do while"](https://github.com/DevelAx/RazorExpress/blob/master/docs/syntax.md#looping-for-while-and-do-while) section for examples of loop structures. 
 
 Misc
 ===
@@ -406,8 +419,8 @@ TODO list
 What is to be done soon:
 
 1. Finish the documentation for the current version.
-2. Implement [Razor-style `@* *@` comments](https://github.com/DevelAx/RazorExpress/blob/master/docs/overview.md#comments).
-3. Implement the *"_viewEnd.raz"* concept.
-4. Improve debugging info.
-5. Make the library available for use on the client side (in the browser).
-6. Implement caching compiled templates.
+2. Implement [Razor-style `@* *@` comments](https://github.com/DevelAx/RazorExpress/blob/master/docs/syntax.md#comments).
+3. Improve debugging info.
+4. Make the library available for use on the client side (in the browser).
+5. Implement caching compiled templates.
+6. Async partial views.
