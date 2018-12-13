@@ -36,7 +36,7 @@ It is a quite simplified description of the request handling to understand the r
 ### Processing a view
 When Razor-Express gets control, it also gets the full filename of a *view template* file and *data model* both passed as parameters. The *data model* is optional though. If the *template* is successfully processed the engine returns HTML. If a failure occurs while reading, parsing, or rendering the file RAZ returns an error. In any case at this point, its work is done.  
 
-After the file is found and read, the engine tries to find all [starting view files](#starting-views-_viewstartraz) named *"_viewStart.raz"* following the [partial views standard search algorithm logic](#partial-view-search-algorithm). If they are found they are added to the current file from its beginning in the order the search sequence goes (each next found is added to the very beginning of the current file and so on).
+After the file is found and read, the engine tries to find all [starting view files](#starting-views-_viewstartraz) named [*"_viewStart.raz"*](#starting-views-_viewstartraz) following the [partial views standard search algorithm logic](#partial-view-search-algorithm). If they are found they are added to the current file from its beginning in the order the search sequence goes (each next found is added to the very beginning of the current file and so on).
 
 When this process is finished the parser starts analyzing that assembled template (if no *"_viewStart.raz"* files are found it contains only the main view template). 
 
@@ -53,27 +53,32 @@ and one type that is referenced implicitly from any page view:
 
 #### The views processing order
 
-*The order in which views are processed is important to remember* in case you decide to change some data in the model, for example, in one view and then use it in another. The **main template with all the start views are processed first**, as you should already know. **Then the layout** (of that view) **is processed**. Then the layout of that layout (if references any). And only then **all partial views are processed** in the order they are referenced. 
-Actually, it is not different from *ASP.NET MVC Razor* algorithm.
+*The order in which views are processed is important to remember* in case you decide to change some data in the model, for example, in one view and then use it in another. The **main template with all the [*"_viewStart.raz"*](#starting-views-_viewstartraz)) views are processed first**, as already mentioned. **Then all partial views are processed** in the order they are referenced and all **[sections](https://github.com/DevelAx/RazorExpress/blob/master/docs/syntax.md#section) are rendered**. **The last step is to find and render layouts**. Actually, it is not different from *ASP.NET MVC Razor* algorithm.
 
 ### Layouts
-*Layout* is just a base markup for a group of website pages that have some common elements, such as header, footer, menu, as well as other structures such as scripts, stylesheets, etc. The use of layouts helps to reduce code duplication in views. From the *Razor-Express engine* point of view, a layout is just a normal view template with the only difference being that the layout defines a top level template for the other views. Using the layout is optional. Apps can define more than one layout, with different views specifying different layouts. A layout can have a reference to another layout and so forth, which means that the layouts can be nested ([an example](https://github.com/DevelAx/RazorExpressFullExample)). Layouts can have references to partial views as well.
+*Layout* is just a base markup for a group of website pages that have some common elements, such as header, footer, menu, as well as other structures such as scripts, stylesheets, etc. The use of layouts helps to reduce code duplication in views. From the Razor-Express engine's perspective, a layout is just a *normal view template* with the only difference being that the layout defines a top-level template for the other views.  Using the layout is optional. Apps can define more than one layout, with different views specifying different layouts. A layout can have a reference to another layout and so forth, which means that the layouts can be nested (an example can be found in [this repository](https://github.com/DevelAx/RazorExpressFullExample)). Layouts can have references to partial views as well.
 
-Conventionally the default layout is named *"_layout.raz"*. To specify a layout for a view an `Html.layout` property must be set in that view:
+Conventionally the default layout is named *"_layout.raz"*. To specify a layout for a view an `Html.layout` property must be set in that view (or in one of its [*"_viewStart.raz"*](#starting-views-_viewstartraz)):
 ```HTML+Razor
 @{
     Html.layout = "_layout";
 }
 ```
-You can use either a partial name like in the example above or a full path:
+You can use either a partial name like in the example above or a full path (relative to the *"views"* folder):
 ```HTML+Razor
 @{
     Html.layout = "/admin/_layout";
 }
 ```
-The layout file extension is optional in both cases. When a partial name is provided, the Razor-Express view engine searches for the layout file using its standard for [partial views discovery process](#partial-view-search-algorithm).
+or relative to the current view directory path:
+```HTML+Razor
+@{
+    Html.layout = "./_layout";
+}
+```
+The layout file extension is optional in all these cases. When only the partial name is provided, the Razor-Express view engine searches for the layout file using its standard for [partial views discovery process](#partial-view-search-algorithm).
 
-Each layout is supposed to call `@Html.body()` within itself where the contents of the current view have to be rendered. (As you remember, the page template is processed before the layout template, so this call renderers an already compiled page template.) 
+Each layout is supposed to call the `@Html.body()` method within itself where the contents of the current view have to be rendered. (As you remember, the page template is processed before the layout template, so this call will renderer an already compiled page HTML.) 
 
 #### Access data from a layout
 A layout has access to the current view `Model` object. It is passed implicitly and there is no way to pass any other object. One possible way to transfer some data to the layout other than the view `Model` is to use the `ViewData` object. 
