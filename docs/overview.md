@@ -1,7 +1,7 @@
 # The overview of Razor-Express template engine
 
-- [**What is View and View Template Engine**](#what-is-view-and-view-template-engine)
-- [**Views rendering and Layout system in Razor-Express**](#views-rendering-and-layout-system-in-razor-express)
+- [**View and View Template Engine**](#views-and-view-template-engine)
+- [**Rendering layout system**](#rendering-layout-system)
   - [Processing a view](#processing-a-view)
     - [The views processing order](#the-views-processing-order)
   - [Layouts](#layouts)
@@ -11,7 +11,7 @@
   - [Partial view search algorithm](#partial-view-search-algorithm)
   - [Starting views](#starting-views-_viewstartraz)
 
-## What is View and View Template Engine?
+## Views and View Template Engine
 Most likely you know that the simplest [NodeJS](https://nodejs.org/) web server built with [Express library](https://expressjs.com/) can work without any template engine. Express library can just [serve static files](https://expressjs.com/en/starter/static-files.html) in response to a browser request. It can be any staic file including a file with HTML markup (which is essentially a regular text file). Although this method is still quite often used for simple small websites, it contains a number of disadvantages and is not suitable for more complex websites.
 
 The main disadvantage is that your HTML file stores not only the structure of the document but also some data. When the data is mixed with HTML code you can't easily edit the data if you are not familiar with HTML and if you need to edit HTML you have to wade through tons of text that have nothing to do with HTML itself. This is where the idea of separating *markup* and *data* comes in. 
@@ -22,10 +22,10 @@ So, when the data is stored separately you need some mechanism that can correctl
 
 Razor-Express engine is one of [many](https://github.com/expressjs/express/wiki#template-engines) working with Express. Razor-Express uses [Razor-like syntax](https://github.com/DevelAx/RazorExpress/blob/master/docs/syntax.md) based on the [ASP.NET MVC Razor concept](https://docs.microsoft.com/en-us/aspnet/core/mvc/views/razor) which allows you to template views by mixing HTML markup with real server-side JavaScript code.
 
-## Views rendering and Layout system in Razor-Express
-When you have a *NodeJS Express web app* set up (an example is [here](https://github.com/DevelAx/RazorExpress/blob/master/README.md#express-web-server-example)) and run the Express framework starts to use the Razor-Express Engine as a service to read the *view templates* and process them into HTML. This happens as follows:
+## Rendering layout system
+When you have a *NodeJS Express web app* set up ([Express web-server example](https://github.com/DevelAx/RazorExpress/blob/master/README.md#express-web-server-example)) and run the *Express framework* starts to use the *Razor-Express engine* as a service to read *view template* files and process them into HTML. This process includes the following steps:
 
-1. The app receives a request from the browser.
+1. Express app receives a request from the browser.
 2. The Express application analyzes the request URL and finds an appropriate route which determines a file to return in response to the browser request. 
 3. Express makes sure that the file actually exists and then transfers control to the Razor-Express engine. Also Express may pass some data (or model) as a parameter to the engine to render it within that HTML-template file content.
 4. Razor-Express reads this template file, runs server-side JavaScript incorporated in it, replaces placeholders with data, and finally renders HTML which is returned back to Express.
