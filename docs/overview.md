@@ -1,4 +1,4 @@
-# The overview of Razor-Express template engine
+# The overview of Razor-Express template engine (RAZ)
 
 - [**View and View Template Engine**](#views-and-view-template-engine)
 - [**Rendering layout system**](#rendering-layout-system)
@@ -27,18 +27,20 @@ When you have a *NodeJS Express web app* set up ([Express web-server example](ht
 
 1. Express app receives a request from the browser.
 2. The Express application analyzes the request URL and finds an appropriate route which determines a file to return in response to the browser request. 
-3. Express makes sure that the file actually exists and then transfers control to the Razor-Express engine. Also Express may pass some data (or model) as a parameter to the engine to render it within that HTML-template file content.
-4. Razor-Express reads this template file, runs server-side JavaScript incorporated in it, replaces placeholders with data, and finally renders HTML which is returned back to Express.
-5. Having control back the library sends that HTML to the browser.
+3. Express makes sure that the file actually exists and then transfers control to the Razor-Express engine. Also Express may pass some *data (or model)* as a parameter to the engine to render it with the *view template* file content.
+4. Razor-Express reads the *view template* file, runs server-side JavaScript incorporated in it, replaces placeholders with data from *model*, and finally renders HTML which is then returned back to Express.
+5. Having control back the Express library sends that HTML to the browser.
 
 It is a quite simplified description of the request handling to understand the role of the Razor-Express engine in this process. Now let's take a closer look at what happens in the Razor-Express engine while processing a *view template* and *data model*.
 
 ### Processing a view
-When Razor-Express gets control, it also gets the full filename of a *view template* file and the *data model* both passed as parameters. The data model is optional though. If the template is successfully processed the engine returns HTML. If a failure occurs while reading, parsing, or rendering the file template it returns an error. In any case at this point, its work is done.  
+When Razor-Express gets control, it also gets the full filename of a *view template* file and *data model* both passed as parameters. The *data model* is optional though. If the *template* is successfully processed the engine returns HTML. If a failure occurs while reading, parsing, or rendering the file RAZ returns an error. In any case at this point, its work is done.  
 
-After the file is found and read, the engine tries to find all [starting view files](#starting-views-_viewstartraz) named *"_viewStart.raz"* following the [partial views standard search algorithm logic](#partial-view-search-algorithm). If they are found they are added to the current file from its beginning in the order the search sequence (each next found is added to the very beginning of the current file and so on).
+After the file is found and read, the engine tries to find all [starting view files](#starting-views-_viewstartraz) named *"_viewStart.raz"* following the [partial views standard search algorithm logic](#partial-view-search-algorithm). If they are found they are added to the current file from its beginning in the order the search sequence goes (each next found is added to the very beginning of the current file and so on).
 
-When this process is finished the parser starts analyzing the resulting template. It's worth noting that *the parser doesn't try to fully analyze the validity of its HTML*. For example, it is not much concerned about mistakes in the attributes of the HTML tags. It only checks the integrity of the HTML tags tree and extracts snippets of server-side JavaScript code.
+When this process is finished the parser starts analyzing that assembled template (if no *"_viewStart.raz"* files are found it contains only the main view template). 
+
+> It's worth noting that the *parser doesn't try to fully analyze the validity of HTML* in a template. For example, it is not much concerned about mistakes in the attributes of HTML tags. *Neither it checks the correctness of JavaScript syntax*, except for the base constructs. It only checks the integrity of the HTML tags tree and extracts snippets of server-side JavaScript code to perform in the next step. 
 
 After parsing is done the execution process begins. At this point, the template placeholders are substituted with the appropriate values from the *data model* and all the server-side JavaScript code found in this template is executed. In this process, the references to other view templates could be found. If so, each referenced template file is read and processed the same way as the main view (with which the engine has started) with the exception that the *"_viewStart.raz"* files are not considered anymore. Each referenced template file is processed separately from the main one and from the others. This means that if you declare a variable in one template it won't be available in any referenced template because each processed file is run in its own scope (and in its own moment). If you need to share some data between those views it is possible to do via `Model` and `ViewData` objects as will be discussed later. However, the *data model* (represented by the `Model` object within a view) is the same for all of them by default (unless it's explicitly set otherwise).
 
