@@ -3,7 +3,7 @@
 - [**View and View Template Engine**](#views-and-view-template-engine)
 - [**Rendering layout system**](#rendering-layout-system)
   - [Processing a view](#processing-a-view)
-    - [The views processing order](#the-views-processing-order)
+    - [The order of processing](#the-order-of-processing)
   - [Layouts](#layouts)
     - [Access data from a layout](#access-data-from-a-layout)
   - [Partial views](#partial-views)
@@ -51,9 +51,9 @@ There are two types of view templates, which can be explicitly referenced from t
 and one type that is referenced implicitly from any page view:
 * [Starting view](#starting-views-_viewstartraz)
 
-#### The views processing order
+#### The order of processing
 
-*The order in which views are processed is important to remember* in case you decide to change some data in the model, for example, in one view and then use it in another. The **main template with all the [*"_viewStart.raz"*](#starting-views-_viewstartraz)) views are processed first**, as already mentioned. **Then all partial views are processed** in the order they are referenced and all **[sections](https://github.com/DevelAx/RazorExpress/blob/master/docs/syntax.md#section) are rendered**. **The last step is to find and render layouts**. Actually, it is not different from *ASP.NET MVC Razor* algorithm.
+*The order in which views are processed is important to remember* in case you decide to change some data in the model, for example, in one view and then use it in another. The **main template with all the [*"_viewStart.raz"*](#starting-views-_viewstartraz) views is processed first**, as already mentioned. **Then all partial views are processed** in the order they are referenced and all **[sections](https://github.com/DevelAx/RazorExpress/blob/master/docs/syntax.md#section) are rendered**. **The last step is to find and render layouts**. Actually, it is not different from *ASP.NET MVC Razor* algorithm.
 
 ### Layouts
 *Layout* is just a base markup for a group of website pages that have some common elements, such as header, footer, menu, as well as other structures such as scripts, stylesheets, etc. The use of layouts helps to reduce code duplication in views. From the Razor-Express engine's perspective, a layout is just a *normal view template* with the only difference being that the layout defines a top-level template for the other views.  Using the layout is optional. Apps can define more than one layout, with different views specifying different layouts. A layout can have a reference to another layout and so forth, which means that the layouts can be nested (an example can be found in [this repository](https://github.com/DevelAx/RazorExpressFullExample)). Layouts can have references to partial views as well.
