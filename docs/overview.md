@@ -123,18 +123,17 @@ Different partial views with the same file name are allowed when the partial vie
 Partial views can be chained — a partial view can call another partial view and so on (be careful not to create circular references).
 
 ### Starting views (`_viewStart.raz`)
-Starting views named *"_viewStart.raz"* are intended to contain code that needs to run before the code of the main view of the page is executed (not before layouts or partial views). Starting views are hierarchical -  if a `_viewStart.raz` file is defined in the current view folder, it will be run after the one defined in the root views folder (if any).
+Starting views named *"_viewStart.raz"* are intended to contain code that needs to run before the code of the main view of the page is executed. Starting views are hierarchical -  if a `_viewStart.raz` file is defined in the current view folder, it will be run after the one defined in the root views folder (if any).
 
-Usually, the `_viewStart.raz` file is used to specify a [layout](#layouts) for a group of views (located in a specific folder or several folders). For example, you can define a `_viewStart.raz` file with the next code:
+Usually, the `_viewStart.raz` file is used to specify a [layout](#layouts) for a group of views (located in a specific folder or several folders). For example, you can define a `_viewStart.raz` file with the next code in the folder with other views instead of adding this code in the beginning of each of these views.
 ```HTML+Razor
 @{
     Html.layout = "_layout";
 }
 ```
-in a folder with other views instead of adding this code in the beginning of each of these views.
 
 ### The order of processing views
 
-*The order in which views are processed is important to remember* in case you decide to change some data in the model, for example, in one view and then use it in another. The **main template with all the [*"_viewStart.raz"*](#starting-views-_viewstartraz) views is processed first**, as already mentioned. **Then all partial views are processed** in the order they are referenced and all **[sections](https://github.com/DevelAx/RazorExpress/blob/master/docs/syntax.md#section) are rendered**. **The last step is to find and render layouts**. Actually, it is not different from *ASP.NET MVC Razor* algorithm.
+*The order in which views are processed is important to remember* in case you decide to change some data in the model, for example, in one view and then use it in another. The **main view template with all the [*"_viewStart.raz"*](#starting-views-_viewstartraz) views is processed first**, as already mentioned. **Then all the partial views are processed** in the order they are referenced and **all [sections](https://github.com/DevelAx/RazorExpress/blob/master/docs/syntax.md#section) are rendered**. **The last step is to find and render layouts** (with partial views and sections they have references to). Actually, it is not different from *ASP.NET MVC Razor* algorithm.
 
 ![The order of processing views](Razor-Express-view-processing-flow.png)
