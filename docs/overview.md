@@ -3,13 +3,13 @@
 - [**View and View Template Engine**](#views-and-view-template-engine)
 - [**Rendering layout system**](#rendering-layout-system)
   - [Processing a view](#processing-a-view)
-    - [The order of processing](#the-order-of-processing)
   - [Layouts](#layouts)
     - [Access data from a layout](#access-data-from-a-layout)
   - [Partial views](#partial-views)
     - [Access data from partial views](#access-data-from-partial-views)
   - [Partial view search algorithm](#partial-view-search-algorithm)
   - [Starting views](#starting-views-_viewstartraz)
+  - [The order of processing views](#the-order-of-processing-views)
 
 ## Views and View Template Engine
 Most likely you know that the simplest [NodeJS](https://nodejs.org/) web server built with [Express library](https://expressjs.com/) can work without any template engine. Express library can just [serve static files](https://expressjs.com/en/starter/static-files.html) in response to a browser request. It can be any staic file including a file with HTML markup (which is essentially a regular text file). Although this method is still quite often used for simple small websites, it contains a number of disadvantages and is not suitable for more complex websites.
@@ -34,6 +34,7 @@ When you have a *NodeJS Express web app* set up ([Express web-server example](ht
 It is a quite simplified description of the request handling to understand the role of the Razor-Express engine in this process. Now let's take a closer look at what happens in the Razor-Express engine while processing a *view template* and *data model*.
 
 ### Processing a view
+
 When Razor-Express gets control, it also gets the full filename of a *view template* file and *data model* both passed as parameters. The *data model* is optional though. If the *template* is successfully processed the engine returns HTML. If a failure occurs while reading, parsing, or rendering the file RAZ returns an error. In any case at this point, its work is done.  
 
 After the file is found and read, the engine tries to find all [starting view files](#starting-views-_viewstartraz) named [*"_viewStart.raz"*](#starting-views-_viewstartraz) following the [partial views standard search algorithm logic](#partial-view-search-algorithm). If they are found they are added to the current file from its beginning in the order the search sequence goes (each next found is added to the very beginning of the current file and so on).
@@ -51,9 +52,6 @@ There are two types of view templates, which can be explicitly referenced from t
 and one type that is referenced implicitly from any page view:
 * [Starting view](#starting-views-_viewstartraz)
 
-#### The order of processing
-
-*The order in which views are processed is important to remember* in case you decide to change some data in the model, for example, in one view and then use it in another. The **main template with all the [*"_viewStart.raz"*](#starting-views-_viewstartraz) views is processed first**, as already mentioned. **Then all partial views are processed** in the order they are referenced and all **[sections](https://github.com/DevelAx/RazorExpress/blob/master/docs/syntax.md#section) are rendered**. **The last step is to find and render layouts**. Actually, it is not different from *ASP.NET MVC Razor* algorithm.
 
 ### Layouts
 *Layout* is just a base markup for a group of website pages that have some common elements, such as header, footer, menu, as well as other structures such as scripts, stylesheets, etc. The use of layouts helps to reduce code duplication in views. From the Razor-Express engine's perspective, a layout is just a *normal view template* with the only difference being that the layout defines a top-level template for the other views.  Using the layout is optional. Apps can define more than one layout, with different views specifying different layouts. A layout can have a reference to another layout and so forth, which means that the layouts can be nested (an example can be found in [this repository](https://github.com/DevelAx/RazorExpressFullExample)). Layouts can have references to partial views as well.
@@ -78,50 +76,64 @@ or relative to the current view directory path:
 ```
 The layout file extension is optional in all these cases. When only the partial name is provided, the Razor-Express view engine searches for the layout file using its standard for [partial views discovery process](#partial-view-search-algorithm).
 
-Each layout is supposed to call the `@Html.body()` method within itself where the contents of the current view have to be rendered. (As you remember, the page template is processed before the layout template, so this call will renderer an already compiled page HTML.) 
+Each layout is supposed to call the `@Html.body()` method within itself where the contents of the current view have to be rendered. (As you already know, the page template is processed before the layout template, so this call will renderer an already compiled page HTML.) 
 
 #### Access data from a layout
-A layout has access to the current view `Model` object. It is passed implicitly and there is no way to pass any other object. One possible way to transfer some data to the layout other than the view `Model` is to use the `ViewData` object. 
+A layout has access to the current view `Model` object. It is passed implicitly and there is no way to pass any other object as `Model`. One possible way to transfer some data to the layout other than the view `Model` is to use the `ViewData` object. 
 
 ### Partial views
 The term *"partial view"* clearly implies that HTML received as a result of processing a partial view template will become a part of another view which references it. Partial view can reference other partial views, but it _can't reference a layout_.
 
-Partial views are supposed to be a means to reuse the same code snippets from different views thus avoiding duplication. Also there is another advantage where large, complex markup file can be split into sereveral logical pieces and each one can be isolated within a partial view for easier perception and work with them.
+Partial views are supposed to be a means to reuse the same code snippets from different views thus avoiding duplication in them. Also, there is another advantage where large, complex markup file can be split into several logical pieces and each one can be isolated within a partial view for easier perception while working with them separately.
 
-By convention, partial view file names begin with an underscore (`_`). It's not strictly required, although it helps to visually differentiate them from page views.
+By convention, partial view file names begin with an underscore (`_`). It's not strictly required, although it helps to visually differentiate them from the page views.
 
 To reference a partial view from any view use the `Html.partial` method:
 ```HTML+Razor
 @Html.partial("_partial")
 ```
-This method initiates [search](#partial-view-search-algorithm) the `_partial.raz` view file, compiling it into HTML, and then rendering this HTML in the parent view where this method is placed.
+This method initiates [search](#partial-view-search-algorithm) the `_partial.raz` view file, compiling it into HTML, and then rendering this HTML in the parent view where this method is placed. The ways to specify the file path for the partial views are exactly the same as for [layouts](#layouts).
 
-> :warning: It's worth emphasizing once again that *only a page template is processed together with starting template* as one whole template (they are joined before being parsed and executed). All other templates are parsed and executed separately, and only then included in each other in the form of ready-made HTML.
+> :warning: It's worth emphasizing once again that *only the page main view template is processed together with the starting templates* as one whole one (as they are joined before being parsed and executed). All other *view templates* are parsed and executed separately, and only then included in each other in the form of ready-made HTML.
 
 #### Access data from partial views
-The `Html.partial` method also can take a second parameter through which you can pass the `Model`. 
+The `Html.partial` method can also take a second parameter through which you can pass a custom model. 
 ```HTML+Razor
 @Html.partial("_partial", { text: "This is an explicit model passing to the partial view." })
 ```
 If this argument is omitted the `Model` of the parent view is passed by default implicitly. Also partial views have access to the `ViewData` object as every view template does.
 
+### A page components illustration examples
+
+#### A page design layout
+![Page layout example](./PageLayoutExample.png)
+
+
+#### Razor-Express layout components
+![Layout elements example](PartsOfLayoutExample.png)
+
 ### Partial view search algorithm
 
 * If a partial view is specified *only by a file name* with or without an extension (as in the [Partial views section](#partial-views) example above) then the search begins with the directory in which the view that initiates the search is located. If the partial view is not found in the current directory the search goes on up the directory tree until it reaches the root views folder specified in the [Express app](https://expressjs.com/en/guide/using-template-engines.html) (which is set as `app.set('views', './views')` by default). If the file is still not found an error is returned.
-* In the case where the *full path relative to the root views directory* is specified the file will be searched only in this directory. Never include the views root folder name in the full path!
+* In the case where the *full path relative to the root views directory* is specified the file will be searched only in this directory. *Never include the views root folder name in the full path!*
 * To make the search take place *only in the current directory*, use relative to the current directory path format `'./_partialView'`.
 
 Different partial views with the same file name are allowed when the partial views are in different folders.
 
-Partial views can be chained — a partial view can call another partial view and so on(be careful not to create circular references).
+Partial views can be chained — a partial view can call another partial view and so on (be careful not to create circular references).
 
 ### Starting views (`_viewStart.raz`)
-Starting views named *"_viewStart.raz"* are intended to contain code that needs to run before the code of the main view of the page is executed (not before layouts or partial views). Starting views are hierarchical -  if a `_viewStart.raz` file is defined in the current view folder, it will be run after the one defined in the root views folder (if any).
+Starting views named *"_viewStart.raz"* are intended to contain code that needs to run before the code of the main view of the page is executed. Starting views are hierarchical -  if a `_viewStart.raz` file is defined in the current view folder, it will be run after the one defined in the root views folder (if any).
 
-Usually, the `_viewStart.raz` file is used to specify a [layout](#layouts) for a group of views (located in a specific folder or several folders). For example, you can define a `_viewStart.raz` file with the next code:
+Usually, the `_viewStart.raz` file is used to specify a [layout](#layouts) for a group of views (located in a specific folder or several folders). For example, you can define a `_viewStart.raz` file with the next code in the folder with other views instead of adding this code in the beginning of each of these views.
 ```HTML+Razor
 @{
     Html.layout = "_layout";
 }
 ```
-in a folder with other views instead of adding this code in the beginning of each of these views.
+
+### The order of processing views
+
+*The order in which views are processed is important to remember* in case you decide to change some data in the model, for example, in one view and then use it in another. The **main view template with all the [*"_viewStart.raz"*](#starting-views-_viewstartraz) views is processed first**, as already mentioned. **Then all the partial views are processed** in the order they are referenced and **all [sections](https://github.com/DevelAx/RazorExpress/blob/master/docs/syntax.md#section) are rendered**. **The last step is to find and render layouts** (with partial views and sections they have references to). Actually, it is not different from *ASP.NET MVC Razor* algorithm.
+
+![The order of processing views](Razor-Express-view-processing-flow.png)
