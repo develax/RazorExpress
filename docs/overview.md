@@ -10,6 +10,7 @@
   - [Partial view search algorithm](#partial-view-search-algorithm)
   - [Starting views](#starting-views-_viewstartraz)
   - [The order of processing views](#the-order-of-processing-views)
+  - [A page components illustration examples](#a-page-components-illustration-examples)
 
 ## Views and View Template Engine
 Most likely you know that the simplest [NodeJS](https://nodejs.org/) web server built with [Express library](https://expressjs.com/) can work without any template engine. Express library can just [serve static files](https://expressjs.com/en/starter/static-files.html) in response to a browser request. It can be any staic file including a file with HTML markup (which is essentially a regular text file). Although this method is still quite often used for simple small websites, it contains a number of disadvantages and is not suitable for more complex websites.
@@ -103,15 +104,6 @@ The `Html.partial` method can also take a second parameter through which you can
 ```
 If this argument is omitted the `Model` of the parent view is passed by default implicitly. Also partial views have access to the `ViewData` object as every view template does.
 
-### A page components illustration examples
-
-#### A page design layout
-![Page layout example](./PageLayoutExample.png)
-
-
-#### Razor-Express layout components
-![Layout elements example](PartsOfLayoutExample.png)
-
 ### Partial view search algorithm
 
 * If a partial view is specified *only by a file name* with or without an extension (as in the [Partial views section](#partial-views) example above) then the search begins with the directory in which the view that initiates the search is located. If the partial view is not found in the current directory the search goes on up the directory tree until it reaches the root views folder specified in the [Express app](https://expressjs.com/en/guide/using-template-engines.html) (which is set as `app.set('views', './views')` by default). If the file is still not found an error is returned.
@@ -137,3 +129,11 @@ Usually, the `_viewStart.raz` file is used to specify a [layout](#layouts) for a
 *The order in which views are processed is important to remember* in case you decide to change some data in the model, for example, in one view and then use it in another. The **main view template with all the [*"_viewStart.raz"*](#starting-views-_viewstartraz) views is processed first**, as already mentioned. **Then all the partial views are processed** in the order they are referenced and **all [sections](https://github.com/DevelAx/RazorExpress/blob/master/docs/syntax.md#section) are rendered**. **The last step is to find and render layouts** (with partial views and sections they have references to). Actually, it is not different from *ASP.NET MVC Razor* algorithm.
 
 ![The order of processing views](Razor-Express-view-processing-flow.png)
+
+### A page components illustration examples
+
+#### Page design layout
+![Page layout example](./PageLayoutExample.png)
+
+#### Razor-Express layout components
+![Layout elements example](PartsOfLayoutExample.png)
