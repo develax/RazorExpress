@@ -1,5 +1,5 @@
 # The overview of Razor-Express template engine (RAZ)
-
+- [**<< Back to start**](../README.md)
 - [**View and View Template Engine**](#views-and-view-template-engine)
 - [**Rendering layout system**](#rendering-layout-system)
   - [Processing a view](#processing-a-view)
@@ -26,11 +26,10 @@ Razor-Express engine is one of [many](https://github.com/expressjs/express/wiki#
 ## Rendering layout system
 When you have a *NodeJS Express web app* set up ([Express web-server example](https://github.com/DevelAx/RazorExpress/blob/master/README.md#express-web-server-example)) and run the *Express framework* starts to use the *Razor-Express engine* as a service to read *view template* files and process them into HTML. This process includes the following steps:
 
-1. Express app receives a request from the browser.
-2. The Express application analyzes the request URL and finds an appropriate route which determines a file to return in response to the browser request. 
-3. Express makes sure that the file actually exists and then transfers control to the Razor-Express engine. Also Express may pass some *data (or model)* as a parameter to the engine to render it with the *view template* file content.
-4. Razor-Express reads the *view template* file, runs server-side JavaScript incorporated in it, replaces placeholders with data from *model*, and finally renders HTML which is then returned back to Express.
-5. Having control back the Express library sends that HTML to the browser.
+1. Express app receives a request from the browser, analyzes its URL and finds an appropriate route which determines a file to return in response to the browser request. 
+2. Express makes sure that the file actually exists and then transfers control to the Razor-Express engine. Also Express may pass some *data (or model)* as a parameter to the engine to render it with the *view template* file content.
+3. Razor-Express reads the *view template* file, runs server-side JavaScript incorporated in it, replaces placeholders with data from *model*, and finally renders HTML which is then returned back to Express.
+4. Having control back the Express library sends that HTML to the browser.
 
 It is a quite simplified description of the request handling to understand the role of the Razor-Express engine in this process. Now let's take a closer look at what happens in the Razor-Express engine while processing a *view template* and *data model*.
 
