@@ -428,7 +428,7 @@ The following objects are available to server-side JavaScript code in a *view te
 * `ViewData`
 
 ### Model
-The *model* is meant to pass some data from the router<sup>[1](#ref1)</sup> to the view (see [Express web-server example](/README.md#express-web-server-example)). This can be either pure data or data and methods that operate on this data. The *view* depends on the *model*, but the *model* should not have any external dependencies.
+The *model* is meant to pass some data from the router<sup>[1](#ref1)</sup> to the *view* (see [Express web-server example](/README.md#express-web-server-example)) where it is used via Razor-Express syntax to display some data to a user. It can contain either pure data or data and methods that operate on this data. The *view* depends on the *model*, but the *model* should not have any dependencies.
 
 
 --------------------
