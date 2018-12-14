@@ -19,12 +19,12 @@
   - [**@Model**](#model)
   - [**@ViewData**](#viewdata)
   - [**@Html**](#html)
-    - [@Html.layout](#html-layout)
-    - [@Html.body](#html-body)
+    - [@Html.layout](#htmllayout)
+    - [@Html.body](#htmlbody)
     - [@Html.partial](#html-partial)
-    - [@Html.encode](#html-encode)
-    - [@Html.raw](#html-raw)
-    - [@Html.getPartial](#html-getPartial)
+    - [@Html.encode](#htmlencode)
+    - [@Html.raw](#htmlraw)
+    - [@Html.getPartial](#htmlgetPartial)
 
 
 Razor is a markup syntax for embedding server-based code into webpages based on [ASP.NET Razor syntax](https://docs.microsoft.com/en-us/aspnet/core/mvc/views/razor). Although I tried to make the Razor-Express syntax as close as possible to [ASP.NET Razor](https://docs.microsoft.com/en-us/aspnet/core/mvc/views/razor) there are some differences that need to be taken into account. 
@@ -452,16 +452,16 @@ The *model* is meant to pass some data from the router<sup>[1](#ref1)</sup> to t
 * Html.raw
 * Html.getPartial
 
-#### Html.layout
+#### `Html.layout`
 Specifies a *layout* for the *view template*, example:
 ```HTML+Razor
 @{
     Html.layout = "_layout";
 }
 ```
-(also see the ["Layouts"](overview.md#layouts) section).
+<sup>(also see the ["Layouts"](overview.md#layouts) section).</sup>
 
-#### Html.body
+#### `Html.body`
 Renders the contents of the view in the layout.
 ```HTML+Razor
 <!DOCTYPE html>
@@ -474,9 +474,9 @@ Renders the contents of the view in the layout.
 </body>
 </html>
 ```
-(also see the ["Layouts"](overview.md#layouts) section).
+<sup>(also see the ["Layouts"](overview.md#layouts) section)</sup>
 
-#### Html.partial
+#### `Html.partial`
 Renders content of the partial view in a view, layout or another partial view.
 As an expression
 ```HTML+Razor
@@ -488,9 +488,9 @@ or as a code-block:
     Html.partial("_userForm");
 }
 ```
-(also see the ["Partial views"](overview.md#partial-views) section).
+<sup>(also see the ["Partial views"](overview.md#partial-views) section)</sup>
 
-#### Html.encode
+#### `Html.encode`
 HTML encodes values and then renders it in a view.
 ```HTML+Razor
 <div>@Html.encode("<span>Hello World</span>")</div>
@@ -500,16 +500,16 @@ This is equivalent to wrapping the string into [the expression](#expressions):
 <div>@("<span>Hello World</span>")</div>
 ```
 The resulting HTML will be no different from the previous one.
-(also see the ["Expression encoding"](#expression-encoding) section).
+<sup>(also see the ["Expression encoding"](#expression-encoding) section)</sup>
 
-#### Html.raw
+#### `Html.raw`
 Renders a string to HTML without encoding.
 ```HTML+Razor
 <span>@Html.raw("This is an example of <b>bold text</b>.")</span>
 ```
-(also see the ["Raw rendering"](#raw-rendering) section).
+<sup>(also see the ["Raw rendering"](#raw-rendering) section)</sup>
 
-#### Html.getPartial
+#### `Html.getPartial`
 Returns a partial view as a string (not HTML encoded).
 ```HTML+Razor
 @{
@@ -517,7 +517,7 @@ Returns a partial view as a string (not HTML encoded).
 }
 @Html.raw(userFormHtml)
 ```
-(also see the ["Partial views"](overview.md#partial-views) section).
+<sup>(also see the ["Partial views"](overview.md#partial-views) section)</sup>
 
 --------------------
 
