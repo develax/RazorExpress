@@ -542,13 +542,29 @@ els
 <div>JS</div>
 @if (2 > 1) {
     <script type="text/javascript">
-        var longText = "<div>";
+        var text = "<div>";
     </script>
 }`,
             expected: `
 <div>JS</div>
     <script type="text/javascript">
-        var longText = "<div>";
+        var text = "<div>";
+    </script>
+`
+        },
+        {
+            name: "Code 61.1",
+            template: `
+<div>JS</div>
+@if (2 > 1) {
+    <script type="text/javascript">
+        var text = "1\"2\"3";
+    </script>
+}`,
+            expected: `
+<div>JS</div>
+    <script type="text/javascript">
+        var text = "1\"2\"3";
     </script>
 `
         },
@@ -653,7 +669,25 @@ catch (ex) {
 finally 
 <br/>`,
             error: `'{' character is expected after 'finally' at line 9 pos 1.`
-        }
+        },
+        {
+            name: "Code 68",
+            template: `
+@{ 
+    var s = "12'3'45";
+}
+<div>@s</div>`,
+            expected: "\n<div>12&#39;3&#39;45</div>"
+        },
+        {
+            name: "Code 68.1",
+            template: `
+@{ 
+    var s = "1\\"2\\"3";
+}
+<div>@s</div>`,
+            expected: "\n<div>1&quot;2&quot;3</div>"
+        },
     ];
     module.exports = cases;
 })();// 
