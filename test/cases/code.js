@@ -180,7 +180,7 @@
 @{
     <span>X<span/>
 }`,
-            error: "'<span>' tag at line 3 pos 5 is missing mathing end tag."
+            error: "'<span>' tag at line 3 pos 5 is missing matching end tag."
         },
         {
             name: "Code 21",
@@ -196,7 +196,7 @@
 @{
     <span>X</div>
 }`,
-            error: "'</div>' tag at line 3 pos 12 is missing mathing start tag."
+            error: "'</div>' tag at line 3 pos 12 is missing matching start tag."
         },
         {
             name: "Code 23",
@@ -262,7 +262,7 @@
 @{
     <span>< /span>
 }`,
-            error: `'<span>' tag at line 3 pos 5 is missing mathing end tag.`
+            error: `'<span>' tag at line 3 pos 5 is missing matching end tag.`
         },
         {
             name: "Code 31.1",
@@ -270,7 +270,7 @@
 @{
     <span>< span>
 }`,
-            error: `'<span>' tag at line 3 pos 5 is missing mathing end tag.`
+            error: `'<span>' tag at line 3 pos 5 is missing matching end tag.`
         },
         {
             name: "Code 32",
@@ -425,7 +425,7 @@
     </div>
 }
 `,
-            error: `'<div style="background-color: yellow">' tag at line 3 pos 5 is missing mathing end tag.`
+            error: `'<div style="background-color: yellow">' tag at line 3 pos 5 is missing matching end tag.`
         },
         {
             name: "Code 53",

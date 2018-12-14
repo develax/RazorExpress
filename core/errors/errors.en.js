@@ -62,12 +62,12 @@ class ParserErrorFactory {
     // }
 
     missingMatchingStartTag(tag, line, pos) {
-        var message = `'${tag}' tag at line ${line + 1} pos ${pos + 1} is missing mathing start tag.`;
+        var message = `'${tag}' tag at line ${line + 1} pos ${pos + 1} is missing matching start tag.`;
         return RazorError.new({ message, info: this.info, line, pos, len: tag.length, capture: this.missingMatchingStartTag });
     }
 
     missingMatchingEndTag(tag, line, pos) {
-        var message = `'${tag}' tag at line ${line + 1} pos ${pos + 1} is missing mathing end tag.`;
+        var message = `'${tag}' tag at line ${line + 1} pos ${pos + 1} is missing matching end tag.`;
         return RazorError.new({ message, info: this.info, line, pos, len: tag.length, capture: this.missingMatchingEndTag });
     }
 
