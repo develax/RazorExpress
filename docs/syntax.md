@@ -459,7 +459,8 @@ Specifies a *layout* for the *view template*, example:
     Html.layout = "_layout";
 }
 ```
-<sup>(also see the ["Layouts"](overview.md#layouts) section).</sup>
+
+<sup>* also see the ["Layouts"](overview.md#layouts) section</sup>
 
 #### `Html.body`
 Renders the contents of the view in the layout.
@@ -474,7 +475,8 @@ Renders the contents of the view in the layout.
 </body>
 </html>
 ```
-<sup>(also see the ["Layouts"](overview.md#layouts) section)</sup>
+
+<sup>* also see the ["Layouts"](overview.md#layouts) section</sup>
 
 #### `Html.partial`
 Renders content of the partial view in a view, layout or another partial view.
@@ -488,7 +490,8 @@ or as a code-block:
     Html.partial("_userForm");
 }
 ```
-<sup>(also see the ["Partial views"](overview.md#partial-views) section)</sup>
+
+<sup>* also see the ["Partial views"](overview.md#partial-views) section</sup>
 
 #### `Html.encode`
 HTML encodes values and then renders it in a view.
@@ -500,14 +503,15 @@ This is equivalent to wrapping the string into [the expression](#expressions):
 <div>@("<span>Hello World</span>")</div>
 ```
 The resulting HTML will be no different from the previous one.
-<sup>(also see the ["Expression encoding"](#expression-encoding) section)</sup>
+
+<sup>* also see the ["Expression encoding"](#expression-encoding) section</sup>
 
 #### `Html.raw`
 Renders a string to HTML without encoding.
 ```HTML+Razor
 <span>@Html.raw("This is an example of <b>bold text</b>.")</span>
 ```
-<sup>(also see the ["Raw rendering"](#raw-rendering) section)</sup>
+<sup>* also see the ["Raw rendering"](#raw-rendering) section</sup>
 
 #### `Html.getPartial`
 Returns a partial view as a string (not HTML encoded).
@@ -517,7 +521,8 @@ Returns a partial view as a string (not HTML encoded).
 }
 @Html.raw(userFormHtml)
 ```
-<sup>(also see the ["Partial views"](overview.md#partial-views) section)</sup>
+
+<sup>* also see the ["Partial views"](overview.md#partial-views) section</sup>
 
 --------------------
 
