@@ -1,5 +1,5 @@
 # The overview of Razor-Express template engine (RAZ)
-- [**<< Back to start**](../README.md)
+[**<< Back to start**](../README.md)
 - [**View and View Template Engine**](#views-and-view-template-engine)
 - [**Rendering layout system**](#rendering-layout-system)
   - [Processing a view](#processing-a-view)
