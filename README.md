@@ -10,11 +10,20 @@
   - [Node.js example](#nodejs-example)
   - [Express web-server example](#express-web-server-example)
 - [**The overview of Razor-Express view template engine**](https://github.com/DevelAx/RazorExpress/blob/master/docs/overview.md)
-  - [What is View Template](https://github.com/DevelAx/RazorExpress/blob/master/docs/overview.md#what-is-view-tempate-and-view-template-engine)
+  - [Views and View Template Engine](https://github.com/DevelAx/RazorExpress/blob/master/docs/overview.md#views-and-view-template-engine)
+  - [Rendering layout system](https://github.com/DevelAx/RazorExpress/blob/master/docs/overview.md#rendering-layout-system)
 - [**Razor-Express syntax**](https://github.com/DevelAx/RazorExpress/blob/master/docs/syntax.md)
-- [**Razor-Express View API**](#razor-express-view-api)
-  - [Analogues of ASP.NET MVC Razor HtmlHelper methods](#analogues-of-aspnet-mvc-razor-htmlhelper-methods)
-  - [Examples of usage](#examples-of-usage)
+  - [A simple example](https://github.com/DevelAx/RazorExpress/blob/master/docs/syntax.md#a-simple-example-of-razor-express-markup)
+  - [Escaping @ character](https://github.com/DevelAx/RazorExpress/blob/master/docs/syntax.md#escaping--character)
+  - [Expressions](https://github.com/DevelAx/RazorExpress/blob/master/docs/syntax.md#expressions)
+  - [Code blocks](https://github.com/DevelAx/RazorExpress/blob/master/docs/syntax.md#code-blocks)
+  - [Control structures](https://github.com/DevelAx/RazorExpress/blob/master/docs/syntax.md#control-structures)
+  - [Reserved keywords](https://github.com/DevelAx/RazorExpress/blob/master/docs/syntax.md#reserved-keywords)
+    - [@section](https://github.com/DevelAx/RazorExpress/blob/master/docs/syntax.md#section)
+  - [Reserved View objects]()
+    - [@Model](https://github.com/DevelAx/RazorExpress/blob/master/docs/syntax.md#view-objects)
+    - [@ViewData](https://github.com/DevelAx/RazorExpress/blob/master/docs/syntax.md#viewdata)
+    - [@Html](https://github.com/DevelAx/RazorExpress/blob/master/docs/syntax.md#html)
 - [**Common pitfalls & remarks**](#warning-common-pitfalls)
   - [Missing semicolon](#missing-semicolon)
   - [Expressions & code blocks confusion](#expressions--code-blocks-confusion)
@@ -280,70 +289,10 @@ ____
 <sup>* The source code of this example is available in [RazorExpressExample](https://github.com/DevelAx/RazorExpressExample) repository.</sup>
 
 > For a more comprehensive understanding of how the Razor-Express Template Engine works and what Razor-Express syntax is, follow these links:
-> * [The overview of Razor-Express View Template Engine](https://github.com/DevelAx/RazorExpress/blob/master/docs/overview.md)
+> * [The overview of Razor-Express template engine](https://github.com/DevelAx/RazorExpress/blob/master/docs/overview.md)
 > * [Razor-Express syntax reference for NodeJS & Express](https://github.com/DevelAx/RazorExpress/blob/master/docs/syntax.md)
 > * [Using template engines with Express](https://expressjs.com/en/guide/using-template-engines.html)
 
-Razor-Express View API
-===
-Analogues of ASP.NET MVC Razor HtmlHelper methods
----
-
-Razor-Express methods | ASP.NET MVC methods | use
------------- | ------------- |-------------
-Html.layout | Layout | specifies a layout
-Html.body | RenderBody | renders the contents of the view
-Html.partial |  Html.RenderPartial & Html.Partial | renders the content of the partial view
-Html.raw | Html.Raw | renders a string without encoding
-Html.getPartial | -- | returns a partial view as a string (not encoded)
-Html.getEncoded | -- | returns an encoded string
-
-
-### Examples of usage
-#### @Html.layout
-```HTML+RAZOR
-@{
-    Html.layout = "_layout";
-}
-```
-#### @Html.body
-```HTML+RAZOR
-<!DOCTYPE html>
-<html>
-<head>...</head>
-<body>
-  ...
-  @Html.body()
-  ...
-</body>
-</html>
-```
-#### @Html.partial
-```HTML+RAZOR
-<div>
-  @Html.partial("_userForm")
-</div>
-```
-or
-```HTML+RAZOR
-@if(Model.showUserForm){
-    Html.partial("_userForm");
-}
-```
-#### @Html.getPartial
-```HTML+RAZOR
-@{
-  var userFormHtml = (Model.showUserForm) ? Html.getPartial("_userForm") : null;
-}
-@Html.raw(userFormHtml)
-```
-#### @Html.raw
-```HTML+RAZOR
-@{
-  var boldText = "This is an example of <b>bold text</b>.";
-}
-<span>@Html.raw(boldText)</span>
-```
 
 :warning: Common pitfalls
 ===
