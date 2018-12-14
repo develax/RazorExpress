@@ -5,7 +5,7 @@
 - [**Escaping `@` character**](#escaping--character)
 - [**Expressions**](#expressions)
   - [Expression encoding](#expression-encoding)
-  - [Expression raw-rendering](#expression-raw-rendering)
+  - [Raw-rendering](#raw-rendering)
 - [**Code blocks**](#code-blocks)
   - [Rendering HTML within JavaScript code blocks](#rendering-html-within-javascript-code-blocks)
 - [**Control structures**](#control-structures)
@@ -16,6 +16,9 @@
 - [**Reserved keywords**](#reserved-keywords)
   - [@section](#section)
 - [**View objects**](#view-objects)
+  - [@Model](#model)
+  - [@ViewData](#viewdata)
+  - [@Html](#html)
 
 Razor is a markup syntax for embedding server-based code into webpages based on [ASP.NET Razor syntax](https://docs.microsoft.com/en-us/aspnet/core/mvc/views/razor). Although I tried to make the Razor-Express syntax as close as possible to [ASP.NET Razor](https://docs.microsoft.com/en-us/aspnet/core/mvc/views/razor) there are some differences that need to be taken into account. 
 
@@ -74,7 +77,7 @@ and the browser will show it with tags as:
 ```
 <strong>Hello Developer!</strong>
 ```
-### Expression raw-rendering
+### Raw-rendering
 If you don't want the expression to be encoded use `Html.raw` method:
 ```HTML+Razor
 @Html.raw("<strong>Hello Developer!</strong>")
@@ -424,12 +427,91 @@ In the preceding code, *"/scripts/site.js"* is added to the scripts section on a
 ## View objects
 The following objects are available to server-side JavaScript code in a *view template*:
 * `Model`
-* `Html`
 * `ViewData`
+* `Html`
 
-### Model
-The *model* is meant to pass some data from the router<sup>[1](#ref1)</sup> to the *view* (see [Express web-server example](/README.md#express-web-server-example)) where it is used via Razor-Express syntax to display some data to a user. It can contain either pure data or data and methods that operate on this data. The *view* depends on the *model*, but the *model* should not have any dependencies.
+### @Model
+The *model* is meant to pass some data from the router<sup>[1](#ref1)</sup> to the *view* (see [Express web-server example](/README.md#express-web-server-example)) where it is represented by the `Model` object and used via Razor-Express syntax to display some data to a user. It can contain either pure data or data and methods that operate on this data. The *view* depends on the *model*, but the *model* should not have any dependencies.
 
+### @ViewData
+*ViewData* is the object to which all the *view templates* involved in the building the page have access to. One view can pass some data through this object to another view (to the layout, for example) taking into account [the order of processing views](overview.md#the-order-of-processing-views).
+
+### @Html
+`Html` object provides several methods and propertis for compiling the page rendering HTML which are used within its *view template*:
+* Html.layout
+* Html.body
+* Html.partial
+* Html.encode
+* Html.raw
+* Html.getPartial
+* Html.getEncoded
+
+#### Html.layout
+Specifies a *layout* for the *view template*, example:
+```HTML+Razor
+@{
+    Html.layout = "_layout";
+}
+```
+(also see the ["Layouts"](overview.md#layouts) section).
+
+#### Html.body
+Renders the contents of the view in the layout.
+```HTML+Razor
+<!DOCTYPE html>
+<html>
+<head>...</head>
+<body>
+  ...
+  @Html.body()
+  ...
+</body>
+</html>
+```
+(also see the ["Layouts"](overview.md#layouts) section).
+
+#### Html.partial
+Renders content of the partial view in a view, layout or another partial view.
+As an expression
+```HTML+Razor
+<div>@Html.partial("_userForm")</div>
+```
+or as a code-block:
+```HTML+Razor
+@if(Model.showUserForm){
+    Html.partial("_userForm");
+}
+```
+(also see the ["Partial views"](overview.md#partial-views) section).
+
+#### Html.encode
+HTML encodes values and then renders it in a view.
+```HTML+Razor
+<div>@Html.encode("<span>Hello World</span>")</div>
+```
+This is equivalent to wrapping the string into [the expression](#expressions):
+```HTML+Razor
+<div>@("<span>Hello World</span>")</div>
+```
+The resulting HTML will be no different from the previous one.
+(also see the ["Expression encoding"](#expression-encoding) section).
+
+#### Html.raw
+Renders a string to HTML without encoding.
+```HTML+Razor
+<span>@Html.raw("This is an example of <b>bold text</b>.")</span>
+```
+(also see the ["Raw rendering"](#raw-rendering) section).
+
+#### Html.getPartial
+Returns a partial view as a string (not HTML encoded).
+```HTML+Razor
+@{
+  var userFormHtml = (Model.showUserForm) ? Html.getPartial("_userForm") : null;
+}
+@Html.raw(userFormHtml)
+```
+(also see the ["Partial views"](overview.md#partial-views) section).
 
 --------------------
 
