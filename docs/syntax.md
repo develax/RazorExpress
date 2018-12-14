@@ -1,4 +1,6 @@
 # Razor-Express syntax reference for NodeJS & Express
+
+[<< Back to start](../README.md)
 - [**A simple example**](#a-simple-example-of-razor-express-markup)
 - [**Escaping `@` character**](#escaping--character)
 - [**Expressions**](#expressions)
@@ -13,6 +15,7 @@
   - [Comments](#comments)
 - [**Reserved keywords**](#reserved-keywords)
   - [@section](#section)
+- [**View objects**](#view-objects)
 
 Razor is a markup syntax for embedding server-based code into webpages based on [ASP.NET Razor syntax](https://docs.microsoft.com/en-us/aspnet/core/mvc/views/razor). Although I tried to make the Razor-Express syntax as close as possible to [ASP.NET Razor](https://docs.microsoft.com/en-us/aspnet/core/mvc/views/razor) there are some differences that need to be taken into account. 
 
@@ -418,4 +421,19 @@ In the preceding code, *"/scripts/site.js"* is added to the scripts section on a
 
 **NOTE:** In *ASP.NET MVC Razor* only the immediate layout page can render a section and they cannot be referenced from partial views. In the current implementation of *Razor-Express* we don't have this limitation. I can't see anything wrong with having some specific script or style in some partial view to be placed in a section. Since partial views can be rendered on a page more than once, each its section is rendered only once. Also, you can have different sections defined in different files (views) with the same name. Then the `@Html.section` method will render all these sections in one specific place. Of course, you should take into account that the order in which the sections will be rendered corresponds to the rendering order of the views, partial views, and layouts. Sections can be defined and rendered even within the same (one) view, in this case the order is also important: definition must go before the reference.
 
+## View objects
+The following objects are available to server-side JavaScript code in a *view template*:
+* `Model`
+* `Html`
+* `ViewData`
 
+### Model
+The model is meant to pass some data from the router<sup>[1](#ref1)</sup> to the view. This can be either pure data or data and methods that operate on this data. 
+
+
+--------------------
+
+<sub>
+<a name="ref1"></a> 
+1. In ASP.NET it's called MVC controller.
+</sub>
