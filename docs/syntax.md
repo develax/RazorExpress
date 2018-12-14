@@ -16,9 +16,16 @@
 - [**Reserved keywords**](#reserved-keywords)
   - [@section](#section)
 - [**View objects**](#view-objects)
-  - [@Model](#model)
-  - [@ViewData](#viewdata)
-  - [@Html](#html)
+  - [**@Model**](#model)
+  - [**@ViewData**](#viewdata)
+  - [**@Html**](#html)
+    - [@Html.layout](#html-layout)
+    - [@Html.body](#html-body)
+    - [@Html.partial](#html-partial)
+    - [@Html.encode](#html-encode)
+    - [@Html.raw](#html-raw)
+    - [@Html.getPartial](#html-getPartial)
+
 
 Razor is a markup syntax for embedding server-based code into webpages based on [ASP.NET Razor syntax](https://docs.microsoft.com/en-us/aspnet/core/mvc/views/razor). Although I tried to make the Razor-Express syntax as close as possible to [ASP.NET Razor](https://docs.microsoft.com/en-us/aspnet/core/mvc/views/razor) there are some differences that need to be taken into account. 
 
@@ -444,7 +451,6 @@ The *model* is meant to pass some data from the router<sup>[1](#ref1)</sup> to t
 * Html.encode
 * Html.raw
 * Html.getPartial
-* Html.getEncoded
 
 #### Html.layout
 Specifies a *layout* for the *view template*, example:
