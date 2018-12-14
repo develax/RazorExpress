@@ -428,12 +428,12 @@ The following objects are available to server-side JavaScript code in a *view te
 * `ViewData`
 
 ### Model
-The model is meant to pass some data from the router<sup>[1](#ref1)</sup> to the view. This can be either pure data or data and methods that operate on this data. 
+The *model* is meant to pass some data from the router<sup>[1](#ref1)</sup> to the view (see [Express web-server example](/readme.md#express-web-server-example)). This can be either pure data or data and methods that operate on this data. The *view* depends on the *model*, but the *model* should not have any external dependencies.
 
 
 --------------------
 
 <sub>
 <a name="ref1"></a> 
-1. In ASP.NET it's called MVC controller.
+1. ASP.NET MVC uses the concept of *"Controller" what is virtually the same as "Router" in Express.
 </sub>
