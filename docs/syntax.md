@@ -537,7 +537,9 @@ Returns a partial view as a string (not HTML encoded).
 ## More examples of Razor-Express syntax
 
 ### Functions
-Let's take [this example](#conditionals-if-else-if-else-and-switch) and modify it so that the calculations are performed in a separate function:
+Let's take [this example](#conditionals-if-else-if-else-and-switch) and modify it so that the calculations are performed in a separate function.
+
+#### A function declaration as a code-block
 ```HTML+Razor
 @function isLeapYear(year){
   return year % 4 == 0 && year % 100 != 0 || year % 400 == 0;
@@ -568,7 +570,7 @@ or the same example slightly modified:
   @Html.raw(html);
 </div>
 ```
-and the same example with a function returning 'raw-string'.
+#### A function rendering raw content
 ```HTML+Razor
 @function isLeapYear(year) {
   return year % 4 == 0 && year % 100 != 0 || year % 400 == 0;
@@ -586,4 +588,4 @@ The result for all these examples will be:
 <pre>
 2018 <strong>is not</strong> a leap year
 </pre>
-<sup>[^ try this example](https://runkit.com/develax/razor-function)</sup>
+<sup>[^ try these examples](https://runkit.com/develax/razor-function)</sup>
