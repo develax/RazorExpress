@@ -14,7 +14,7 @@
   - [Exception handling: `@try`, `catch`, `finally`](#exception-handling-try-catch-finally)
   - [Comments](#comments)
 - [**Functions**](#functions)
-  - [A standalone function declaration](#comments)
+  - [A standalone function declaration](#a-standalone-function-declaration)
   - [A function rendering raw content](#a-function-rendering-raw-content)
   - [Transitions to HTML in a function](#transitions-to-html-in-a-function)
 - [**Reserved keywords**](#reserved-keywords)
