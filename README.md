@@ -14,7 +14,7 @@
   - [Rendering layout system](https://github.com/DevelAx/RazorExpress/blob/master/docs/overview.md#rendering-layout-system)
 - [**Razor-Express syntax**](https://github.com/DevelAx/RazorExpress/blob/master/docs/syntax.md)
   - [A simple example](https://github.com/DevelAx/RazorExpress/blob/master/docs/syntax.md#a-simple-example-of-razor-express-markup)
-  - [Escaping `@ character](https://github.com/DevelAx/RazorExpress/blob/master/docs/syntax.md#escaping--character)
+  - [Escaping `@` character](https://github.com/DevelAx/RazorExpress/blob/master/docs/syntax.md#escaping--character)
   - [Expressions](https://github.com/DevelAx/RazorExpress/blob/master/docs/syntax.md#expressions)
   - [Code blocks](https://github.com/DevelAx/RazorExpress/blob/master/docs/syntax.md#code-blocks)
   - [Control structures](https://github.com/DevelAx/RazorExpress/blob/master/docs/syntax.md#control-structures)
