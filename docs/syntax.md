@@ -190,7 +190,7 @@ The same could be written a little differently:
 </div>
 ```
 
-A **switch statement** example:
+A `switch` statement example:
 ```HTML+Razor
 @switch (new Date().getDay()) {
   case 0:
