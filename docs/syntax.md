@@ -21,11 +21,12 @@
   - [`@Html`](#html)
     - [@Html.layout](#htmllayout)
     - [@Html.body](#htmlbody)
-    - [@Html.partial](#html-partial)
+    - [@Html.partial](#htmlpartial)
     - [@Html.encode](#htmlencode)
     - [@Html.raw](#htmlraw)
     - [@Html.getPartial](#htmlgetPartial)
-
+- [**More examples of Razor-Express syntax**](#more-examples-of-razor-express-syntax)
+  - [Functions](#functions)
 
 Razor is a markup syntax for embedding server-based code into webpages based on [ASP.NET Razor syntax](https://docs.microsoft.com/en-us/aspnet/core/mvc/views/razor). Although I tried to make the Razor-Express syntax as close as possible to [ASP.NET Razor](https://docs.microsoft.com/en-us/aspnet/core/mvc/views/razor) there are some differences that need to be taken into account. 
 
@@ -99,7 +100,9 @@ and the browser displays it without tags as just:
 </pre>
 <sup>[^ try this code](https://runkit.com/develax/razor-expression-encoding)</sup> 
 
-> :warning: Using the `Html.raw` method with a user input which might contain malicious JavaScript or other exploits is a **security risk**. Sanitizing user input is not a trivial task, so you'd better avoid using `Html.raw` with user input.
+> :warning: **Security risk** Using the `Html.raw` method with a user input which might contain malicious JavaScript or other exploits is not safe. Sanitizing user input is not a trivial task, so you'd better avoid using `Html.raw` with user input.
+
+It's alsow possible to render *raw text* directly to the HTML in your own functions with Razor-Express syntax (see the 3rd example in the [Functions](#functions) section).
 
 ## Code blocks
 *Razor-Express code blocks* start with `@` symbol just like *expressions*. But unlike expressions code blocks are enclosed by `{}` and JavaScript code result inside code blocks isn't rendered (unless you do it explicitly via `Html.render` or other methods). 
@@ -570,13 +573,13 @@ and the same example with a function returning 'raw-string'.
 @function isLeapYear(year) {
   return year % 4 == 0 && year % 100 != 0 || year % 400 == 0;
 }
-@function rawYearInfo() {
+@function renderYearInfo() {
     var year = new Date().getFullYear();
     var html = \`<span>\${year} <strong>\${isLeapYear(year) ? "is" : "is not"}</strong> a leap year</span>\`;
-    return Html.raw(html);
+    Html.raw(html);
 }
 <div>
-  @rawYearInfo()
+  @renderYearInfo()
 </div>
 ```
 The result for all these examples will be:
