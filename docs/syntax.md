@@ -552,7 +552,34 @@ Let's take [this example](#conditionals-if-else-if-else-and-switch) and modify i
   }
 </div>
 ```
-Result:
+or the same example slightly modified:
+```HTML+Razor
+@function isLeapYear(year){
+  return year % 4 == 0 && year % 100 != 0 || year % 400 == 0;
+}
+<div>
+  @{ 
+    var year = new Date().getFullYear();
+    var html = \`<span>\${year} <strong>\${isLeapYear(year) ? "is" : "is not"}</strong> a leap year</span>\`;
+  }
+  @Html.raw(html);
+</div>
+```
+and the same example with a function returning 'raw-string'.
+```HTML+Razor
+@function isLeapYear(year) {
+  return year % 4 == 0 && year % 100 != 0 || year % 400 == 0;
+}
+@function rawYearInfo() {
+    var year = new Date().getFullYear();
+    var html = \`<span>\${year} <strong>\${isLeapYear(year) ? "is" : "is not"}</strong> a leap year</span>\`;
+    return Html.raw(html);
+}
+<div>
+  @rawYearInfo()
+</div>
+```
+The result for all these examples will be:
 <pre>
 2018 <strong>is not</strong> a leap year
 </pre>
