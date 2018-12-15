@@ -102,7 +102,7 @@ and the browser displays it without tags as just:
 
 > :warning: **Security risk** Using the `Html.raw` method with a user input which might contain malicious JavaScript or other exploits is not safe. Sanitizing user input is not a trivial task, so you'd better avoid using `Html.raw` with user input.
 
-It's also possible to render a *raw text* directly to the HTML in your own functions with Razor-Express syntax (see the 3rd example in the [Functions](#functions) section).
+It's also possible to render *raw text* directly to the HTML in your own functions with Razor-Express syntax (see [A function rendering raw content](#a-function-rendering-raw-content) section).
 
 ## Code blocks
 *Razor-Express code blocks* start with `@` symbol just like *expressions*. But unlike expressions code blocks are enclosed by `{}` and JavaScript code result inside code blocks isn't rendered (unless you do it explicitly via `Html.render` or other methods). 
@@ -126,7 +126,9 @@ The current year is 2018. It is not a leap year.
 </pre>
 <sup>[^ try this code](https://runkit.com/develax/razor-code-blocks)</sup> 
 
-<sub>* *If you want to share some data among all the request rendering views you can do it either through the `Model` (if there is a single model for all of them) or through the `ViewData` objects.*</sub>
+Function is a special case of a block, see examples in the *[Functions](#functions)* section.
+
+<sub>* *If you need to share some data among all the request rendering views you can do it either through the [`Model`](#model) (if there is a single model for all of them) or through the [`ViewData`](#viewdata) objects.*</sub>
 
 
 ### Rendering HTML within JavaScript code blocks
