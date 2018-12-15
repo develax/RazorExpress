@@ -532,3 +532,28 @@ Returns a partial view as a string (not HTML encoded).
 </sub>
 
 ## More examples of Razor-Express syntax
+
+### Functions
+Let's take [this example](#conditionals-if-else-if-else-and-switch) and modify it so that the calculations are performed in a separate function:
+```HTML+Razor
+@function isLeapYear(year){
+  return year % 4 == 0 && year % 100 != 0 || year % 400 == 0;
+}
+<div>
+  @{ 
+    var year = new Date().getFullYear();
+    
+    if (isLeapYear(year)){
+      <span>@year <strong>is</strong> a leap year</span>
+    }
+    else{
+      <span>@year <strong>is not</strong> a leap year</span>
+    }
+  }
+</div>
+```
+Result:
+<pre>
+2018 <strong>is not</strong> a leap year
+</pre>
+<sup>[^ try this example](https://runkit.com/develax/razor-function)</sup>
