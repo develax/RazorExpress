@@ -9,16 +9,16 @@
 - [**Code blocks**](#code-blocks)
   - [Rendering HTML within JavaScript code blocks](#rendering-html-within-javascript-code-blocks)
 - [**Control structures**](#control-structures)
-  - [Conditionals: **@if, else if, else, and @switch**](#conditionals-if-else-if-else-and-switch)
-  - [Looping: **@for, @while, and @do while**](#looping-for-while-and-do-while)
-  - [Exception handling: **@try, catch, finally**](#exception-handling-try-catch-finally)
+  - [Conditionals: `@if`, `else if`, `else`, and `@switch`](#conditionals-if-else-if-else-and-switch)
+  - [Looping: `@for`, `@while`, and `@do while`](#looping-for-while-and-do-while)
+  - [Exception handling: `@try`, `catch`, `finally`](#exception-handling-try-catch-finally)
   - [Comments](#comments)
 - [**Reserved keywords**](#reserved-keywords)
-  - [@section](#section)
+  - [`@section`](#section)
 - [**View objects**](#view-objects)
-  - [**@Model**](#model)
-  - [**@ViewData**](#viewdata)
-  - [**@Html**](#html)
+  - [`@Model`](#model)
+  - [`@ViewData`](#viewdata)
+  - [`@Html`](#html)
     - [@Html.layout](#htmllayout)
     - [@Html.body](#htmlbody)
     - [@Html.partial](#html-partial)
@@ -150,7 +150,7 @@ The browser output would be:
 ## Control structures
 Control structures are just an extension of code blocks. All aspects of code blocks also apply to the JavaScript structures: `{}` are required and the `@` symbol is placed only at the beginning of the structure. 
 
-### Conditionals @if, else if, else, and @switch
+### Conditionals `@if`, `else if`, `else`, and `@switch`
 In the next example there are a code block and a control structure:
 
 ```HTML+Razor
@@ -218,7 +218,7 @@ A `switch` statement example:
 ```
 <sup>[^ try these code examples](https://runkit.com/develax/razor-conditional-control-structures)</sup>
 
-### Looping @for, @while, and @do while
+### Looping `@for`, `@while`, and `@do while`
 You can use looping control statements to render a templated HTML. In the following examples, we will use different kinds of loops to render a list of countries. 
 
 ```JavaScript
@@ -284,7 +284,7 @@ const countries = [
 Using `forEach` structure for looping an array is not recommended. An example of using `forEach` with explanations is given in the ["Expressions & code blocks confusion"](https://github.com/DevelAx/RazorExpress/blob/master/README.md#expressions--code-blocks-confusion) section.
 
 
-### Exception handling: @try, catch, finally
+### Exception handling: `@try`, `catch`, `finally`
 
 ```HTML+Razor
 @try {
