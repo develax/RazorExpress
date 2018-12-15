@@ -8,6 +8,7 @@
   - [Raw-rendering](#raw-rendering)
 - [**Code blocks**](#code-blocks)
   - [Rendering HTML within JavaScript code blocks](#rendering-html-within-javascript-code-blocks)
+  - [Functions](#functions)
 - [**Control structures**](#control-structures)
   - [Conditionals: `@if`, `else if`, `else`, and `@switch`](#conditionals-if-else-if-else-and-switch)
   - [Looping: `@for`, `@while`, and `@do while`](#looping-for-while-and-do-while)
@@ -26,8 +27,7 @@
     - [@Html.raw](#htmlraw)
     - [@Html.getPartial](#htmlgetPartial)
 - [**More examples of Razor-Express syntax**](#more-examples-of-razor-express-syntax)
-  - [Functions](#functions)
-
+  
 Razor is a markup syntax for embedding server-based code into webpages based on [ASP.NET Razor syntax](https://docs.microsoft.com/en-us/aspnet/core/mvc/views/razor). Although I tried to make the Razor-Express syntax as close as possible to [ASP.NET Razor](https://docs.microsoft.com/en-us/aspnet/core/mvc/views/razor) there are some differences that need to be taken into account. 
 
 Just like the *ASP.NET Razor* syntax, the *Razor-Express* syntax consists of Razor-Express markup, JavaScript, and HTML. Files with Razor markup generally have a `.raz` file extension. In fact, the *Razor-Express markup is a normal HTML markup with optionally embedded JavaScript server-side code* to manage that HTML. [Don't be confused with client-side JavaScript](https://stackoverflow.com/a/1404400/1844247) embedded in HTML which is interpreted by *Razor-Express* as part of HTML markup and runs on the client side (in browsers) while Razor-Express' JavaScript runs on the server (in NodeJs). For example, it doesn't make any sense to write this code for server-side JavaScript:
@@ -125,11 +125,6 @@ The browser will show:
 The current year is 2018. It is not a leap year.
 </pre>
 <sup>[^ try this code](https://runkit.com/develax/razor-code-blocks)</sup> 
-
-Function is a special case of a block, see examples in the *[Functions](#functions)* section.
-
-<sub>* *If you need to share some data among all the request rendering views you can do it either through the [`Model`](#model) (if there is a single model for all of them) or through the [`ViewData`](#viewdata) objects.*</sub>
-
 
 ### Rendering HTML within JavaScript code blocks
 To render an HTML code within JavaScript code block you can either use implicit transitions or the `Html` object methods.
@@ -335,6 +330,77 @@ The rendered HTML:
 
 *The current Razor-Express version doesn't support universal comments for the Razor Razor-Express markup.* So, if you try `@* *@` from ASP.NET MVC Razor it wouldn't work.
 
+### Functions
+Function is merely a special case of a [*code block*](#code-blocks).
+
+#### A function declaration as a code-block
+Let's take [this example](#conditionals-if-else-if-else-and-switch) and modify it so that the calculations are performed in a separate function.
+
+```HTML+Razor
+@function isLeapYear(year){
+  return year % 4 == 0 && year % 100 != 0 || year % 400 == 0;
+}
+<div>
+  @{ 
+    var year = new Date().getFullYear();
+    
+    if (isLeapYear(year)){
+      <span>@year <strong>is</strong> a leap year</span>
+    }
+    else{
+      <span>@year <strong>is not</strong> a leap year</span>
+    }
+  }
+</div>
+```
+or the same example slightly modified:
+```HTML+Razor
+@function isLeapYear(year){
+  return year % 4 == 0 && year % 100 != 0 || year % 400 == 0;
+}
+<div>
+  @{ 
+    var year = new Date().getFullYear();
+    var html = \`<span>\${year} <strong>\${isLeapYear(year) ? "is" : "is not"}</strong> a leap year</span>\`;
+  }
+  @Html.raw(html);
+</div>
+```
+#### A function rendering raw content
+```HTML+Razor
+@function isLeapYear(year) {
+  return year % 4 == 0 && year % 100 != 0 || year % 400 == 0;
+}
+@function renderYearInfo() {
+    var year = new Date().getFullYear();
+    var html = \`<span>\${year} <strong>\${isLeapYear(year) ? "is" : "is not"}</strong> a leap year</span>\`;
+    Html.raw(html);
+}
+<div>
+  @renderYearInfo()
+</div>
+```
+#### Transitions to HTML in a function
+Because a function is a special case of a code block it's also possible to make [transitions from code to HTML](#transitions-to-html) within it. Let's modify our example one time more again:
+```HTML+Razor
+@function isLeapYear(year) {
+  return year % 4 == 0 && year % 100 != 0 || year % 400 == 0;
+}
+@function renderYearInfo() {
+    var year = new Date().getFullYear();
+    <span>@year <strong>@(\`\${isLeapYear(year) ? "is" : "is not"}\`)</strong> a leap year</span>
+}
+<div>
+  @renderYearInfo()
+</div>
+```
+The result for all these examples will be the same:
+<pre>
+2018 <strong>is not</strong> a leap year
+</pre>
+<sup>[^ try these examples](https://runkit.com/develax/razor-function)</sup>
+
+> :warning: **Arrow functions** work as well but they should be used with caution because they can be regarded by Razor-Express as an expression, not a block of code (see [*"Expressions & code blocks confusion"*](../README.md#expressions--code-blocks-confusion)).
 
 ## Reserved keywords
 - `@section`
@@ -538,56 +604,3 @@ Returns a partial view as a string (not HTML encoded).
 
 ## More examples of Razor-Express syntax
 
-### Functions
-Let's take [this example](#conditionals-if-else-if-else-and-switch) and modify it so that the calculations are performed in a separate function.
-
-#### A function declaration as a code-block
-```HTML+Razor
-@function isLeapYear(year){
-  return year % 4 == 0 && year % 100 != 0 || year % 400 == 0;
-}
-<div>
-  @{ 
-    var year = new Date().getFullYear();
-    
-    if (isLeapYear(year)){
-      <span>@year <strong>is</strong> a leap year</span>
-    }
-    else{
-      <span>@year <strong>is not</strong> a leap year</span>
-    }
-  }
-</div>
-```
-or the same example slightly modified:
-```HTML+Razor
-@function isLeapYear(year){
-  return year % 4 == 0 && year % 100 != 0 || year % 400 == 0;
-}
-<div>
-  @{ 
-    var year = new Date().getFullYear();
-    var html = \`<span>\${year} <strong>\${isLeapYear(year) ? "is" : "is not"}</strong> a leap year</span>\`;
-  }
-  @Html.raw(html);
-</div>
-```
-#### A function rendering raw content
-```HTML+Razor
-@function isLeapYear(year) {
-  return year % 4 == 0 && year % 100 != 0 || year % 400 == 0;
-}
-@function renderYearInfo() {
-    var year = new Date().getFullYear();
-    var html = \`<span>\${year} <strong>\${isLeapYear(year) ? "is" : "is not"}</strong> a leap year</span>\`;
-    Html.raw(html);
-}
-<div>
-  @renderYearInfo()
-</div>
-```
-The result for all these examples will be:
-<pre>
-2018 <strong>is not</strong> a leap year
-</pre>
-<sup>[^ try these examples](https://runkit.com/develax/razor-function)</sup>
