@@ -102,7 +102,7 @@ and the browser displays it without tags as just:
 
 > :warning: **Security risk** Using the `Html.raw` method with a user input which might contain malicious JavaScript or other exploits is not safe. Sanitizing user input is not a trivial task, so you'd better avoid using `Html.raw` with user input.
 
-It's alsow possible to render *raw text* directly to the HTML in your own functions with Razor-Express syntax (see the 3rd example in the [Functions](#functions) section).
+It's also possible to render a *raw text* directly to the HTML in your own functions with Razor-Express syntax (see the 3rd example in the [Functions](#functions) section).
 
 ## Code blocks
 *Razor-Express code blocks* start with `@` symbol just like *expressions*. But unlike expressions code blocks are enclosed by `{}` and JavaScript code result inside code blocks isn't rendered (unless you do it explicitly via `Html.render` or other methods). 
