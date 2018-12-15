@@ -8,12 +8,15 @@
   - [Raw-rendering](#raw-rendering)
 - [**Code blocks**](#code-blocks)
   - [Rendering HTML within JavaScript code blocks](#rendering-html-within-javascript-code-blocks)
-  - [Functions](#functions)
 - [**Control structures**](#control-structures)
   - [Conditionals: `@if`, `else if`, `else`, and `@switch`](#conditionals-if-else-if-else-and-switch)
   - [Looping: `@for`, `@while`, and `@do while`](#looping-for-while-and-do-while)
   - [Exception handling: `@try`, `catch`, `finally`](#exception-handling-try-catch-finally)
   - [Comments](#comments)
+- [**Functions**](#functions)
+  - [A standalone function declaration](#comments)
+  - [A function rendering raw content](#a-function-rendering-raw-content)
+  - [Transitions to HTML in a function](#transitions-to-html-in-a-function)
 - [**Reserved keywords**](#reserved-keywords)
   - [`@section`](#section)
 - [**View objects**](#view-objects)
@@ -331,9 +334,10 @@ The rendered HTML:
 *The current Razor-Express version doesn't support universal comments for the Razor Razor-Express markup.* So, if you try `@* *@` from ASP.NET MVC Razor it wouldn't work.
 
 ### Functions
-Function is merely a special case of a [*code block*](#code-blocks).
 
-#### A function declaration as a code-block
+#### A standalone function declaration
+A standalone function declaration is merely a special case of a [*code block*](#code-blocks).
+
 Let's take [this example](#conditionals-if-else-if-else-and-switch) and modify it so that the calculations are performed in a separate function.
 
 ```HTML+Razor
