@@ -530,3 +530,5 @@ Returns a partial view as a string (not HTML encoded).
 <a name="ref1"></a> 
 1. ASP.NET MVC uses the concept of *"Controller" what is virtually the same as "Router" in Express.
 </sub>
+
+## More examples of Razor-Express syntax
