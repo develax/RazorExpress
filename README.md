@@ -367,9 +367,10 @@ TODO list
 ---
 What is to be done soon:
 
-1. Finish the documentation for the current version.
+1. Finish the documentation for the current version (debugging, other syntax examples, RAZ-API).
 2. Implement [Razor-style `@* *@` comments](https://github.com/DevelAx/RazorExpress/blob/master/docs/syntax.md#comments).
 3. Improve debugging info.
 4. Make the library available for use on the client side (in the browser).
 5. Implement caching compiled templates.
 6. Async partial views.
+7. Make `HtmlString` class public for making functions returnin *raw-values* as expessions.
