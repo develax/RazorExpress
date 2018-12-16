@@ -357,6 +357,28 @@ To make this code work you need to *wrap it explicitly in a code block* then it 
 }
 ...
 ```
+Another solution would be to use a separate JavaScript function to output HTML. It will be understood by the parser as a block of code and there will be no problem with the transition to HTML:
+```HTML+Razor
+...
+@function tr(c) {
+<tr>
+  <td>@c.name</td>
+  <td>@c.area</td>
+</tr>
+}
+<table>
+  <tr>
+    <th>Country</th>
+    <th>Area sq.km</th>
+  </tr>
+  @countries.forEach((c)=>{
+    tr(c);
+  })
+</table>
+...
+```
+
+
 <sup>^ [run this example](https://runkit.com/develax/razor-array-foreach)</sup>
 
 However, the best way to avoid such ambiguities is to stick to a plain JavaScript syntax style while writing your view templates. See ["Looping @for, @while, and @do while"](https://github.com/DevelAx/RazorExpress/blob/master/docs/syntax.md#looping-for-while-and-do-while) section for examples of loop structures. 
