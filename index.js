@@ -7,8 +7,15 @@ module.exports = {
     // https://www.npmjs.com/package/hbs
     __express: renderFile,
     compileFile: renderFile,
-    compile: getParser().compile,
-    compileSync: getParser().compileSync,
+    compile: getParser().compileSync,
+    /**
+     * @deprecated Since version "0.0.66". Will be deleted in version "1.0.0". Use 'compile' instead.
+     */
+    compileSync: function () {
+        console.warn("The 'compileSync' method is deprecated. Will be deleted in version '1.0.0'. Use 'compile' instead.");
+        var parser = getParser();
+        parser.compileSync.apply(parser, arguments);
+    },
     register: registerRazorEngine,
     handleErrors: handleErrors
 };
@@ -24,8 +31,8 @@ function renderFile(filepath, options, done) {
     razor.renderFile(filepath, done);
 }
 
-function getParser(){
-    if (!parser){
+function getParser() {
+    if (!parser) {
         var env = process && process.env.NODE_ENV;
         parser = require('./core/parser')({ debug: false, mode: env });
     }
@@ -38,23 +45,23 @@ function registerRazorEngine(app) {
     app.set('view engine', ext);
 }
 
-function handleErrors(app, errorCode, mode){
+function handleErrors(app, errorCode, mode) {
     mode = mode || "development";
     app.use(appErrorHandler);
 
     function appErrorHandler(err, req, res, next) {
         if (res.headersSent)
             return next(err); // must
-    
+
         var env = app.get('env');
-    
+
         if (env === mode && err instanceof RazorError) {
             var errorHtml = err.html();
             res.status(errorCode || 500);
             res.send(errorHtml);
             return;
         }
-        
+
         return next(err);
     }
 }
