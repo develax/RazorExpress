@@ -31,7 +31,6 @@
     - [@Html.encode](#htmlencode)
     - [@Html.raw](#htmlraw)
     - [@Html.getPartial](#htmlgetPartial)
-- [**More examples of Razor-Express syntax**](#more-examples-of-razor-express-syntax)
   
 Razor is a markup syntax for embedding server-based code into webpages based on [ASP.NET Razor syntax](https://docs.microsoft.com/en-us/aspnet/core/mvc/views/razor). Although I tried to make the Razor-Express syntax as close as possible to [ASP.NET Razor](https://docs.microsoft.com/en-us/aspnet/core/mvc/views/razor) there are some differences that need to be taken into account. 
 
