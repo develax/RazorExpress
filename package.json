@@ -1,24 +1,20 @@
 {
   "name": "raz",
-  "description": "ASP.NET MVC Razor-like template engine for NodeJS Express library. Template your views by mixing HTML markup with JavaScript server-side code!",
-  "version": "0.0.53",
+  "description": "Razor-like Template Engine for NodeJS Express library based on ASP.NET MVC Razor syntax. Template your views by mixing HTML markup with JavaScript server-side code!",
+  "version": "0.0.63",
   "author": {
-    "name": "Sergey",
+    "name": "Sergey Fisun",
     "email": "develax@gmail.com",
     "url": "https://www.npmjs.com/package/raz"
   },
+  "license" : "MIT",
   "keywords": [
-    "razor",
-    "engine",
-    "template",
-    "engine",
-    "asp.net mvc",
-    "parser",
-    "view",
-    "template",
-    "express",
-    "raz",
-    "vash"
+    "Razor",
+    "Template",
+    "Engine",
+    "NodeJS",
+    "Express",
+    "Parser"
   ],
   "engines": {
     "node": ">=10.10.0"
