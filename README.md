@@ -18,6 +18,8 @@
   - [Expressions](https://github.com/DevelAx/RazorExpress/blob/master/docs/syntax.md#expressions)
   - [Code blocks](https://github.com/DevelAx/RazorExpress/blob/master/docs/syntax.md#code-blocks)
   - [Control structures](https://github.com/DevelAx/RazorExpress/blob/master/docs/syntax.md#control-structures)
+  - [Functions](/docs/syntax.md#functions)
+  - [More examples](/docs/syntax.md#more-examples-of-razor-express-syntax)
   - [Reserved keywords](https://github.com/DevelAx/RazorExpress/blob/master/docs/syntax.md#reserved-keywords)
     - [`@section`](https://github.com/DevelAx/RazorExpress/blob/master/docs/syntax.md#section)
   - [Reserved View objects]()
@@ -357,7 +359,7 @@ To make this code work you need to *wrap it explicitly in a code block* then it 
 }
 ...
 ```
-Another solution would be to use a separate JavaScript function to output HTML. It will be understood by the parser as a block of code and there will be no problem with the transition to HTML:
+Another solution would be to use a separate JavaScript function to output HTML. It will be understood by the parser as a block of code and there will be no problem with the [transition to HTML](/docs/syntax.md#transitions-to-html-in-a-function):
 ```HTML+Razor
 ...
 @function tr(c) {
@@ -377,8 +379,6 @@ Another solution would be to use a separate JavaScript function to output HTML. 
 </table>
 ...
 ```
-
-
 <sup>^ [run this example](https://runkit.com/develax/razor-array-foreach)</sup>
 
 However, the best way to avoid such ambiguities is to stick to a plain JavaScript syntax style while writing your view templates. See ["Looping @for, @while, and @do while"](https://github.com/DevelAx/RazorExpress/blob/master/docs/syntax.md#looping-for-while-and-do-while) section for examples of loop structures. 
