@@ -38,7 +38,7 @@ Just like the *ASP.NET Razor* syntax, the *Razor-Express* syntax consists of Raz
 document.getElementsByTagName("body")[0].innerHTML = "<div>This JavaScript will work only in the browser!</div>"
 ```
 
-Since the *Razor-Express* engine must somehow distinguish server-side JavaScript from HTML markup we use the `@` symbol. The `@` just tells the engine's parser that JavaScript server-side code or expression starts after this character. This is the minimum intervention in HTML markup [compared to other existing markup engines](https://github.com/DevelAx/RazorExpress#a-brief-comparison-of-syntax-of-nodejs-layout-engines).
+Since the *Razor-Express* engine must somehow distinguish server-side JavaScript from HTML markup we use the `@` symbol. The `@` just tells the engine's parser that JavaScript server-side code or an expression starts after this character. This is the minimum intervention in HTML markup [compared to other existing markup engines](https://github.com/DevelAx/RazorExpress#a-brief-comparison-of-syntax-of-nodejs-layout-engines).
 
 ## A simple example of Razor-Express markup
 ```HTML+Razor
@@ -608,3 +608,55 @@ Returns a partial view as a string (not HTML encoded).
 
 ## More examples of Razor-Express syntax
 
+### Templating HTML tags & styles
+With the Razor-Express engine, you can template not only the content of the page but the markup elements themselves, such as tags, styles, attributes, etc. 
+
+```HTML+Razor
+@{
+    var size = "50px";
+}
+@function randomInt(max) {
+  return Math.floor(Math.random() * Math.floor(max + 1));
+}
+@function drawBox() {
+    var x = randomInt(1);
+    var tag = x ? "div" : "span";
+    <@tag class="box">@tag</@tag>
+}
+@for(var i = 0; i < 5; i++){
+    drawBox();
+}
+<style>
+ .box { 
+    width:@size; 
+    height:@size; 
+    display: table-cell; 
+    vertical-align: middle; 
+    text-align: center;
+    border:1px solid black;
+ }
+ span { background-color: lightblue; }
+ div { background-color: yellow; }
+</style>
+```
+Result:
+```HTML
+<span class="box">span</span>
+<div class="box">div</div>
+<span class="box">span</span>
+<span class="box">span</span>
+<span class="box">span</span>
+<style>
+ .box { 
+    width:50px; 
+    height:50px; 
+    display: table-cell; 
+    vertical-align: middle; 
+    text-align: center;
+    border:1px solid black;
+ }
+ span { background-color: lightblue; }
+ div { background-color: yellow; }
+</style>
+```
+<sup>[^ live example](https://runkit.com/develax/razor-tags)</sup>
