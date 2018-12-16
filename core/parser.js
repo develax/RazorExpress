@@ -452,6 +452,10 @@ module.exports = function (opts) {
                     else {
                         this.fetchChar();
                         this.parseCode(blocks);
+
+                        if (tag === '<' || tag === '</')
+                            tag = '';
+
                         block = newBlock(type.html, blocks);
                         continue;
                     }
@@ -637,7 +641,7 @@ module.exports = function (opts) {
                         this.parseCode(blocks);
 
                         if (tag && (tag === '<' || tag === '</'))
-                            tag += '@' + blocks[blocks.length - 1].text; // just to be considered as a tag later (for the case of '<@tag>')
+                            tag += '@' + blocks[blocks.length - 1].text + this.padding; // just to be considered as a tag later (for the case of '<@tag>')
 
                         block = newBlock(type.html, blocks);
                         continue;

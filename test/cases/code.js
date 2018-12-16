@@ -84,6 +84,20 @@
             expected: "\n<div>\n        <span></span>\n</div>"
         },
         {
+            name: "Code 9.1",
+            template: `
+@{
+    var tag = 'div';
+    var tag2 = 'span';
+}
+<@tag class="box">
+    @{
+        <@tag2 class="box"></@tag2>
+    }
+</@tag>`,
+            expected: '\n<div class="box">\n        <span class="box"></span>\n</div>'
+        },
+        {
             name: "Code 10",
             template: `
 <div>
@@ -687,7 +701,7 @@ finally
 }
 <div>@s</div>`,
             expected: "\n<div>1&quot;2&quot;3</div>"
-        },
+        }
     ];
     module.exports = cases;
 })();// 
