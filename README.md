@@ -14,16 +14,18 @@
   - [Rendering layout system](https://github.com/DevelAx/RazorExpress/blob/master/docs/overview.md#rendering-layout-system)
 - [**Razor-Express syntax**](https://github.com/DevelAx/RazorExpress/blob/master/docs/syntax.md)
   - [A simple example](https://github.com/DevelAx/RazorExpress/blob/master/docs/syntax.md#a-simple-example-of-razor-express-markup)
-  - [Escaping @ character](https://github.com/DevelAx/RazorExpress/blob/master/docs/syntax.md#escaping--character)
+  - [Escaping `@` character](https://github.com/DevelAx/RazorExpress/blob/master/docs/syntax.md#escaping--character)
   - [Expressions](https://github.com/DevelAx/RazorExpress/blob/master/docs/syntax.md#expressions)
   - [Code blocks](https://github.com/DevelAx/RazorExpress/blob/master/docs/syntax.md#code-blocks)
   - [Control structures](https://github.com/DevelAx/RazorExpress/blob/master/docs/syntax.md#control-structures)
+  - [Functions](/docs/syntax.md#functions)
+  - [More examples](/docs/syntax.md#more-examples-of-razor-express-syntax)
   - [Reserved keywords](https://github.com/DevelAx/RazorExpress/blob/master/docs/syntax.md#reserved-keywords)
-    - [@section](https://github.com/DevelAx/RazorExpress/blob/master/docs/syntax.md#section)
+    - [`@section`](https://github.com/DevelAx/RazorExpress/blob/master/docs/syntax.md#section)
   - [Reserved View objects]()
-    - [@Model](https://github.com/DevelAx/RazorExpress/blob/master/docs/syntax.md#view-objects)
-    - [@ViewData](https://github.com/DevelAx/RazorExpress/blob/master/docs/syntax.md#viewdata)
-    - [@Html](https://github.com/DevelAx/RazorExpress/blob/master/docs/syntax.md#html)
+    - [`@Model`](https://github.com/DevelAx/RazorExpress/blob/master/docs/syntax.md#view-objects)
+    - [`@ViewData`](https://github.com/DevelAx/RazorExpress/blob/master/docs/syntax.md#viewdata)
+    - [`@Html`](https://github.com/DevelAx/RazorExpress/blob/master/docs/syntax.md#html)
 - [**Common pitfalls & remarks**](#warning-common-pitfalls)
   - [Missing semicolon](#missing-semicolon)
   - [Expressions & code blocks confusion](#expressions--code-blocks-confusion)
@@ -357,6 +359,26 @@ To make this code work you need to *wrap it explicitly in a code block* then it 
 }
 ...
 ```
+Another solution would be to use a separate JavaScript function to output HTML. It will be understood by the parser as a block of code and there will be no problem with the [transition to HTML](/docs/syntax.md#transitions-to-html-in-a-function):
+```HTML+Razor
+...
+@function tr(c) {
+<tr>
+  <td>@c.name</td>
+  <td>@c.area</td>
+</tr>
+}
+<table>
+  <tr>
+    <th>Country</th>
+    <th>Area sq.km</th>
+  </tr>
+  @countries.forEach((c)=>{
+    tr(c);
+  })
+</table>
+...
+```
 <sup>^ [run this example](https://runkit.com/develax/razor-array-foreach)</sup>
 
 However, the best way to avoid such ambiguities is to stick to a plain JavaScript syntax style while writing your view templates. See ["Looping @for, @while, and @do while"](https://github.com/DevelAx/RazorExpress/blob/master/docs/syntax.md#looping-for-while-and-do-while) section for examples of loop structures. 
@@ -367,9 +389,10 @@ TODO list
 ---
 What is to be done soon:
 
-1. Finish the documentation for the current version.
+1. Finish the documentation for the current version (debugging, other syntax examples, RAZ-API).
 2. Implement [Razor-style `@* *@` comments](https://github.com/DevelAx/RazorExpress/blob/master/docs/syntax.md#comments).
 3. Improve debugging info.
 4. Make the library available for use on the client side (in the browser).
 5. Implement caching compiled templates.
 6. Async partial views.
+7. Make `HtmlString` class public for making functions returnin *raw-values* as expessions.

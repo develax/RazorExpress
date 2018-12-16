@@ -9,24 +9,29 @@
 - [**Code blocks**](#code-blocks)
   - [Rendering HTML within JavaScript code blocks](#rendering-html-within-javascript-code-blocks)
 - [**Control structures**](#control-structures)
-  - [Conditionals: **@if, else if, else, and @switch**](#conditionals-if-else-if-else-and-switch)
-  - [Looping: **@for, @while, and @do while**](#looping-for-while-and-do-while)
-  - [Exception handling: **@try, catch, finally**](#exception-handling-try-catch-finally)
+  - [Conditionals: `@if`, `else if`, `else`, and `@switch`](#conditionals-if-else-if-else-and-switch)
+  - [Looping: `@for`, `@while`, and `@do while`](#looping-for-while-and-do-while)
+  - [Exception handling: `@try`, `catch`, `finally`](#exception-handling-try-catch-finally)
   - [Comments](#comments)
+- [**Functions**](#functions)
+  - [A standalone function declaration](#a-standalone-function-declaration)
+  - [A function rendering raw content](#a-function-rendering-raw-content)
+  - [Transitions to HTML in a function](#transitions-to-html-in-a-function)
+- [**More examples**](#more-examples-of-razor-express-syntax)
+  - [Templating HTML tags & styles](#templating-html-tags--styles)
 - [**Reserved keywords**](#reserved-keywords)
-  - [@section](#section)
+  - [`@section`](#section)
 - [**View objects**](#view-objects)
-  - [**@Model**](#model)
-  - [**@ViewData**](#viewdata)
-  - [**@Html**](#html)
+  - [`@Model`](#model)
+  - [`@ViewData`](#viewdata)
+  - [`@Html`](#html)
     - [@Html.layout](#htmllayout)
     - [@Html.body](#htmlbody)
-    - [@Html.partial](#html-partial)
+    - [@Html.partial](#htmlpartial)
     - [@Html.encode](#htmlencode)
     - [@Html.raw](#htmlraw)
     - [@Html.getPartial](#htmlgetPartial)
-
-
+  
 Razor is a markup syntax for embedding server-based code into webpages based on [ASP.NET Razor syntax](https://docs.microsoft.com/en-us/aspnet/core/mvc/views/razor). Although I tried to make the Razor-Express syntax as close as possible to [ASP.NET Razor](https://docs.microsoft.com/en-us/aspnet/core/mvc/views/razor) there are some differences that need to be taken into account. 
 
 Just like the *ASP.NET Razor* syntax, the *Razor-Express* syntax consists of Razor-Express markup, JavaScript, and HTML. Files with Razor markup generally have a `.raz` file extension. In fact, the *Razor-Express markup is a normal HTML markup with optionally embedded JavaScript server-side code* to manage that HTML. [Don't be confused with client-side JavaScript](https://stackoverflow.com/a/1404400/1844247) embedded in HTML which is interpreted by *Razor-Express* as part of HTML markup and runs on the client side (in browsers) while Razor-Express' JavaScript runs on the server (in NodeJs). For example, it doesn't make any sense to write this code for server-side JavaScript:
@@ -34,7 +39,7 @@ Just like the *ASP.NET Razor* syntax, the *Razor-Express* syntax consists of Raz
 document.getElementsByTagName("body")[0].innerHTML = "<div>This JavaScript will work only in the browser!</div>"
 ```
 
-Since the *Razor-Express* engine must somehow distinguish server-side JavaScript from HTML markup we use the `@` symbol. The `@` just tells the engine's parser that JavaScript server-side code or expression starts after this character. This is the minimum intervention in HTML markup [compared to other existing markup engines](https://github.com/DevelAx/RazorExpress#a-brief-comparison-of-syntax-of-nodejs-layout-engines).
+Since the *Razor-Express* engine must somehow distinguish server-side JavaScript from HTML markup we use the `@` symbol. The `@` just tells the engine's parser that JavaScript server-side code or an expression starts after this character. This is the minimum intervention in HTML markup [compared to other existing markup engines](https://github.com/DevelAx/RazorExpress#a-brief-comparison-of-syntax-of-nodejs-layout-engines).
 
 ## A simple example of Razor-Express markup
 ```HTML+Razor
@@ -99,7 +104,9 @@ and the browser displays it without tags as just:
 </pre>
 <sup>[^ try this code](https://runkit.com/develax/razor-expression-encoding)</sup> 
 
-> :warning: Using the `Html.raw` method with a user input which might contain malicious JavaScript or other exploits is a **security risk**. Sanitizing user input is not a trivial task, so you'd better avoid using `Html.raw` with user input.
+> :warning: **Security risk** Using the `Html.raw` method with a user input which might contain malicious JavaScript or other exploits is not safe. Sanitizing user input is not a trivial task, so you'd better avoid using `Html.raw` with user input.
+
+It's also possible to render *raw text* directly to the HTML in your own functions with Razor-Express syntax (see [A function rendering raw content](#a-function-rendering-raw-content) section).
 
 ## Code blocks
 *Razor-Express code blocks* start with `@` symbol just like *expressions*. But unlike expressions code blocks are enclosed by `{}` and JavaScript code result inside code blocks isn't rendered (unless you do it explicitly via `Html.render` or other methods). 
@@ -122,9 +129,6 @@ The browser will show:
 The current year is 2018. It is not a leap year.
 </pre>
 <sup>[^ try this code](https://runkit.com/develax/razor-code-blocks)</sup> 
-
-<sub>* *If you want to share some data among all the request rendering views you can do it either through the `Model` (if there is a single model for all of them) or through the `ViewData` objects.*</sub>
-
 
 ### Rendering HTML within JavaScript code blocks
 To render an HTML code within JavaScript code block you can either use implicit transitions or the `Html` object methods.
@@ -150,7 +154,7 @@ The browser output would be:
 ## Control structures
 Control structures are just an extension of code blocks. All aspects of code blocks also apply to the JavaScript structures: `{}` are required and the `@` symbol is placed only at the beginning of the structure. 
 
-### Conditionals @if, else if, else, and @switch
+### Conditionals `@if`, `else if`, `else`, and `@switch`
 In the next example there are a code block and a control structure:
 
 ```HTML+Razor
@@ -190,7 +194,7 @@ The same could be written a little differently:
 </div>
 ```
 
-A **switch statement** example:
+A `switch` statement example:
 ```HTML+Razor
 @switch (new Date().getDay()) {
   case 0:
@@ -218,7 +222,7 @@ A **switch statement** example:
 ```
 <sup>[^ try these code examples](https://runkit.com/develax/razor-conditional-control-structures)</sup>
 
-### Looping @for, @while, and @do while
+### Looping `@for`, `@while`, and `@do while`
 You can use looping control statements to render a templated HTML. In the following examples, we will use different kinds of loops to render a list of countries. 
 
 ```JavaScript
@@ -284,7 +288,7 @@ const countries = [
 Using `forEach` structure for looping an array is not recommended. An example of using `forEach` with explanations is given in the ["Expressions & code blocks confusion"](https://github.com/DevelAx/RazorExpress/blob/master/README.md#expressions--code-blocks-confusion) section.
 
 
-### Exception handling: @try, catch, finally
+### Exception handling: `@try`, `catch`, `finally`
 
 ```HTML+Razor
 @try {
@@ -330,6 +334,133 @@ The rendered HTML:
 
 *The current Razor-Express version doesn't support universal comments for the Razor Razor-Express markup.* So, if you try `@* *@` from ASP.NET MVC Razor it wouldn't work.
 
+### Functions
+
+#### A standalone function declaration
+A standalone function declaration is merely a special case of a [*code block*](#code-blocks).
+
+Let's take [this example](#conditionals-if-else-if-else-and-switch) and modify it so that the calculations are performed in a separate function.
+
+```HTML+Razor
+@function isLeapYear(year){
+  return year % 4 == 0 && year % 100 != 0 || year % 400 == 0;
+}
+<div>
+  @{ 
+    var year = new Date().getFullYear();
+    
+    if (isLeapYear(year)){
+      <span>@year <strong>is</strong> a leap year</span>
+    }
+    else{
+      <span>@year <strong>is not</strong> a leap year</span>
+    }
+  }
+</div>
+```
+or the same example slightly modified:
+```HTML+Razor
+@function isLeapYear(year){
+  return year % 4 == 0 && year % 100 != 0 || year % 400 == 0;
+}
+<div>
+  @{ 
+    var year = new Date().getFullYear();
+    var html = \`<span>\${year} <strong>\${isLeapYear(year) ? "is" : "is not"}</strong> a leap year</span>\`;
+  }
+  @Html.raw(html);
+</div>
+```
+#### A function rendering raw content
+```HTML+Razor
+@function isLeapYear(year) {
+  return year % 4 == 0 && year % 100 != 0 || year % 400 == 0;
+}
+@function renderYearInfo() {
+    var year = new Date().getFullYear();
+    var html = \`<span>\${year} <strong>\${isLeapYear(year) ? "is" : "is not"}</strong> a leap year</span>\`;
+    Html.raw(html);
+}
+<div>
+  @renderYearInfo()
+</div>
+```
+#### Transitions to HTML in a function
+Because a function is a special case of a code block it's also possible to make [transitions from code to HTML](#transitions-to-html) within it. Let's modify our example one time more again:
+```HTML+Razor
+@function isLeapYear(year) {
+  return year % 4 == 0 && year % 100 != 0 || year % 400 == 0;
+}
+@function renderYearInfo() {
+    var year = new Date().getFullYear();
+    <span>@year <strong>@(\`\${isLeapYear(year) ? "is" : "is not"}\`)</strong> a leap year</span>
+}
+<div>
+  @renderYearInfo()
+</div>
+```
+The result for all these examples will be the same:
+<pre>
+2018 <strong>is not</strong> a leap year
+</pre>
+<sup>[^ try these examples](https://runkit.com/develax/razor-function)</sup>
+
+> :warning: **Arrow functions** work as well but they should be used with caution because they can be regarded by Razor-Express as an expression, not a block of code (see [*"Expressions & code blocks confusion"*](../README.md#expressions--code-blocks-confusion)).
+
+## More examples of Razor-Express syntax
+
+### Templating HTML tags & styles
+With the Razor-Express engine, you can template not only the content of the page but the markup elements themselves, such as tags, styles, attributes, etc. 
+
+```HTML+Razor
+@{
+    var size = "50px";
+}
+@function randomInt(max) {
+  return Math.floor(Math.random() * Math.floor(max + 1));
+}
+@function drawBox() {
+    var x = randomInt(1);
+    var tag = x ? "div" : "span";
+    <@tag class="box">@tag</@tag>
+}
+@for(var i = 0; i < 5; i++){
+    drawBox();
+}
+<style>
+ .box { 
+    width:@size; 
+    height:@size; 
+    display: table-cell; 
+    vertical-align: middle; 
+    text-align: center;
+    border:1px solid black;
+ }
+ span { background-color: lightblue; }
+ div { background-color: yellow; }
+</style>
+```
+Result:
+```HTML
+<span class="box">span</span>
+<div class="box">div</div>
+<span class="box">span</span>
+<span class="box">span</span>
+<span class="box">span</span>
+<style>
+ .box { 
+    width:50px; 
+    height:50px; 
+    display: table-cell; 
+    vertical-align: middle; 
+    text-align: center;
+    border:1px solid black;
+ }
+ span { background-color: lightblue; }
+ div { background-color: yellow; }
+</style>
+```
+<sup>[^ live example](https://runkit.com/develax/razor-tags)</sup>
 
 ## Reserved keywords
 - `@section`
