@@ -10,8 +10,11 @@ The Razor-Express module provides the following functions:
 * **options** `<Object>` parameters passed by the *Express* module
 * **done** `<Function>` callback function
   * **err** `<RazorError>` Razor-Express parser or compiler error
+  * **html** <string> rendered HTML
 
+Asynchronously reads the [view template file](overview.md#views-and-view-template-engine), parses, compiles and renderes it to HTML. The `done` callback returns to the caller either the rendered HTML via the `html` argument or an error via the `err` argument if it occurs. 
 This method is meant to be called by the [Express library](https://expressjs.com/) if you set the template engine explicitly: 
+
 ```JavaScript
 const app = require('express')(); // the Express web server app.
 const razor = require('razor') // the Razor-Express engine 
