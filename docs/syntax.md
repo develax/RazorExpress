@@ -17,6 +17,8 @@
   - [A standalone function declaration](#a-standalone-function-declaration)
   - [A function rendering raw content](#a-function-rendering-raw-content)
   - [Transitions to HTML in a function](#transitions-to-html-in-a-function)
+- [**More examples**](#more-examples-of-razor-express-syntax)
+  - [Templating HTML tags & styles](#templating-html-tags--styles)
 - [**Reserved keywords**](#reserved-keywords)
   - [`@section`](#section)
 - [**View objects**](#view-objects)
@@ -406,6 +408,61 @@ The result for all these examples will be the same:
 
 > :warning: **Arrow functions** work as well but they should be used with caution because they can be regarded by Razor-Express as an expression, not a block of code (see [*"Expressions & code blocks confusion"*](../README.md#expressions--code-blocks-confusion)).
 
+## More examples of Razor-Express syntax
+
+### Templating HTML tags & styles
+With the Razor-Express engine, you can template not only the content of the page but the markup elements themselves, such as tags, styles, attributes, etc. 
+
+```HTML+Razor
+@{
+    var size = "50px";
+}
+@function randomInt(max) {
+  return Math.floor(Math.random() * Math.floor(max + 1));
+}
+@function drawBox() {
+    var x = randomInt(1);
+    var tag = x ? "div" : "span";
+    <@tag class="box">@tag</@tag>
+}
+@for(var i = 0; i < 5; i++){
+    drawBox();
+}
+<style>
+ .box { 
+    width:@size; 
+    height:@size; 
+    display: table-cell; 
+    vertical-align: middle; 
+    text-align: center;
+    border:1px solid black;
+ }
+ span { background-color: lightblue; }
+ div { background-color: yellow; }
+</style>
+```
+Result:
+```HTML
+<span class="box">span</span>
+<div class="box">div</div>
+<span class="box">span</span>
+<span class="box">span</span>
+<span class="box">span</span>
+<style>
+ .box { 
+    width:50px; 
+    height:50px; 
+    display: table-cell; 
+    vertical-align: middle; 
+    text-align: center;
+    border:1px solid black;
+ }
+ span { background-color: lightblue; }
+ div { background-color: yellow; }
+</style>
+```
+<sup>[^ live example](https://runkit.com/develax/razor-tags)</sup>
+
 ## Reserved keywords
 - `@section`
 
@@ -605,58 +662,3 @@ Returns a partial view as a string (not HTML encoded).
 <a name="ref1"></a> 
 1. ASP.NET MVC uses the concept of *"Controller" what is virtually the same as "Router" in Express.
 </sub>
-
-## More examples of Razor-Express syntax
-
-### Templating HTML tags & styles
-With the Razor-Express engine, you can template not only the content of the page but the markup elements themselves, such as tags, styles, attributes, etc. 
-
-```HTML+Razor
-@{
-    var size = "50px";
-}
-@function randomInt(max) {
-  return Math.floor(Math.random() * Math.floor(max + 1));
-}
-@function drawBox() {
-    var x = randomInt(1);
-    var tag = x ? "div" : "span";
-    <@tag class="box">@tag</@tag>
-}
-@for(var i = 0; i < 5; i++){
-    drawBox();
-}
-<style>
- .box { 
-    width:@size; 
-    height:@size; 
-    display: table-cell; 
-    vertical-align: middle; 
-    text-align: center;
-    border:1px solid black;
- }
- span { background-color: lightblue; }
- div { background-color: yellow; }
-</style>
-```
-Result:
-```HTML
-<span class="box">span</span>
-<div class="box">div</div>
-<span class="box">span</span>
-<span class="box">span</span>
-<span class="box">span</span>
-<style>
- .box { 
-    width:50px; 
-    height:50px; 
-    display: table-cell; 
-    vertical-align: middle; 
-    text-align: center;
-    border:1px solid black;
- }
- span { background-color: lightblue; }
- div { background-color: yellow; }
-</style>
-```
-<sup>[^ live example](https://runkit.com/develax/razor-tags)</sup>
