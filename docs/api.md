@@ -36,7 +36,7 @@ const razor = require('razor'); // the Razor-Express engine
 app.set('view engine', 'raz'); // register the RAZ template engine
 // ...
 ```
-the Express looks for the `__express()` method and calles it when a view template needs to be rendered. The `__express()` internally calls the [`renderFile()`](#renderFile), so there is no difference between themю
+the Express looks for the `__express()` method and calls it when a view template needs to be rendered. The `__express()` internally calls [`renderFile()`](#renderFile), so there is no difference between themю
 
 <sup>(see [RazorExpressExample repository](https://github.com/DevelAx/RazorExpressExample))</sup>
 
