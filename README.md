@@ -9,6 +9,7 @@
 - [**Quick Start**](#quick-start)
   - [Node.js example](#nodejs-example)
   - [Express web-server example](#express-web-server-example)
+- [**Razor-Express API**](/docs/api.md)
 - [**The overview of Razor-Express view template engine**](https://github.com/DevelAx/RazorExpress/blob/master/docs/overview.md)
   - [Views and View Template Engine](https://github.com/DevelAx/RazorExpress/blob/master/docs/overview.md#views-and-view-template-engine)
   - [Rendering layout system](https://github.com/DevelAx/RazorExpress/blob/master/docs/overview.md#rendering-layout-system)
