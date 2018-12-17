@@ -58,4 +58,8 @@ razor.register(app);  // register the RAZ template engine
 
 Sets the engine's built-in error handler, after which all Razor-Express errors will be converted to the HTML format with the specified error code. This handler will work only if the mode specified in the `mode` parameter matches the value of the `NODE_ENV` environment variable. See also the ["Errors handling"](Debugging.md#errors-handling) section.
 
+## render(template)
+* **template** `<String>` template in Razor-Express format
+* Returns: `<String>` rendered HTML.
 
+Renderes HTML from the text in [Razor-Express format](syntax.md) passed in the `template` parameter.
