@@ -184,7 +184,7 @@ const template = `
 ```JS
 // This code is meant for Node.js 
 const razor = require("raz");
-var html = razor.compileSync({ model, template });
+var html = razor.compile({ model, template });
 ```
 
 Now let's display it in the console to make sure our expectations are fully met.
@@ -315,7 +315,7 @@ const template = `
 const razor = require("raz")
 
 try{
-    var html = razor.compileSync({ template });
+    var html = razor.compile({ template });
 }
 catch(err){
     console.log(err);
