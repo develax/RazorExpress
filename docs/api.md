@@ -73,11 +73,17 @@ See also the ["Errors handling"](Debugging.md#errors-handling) section.
 * **template** `<String>` template in [Razor-Express format](syntax.md)
 * Returns: `<String>` rendered HTML.
 
-Renderes HTML from the Razor-Express templated text passed in the `template` parameter.
+Renderes HTML from the Razor-Express templated text passed in the `template` parameter:
+```HTML+Razor
+require("raz").render("Today is @(new Date())");
+```
 
 ## render({template, model})
 * **template** `<String>` template in [Razor-Express format](syntax.md)
 * **model** `<Object>` data for the template
 * Returns: `<String>` rendered HTML.
 
-Renderes HTML from the Razor-Express templated text passed in the `template` parameter and the data passed in the 'model' parameter.
+Renderes HTML from the Razor-Express templated text passed in the `template` parameter and the data passed in the 'model' parameter:
+```HTML+Razor
+require("raz").render({template: "It's @Model now.", model: new Date().getFullYear()});
+```
