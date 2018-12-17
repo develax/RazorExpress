@@ -87,7 +87,7 @@ See also the ["Errors handling"](Debugging.md#errors-handling) section.
 
 Renderes HTML from the Razor-Express templated text passed in the `template` parameter:
 ```js
-require("raz").render("Today is @(new Date())");
+require("raz").compile("Today is @(new Date())");
 ```
 
 ### render({ template, model })
@@ -97,5 +97,5 @@ require("raz").render("Today is @(new Date())");
 
 Renderes HTML from the Razor-Express templated text passed in the `template` parameter and the data passed in the 'model' parameter:
 ```js
-require("raz").render({ template: "It's @Model now.", model: new Date().getFullYear() });
+require("raz").compile({ template: "It's @Model now.", model: new Date().getFullYear() });
 ```
