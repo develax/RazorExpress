@@ -2,7 +2,7 @@
 
 # Razor-Express API
 
-The Razor-Express module provides the following functions:
+The Razor-Express module exports the following functions:
 
 <a name="renderFile"></a>
 ## renderFile(filepath, options, done)
@@ -41,7 +41,7 @@ the Express looks for the `__express()` method and calls it when a view template
 <sup>(see [RazorExpressExample repository](https://github.com/DevelAx/RazorExpressExample))</sup>
 
 ## register(app)
-* **app** `<expres-app-instance>` the instance of the Express app
+* **app** `<express>` the instance of the Express app
 
 Registers the Razor-Express engine so you don't have to do it via `app.set('view engine', 'raz')`:
 ```JavaScript
@@ -50,3 +50,10 @@ const razor = require('razor'); // the Razor-Express engine
 razor.register(app);  // register the RAZ template engine
 // ...
 ```
+
+## handleErrors(app, errorCode, mode)
+* **app** `<express>` the instance of the Express app
+* **errorCode** `<integer>`, *default:* 500
+* **mode** `<String>`, *default:* "development"
+
+Sets the engine's built-in error handler, after which all Razor-Express errors will be converted to the HTML format with the specified error code. This handler will work only if the mode specified in the `mode` parameter matches the value of the `NODE_ENV` environment variable. See also the ["Errors handling"](Debugging.md#errors-handling) section.
