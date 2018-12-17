@@ -82,12 +82,12 @@ Renderes HTML from the Razor-Express templated text passed in the `template` par
 require("raz").render("Today is @(new Date())");
 ```
 
-## render({template, model})
+## render({ template, model })
 * **template** `<String>` template in [Razor-Express format](syntax.md)
 * **model** `<Object>` data for the template
 * Returns: `<String>` rendered HTML.
 
 Renderes HTML from the Razor-Express templated text passed in the `template` parameter and the data passed in the 'model' parameter:
 ```js
-require("raz").render({template: "It's @Model now.", model: new Date().getFullYear()});
+require("raz").render({ template: "It's @Model now.", model: new Date().getFullYear() });
 ```
