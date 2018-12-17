@@ -39,10 +39,12 @@ app.set('view engine', 'raz'); // register the RAZ template engine
 <sup>(see [RazorExpressExample repository](https://github.com/DevelAx/RazorExpressExample))</sup>
 
 ## register(app)
-* **app** `<expres-app-instance>` full path to the view template file
+* **app** `<expres-app-instance>` the instance of the Express app
 
 Registers the Razor-Express engine so you don't have to do it via `app.set('view engine', 'raz')`:
+```JavaScript
 const app = require('express')(); // the Express web server app
 const razor = require('razor'); // the Razor-Express engine 
 razor.register(app);  // register the RAZ template engine
-
+// ...
+```
