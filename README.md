@@ -179,12 +179,12 @@ const template = `
 }
 </ul>`;
 ```
-...which are pretty much self-explained as we remember what our two components are. Next, we have to compile them together using Razor-Express library to get the expected HTML.
+...which are pretty much self-explained as we remember what our two components are. Next, we have to render them together using Razor-Express library to get the expected HTML.
 
 ```JS
 // This code is meant for Node.js 
 const razor = require("raz");
-var html = razor.compile({ model, template });
+var html = razor.render({ model, template });
 ```
 
 Now let's display it in the console to make sure our expectations are fully met.
@@ -315,7 +315,7 @@ const template = `
 const razor = require("raz")
 
 try{
-    var html = razor.compile({ template });
+    var html = razor.render({ template });
 }
 catch(err){
     console.log(err);
