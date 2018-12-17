@@ -6,13 +6,13 @@ module.exports = {
     // https://expressjs.com/en/guide/using-template-engines.html
     // https://www.npmjs.com/package/hbs
     __express: renderFile,
-    compileFile: renderFile,
-    compile: getParser().compileSync,
+    renderFile: renderFile,
+    render: getParser().compileSync,
     /**
-     * @deprecated Since version "0.0.66". Will be deleted in version "1.0.0". Use 'compile' instead.
+     * @deprecated Since version "0.0.66". Will be deleted in version "1.0.0". Use 'render' instead.
      */
     compileSync: function () {
-        console.warn("The 'compileSync' method is deprecated. Will be deleted in version '1.0.0'. Use 'compile' instead.");
+        console.warn("The 'compileSync' method is deprecated. Will be deleted in version '1.0.0'. Use 'render' instead.");
         var parser = getParser();
         parser.compileSync.apply(parser, arguments);
     },
