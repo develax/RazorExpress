@@ -2,16 +2,21 @@
 
 # Razor-Express API
 
-- [`renderFile`](#renderFile)
-- [`__express`](#__express)
-- [`register`](#register)
-- [`handleErrors`](#handleErrors)
-- [`render`](#render)
+- [For NodeJS Express web-server](#for-express)
+ - [`renderFile`](#renderFile)
+ - [`__express`](#__express)
+ - [`register`](#register)
+ - [`handleErrors`](#handleErrors)
+- [Direct rendering string templates to HTML](#direct-rendering)
+ - [`render`](#render)
 
 The Razor-Express module exports the following functions:
 
+<a name="for-express"></a>
+## For NodeJS Express web-server:
+
 <a name="renderFile"></a>
-## renderFile(filepath, options, done)
+### renderFile(filepath, options, done)
 * **filepath** `<string>` full path to the view template file
 * **options** `<Object>` parameters passed by the *Express* module
 * **done** `<Function>` callback function
@@ -33,7 +38,7 @@ app.set('view engine', 'raz'); // register the template engine
 <sup>(example from the [Express docs](https://expressjs.com/en/advanced/developing-template-engines.html))</sup>
 
 <a name="__express"></a>
-## __express(filepath, options, done)
+### __express(filepath, options, done)
 
 If any view engine is set in one line of code, like in this example:
 ```JavaScript
@@ -47,7 +52,7 @@ the [Express looks](https://expressjs.com/en/guide/using-template-engines.html) 
 <sup>(see [RazorExpressExample repository](https://github.com/DevelAx/RazorExpressExample))</sup>
 
 <a name="register"></a>
-## register(app)
+### register(app)
 * **app** `<express>` instance of the Express app
 
 Registers the Razor-Express engine so you don't have to do it via `app.set('view engine', 'raz')`:
@@ -59,7 +64,7 @@ razor.register(app);  // register the RAZ template engine
 ```
 
 <a name="handleErrors"></a>
-## handleErrors(app, errorCode, mode)
+### handleErrors(app, errorCode, mode)
 * **app** `<express>` instance of the Express app
 * **errorCode** `<integer>`, *default:* 500
 * **mode** `<String>`, *default:* "development"
@@ -72,8 +77,11 @@ raz.handleErrors(app); // set default error-handler for Razor-Express errors
 ```
 See also the ["Errors handling"](Debugging.md#errors-handling) section.
 
+<a name="#direct-rendering"></a>
+## Direct rendering string templates to HTML:
+
 <a name="render"></a>
-## render(template)
+### render(template)
 * **template** `<String>` template in [Razor-Express format](syntax.md)
 * Returns: `<String>` rendered HTML.
 
@@ -82,9 +90,9 @@ Renderes HTML from the Razor-Express templated text passed in the `template` par
 require("raz").render("Today is @(new Date())");
 ```
 
-## render({ template, model })
+### render({ template, model })
 * **template** `<String>` template in [Razor-Express format](syntax.md)
-* **model** `<Object>` data for the template
+* **model** `<Object>` data for the template, *default*: `undefined`
 * Returns: `<String>` rendered HTML.
 
 Renderes HTML from the Razor-Express templated text passed in the `template` parameter and the data passed in the 'model' parameter:
