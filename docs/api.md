@@ -77,7 +77,7 @@ raz.handleErrors(app); // set default error-handler for Razor-Express errors
 ```
 See also the ["Errors handling"](Debugging.md#errors-handling) section.
 
-<a name="#direct-rendering"></a>
+<a name="direct-rendering"></a>
 ## Direct rendering string templates to HTML:
 
 <a name="render"></a>
