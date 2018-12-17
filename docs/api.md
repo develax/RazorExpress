@@ -12,8 +12,8 @@ The Razor-Express module exports the following functions:
   * **err** `<RazorError>` Razor-Express parser or compiler error
   * **html** <string> rendered HTML
 
-Asynchronously reads the [view template file](overview.md#views-and-view-template-engine), parses, compiles, and renderes it to HTML. The `done` callback returns to the caller either the rendered HTML via the `html` argument or an error via the `err` argument if it occurs. 
-This method is meant to be called by the [Express library](https://expressjs.com/) if you set the template engine explicitly: 
+Asynchronously reads the [view template file](overview.md#views-and-view-template-engine), parses, compiles, and renderes it with all its referenced views to HTML. The `done` callback returns to the caller either the rendered HTML via the `html` argument or an error via the `err` argument if it occurs. 
+This method is meant to be called by the [Express library](https://expressjs.com/) in case you set the template engine handler explicitly: 
 
 ```JavaScript
 const app = require('express')(); // the Express web server app.
@@ -31,7 +31,7 @@ app.set('view engine', 'raz'); // register the template engine
 
 If any view engine is set in one line of code, like in this example:
 ```JavaScript
-const app = require('express')(); // the Express web server app.
+const app = require('express')(); // the Express web server app
 const razor = require('razor'); // the Razor-Express engine 
 app.set('view engine', 'raz'); // register the RAZ template engine
 // ...
@@ -41,7 +41,7 @@ the Express looks for the `__express()` method and calls it when a view template
 <sup>(see [RazorExpressExample repository](https://github.com/DevelAx/RazorExpressExample))</sup>
 
 ## register(app)
-* **app** `<express>` the instance of the Express app
+* **app** `<express>` instance of the Express app
 
 Registers the Razor-Express engine so you don't have to do it via `app.set('view engine', 'raz')`:
 ```JavaScript
@@ -52,8 +52,10 @@ razor.register(app);  // register the RAZ template engine
 ```
 
 ## handleErrors(app, errorCode, mode)
-* **app** `<express>` the instance of the Express app
+* **app** `<express>` instance of the Express app
 * **errorCode** `<integer>`, *default:* 500
 * **mode** `<String>`, *default:* "development"
 
 Sets the engine's built-in error handler, after which all Razor-Express errors will be converted to the HTML format with the specified error code. This handler will work only if the mode specified in the `mode` parameter matches the value of the `NODE_ENV` environment variable. See also the ["Errors handling"](Debugging.md#errors-handling) section.
+
+
