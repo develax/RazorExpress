@@ -29,13 +29,15 @@ app.set('view engine', 'raz'); // register the template engine
 
 ## __express(filepath, options, done)
 
-Internally calls the [`renderFile()`](#renderFile) method if the Razor-Express engine is set just in one line of code:
+This function is intended to be used by the Express app only. If any view engine is set in one line of code, like in this example:
 ```JavaScript
 const app = require('express')(); // the Express web server app.
 const razor = require('razor'); // the Razor-Express engine 
 app.set('view engine', 'raz'); // register the RAZ template engine
 // ...
 ```
+the Express looks for the `__express()` method and calles it when a view template needs to be rendered. The `__express()` internally calls the [`renderFile()`](#renderFile), so there is no difference between themю
+
 <sup>(see [RazorExpressExample repository](https://github.com/DevelAx/RazorExpressExample))</sup>
 
 ## register(app)
