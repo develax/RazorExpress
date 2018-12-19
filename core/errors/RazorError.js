@@ -8,17 +8,17 @@ const htmlEncode = require('js-htmlencode');
 // const regex = /.*Error:/;
 
 module.exports = class RazorError extends Error {
-    constructor(message, templateInfo, line, pos, len, captureFrame) {
+    constructor(message, templateInfo, line, pos, len, captureFrame, posRange) {
         super(message);
         this.name = this.constructor.name;
-        this.data = Object.assign({ line, pos, len }, templateInfo);
+        this.data = Object.assign({ line, pos, len, posRange }, templateInfo);
 
         if (Error.captureStackTrace)
             Error.captureStackTrace(this, captureFrame || this.constructor);
     }
 
-    static new(args){
-        return new RazorError(args.message, args.info, args.line, args.pos, args.len, args.capture || this.new);
+    static new(args) {
+        return new RazorError(args.message, args.info, args.line, args.pos, args.len, args.capture || this.new, args.posRange);
     }
 
     html() {
@@ -52,24 +52,46 @@ module.exports = class RazorError extends Error {
         let code;
 
         if (this.data.jshtml) {
+            let textCursor = 0;
             lines = this.data.jshtml.split('\n');
             code = "<ol start='1'>";
 
             for (let i = 0; i < lines.length; i++) {
                 let line = lines[i];
-                let highlight, htmlLine, comment;
+                let highlight, htmlLine, comment, multilight;
+                let textCursorEnd = textCursor + line.length + 1; // + '\n'
 
-                if (this.data.line === i) {
-                    highlight = "class='highlight'";
-                    let pos = this.data.pos;
-                    let len = this.data.len || 1;
+                if (this.data.posRange && this.data.posRange.start < this.data.posRange.end) {
+                    if (this.data.posRange.start >= textCursor && this.data.posRange.start < textCursorEnd) {
+                        var pos = this.data.posRange.start - textCursor;
 
-                    if (typeof pos !== 'undefined' && pos < line.length) {
+                        if (this.data.posRange.end < textCursorEnd) {
+                            var len = this.data.posRange.end - this.data.posRange.start;
+                            this.data.posRange = null; // prevent further useless computation during the next iterations of this cycle
+                        }
+                        else {
+                            len = line.length;
+                            this.data.posRange.start = textCursorEnd; // move to the beginning of the next line
+                        }
+
+                        multilight = "multilight";
+                    }
+                }
+                else if (this.data.line === i) {
+                    pos = this.data.pos;
+                    len = this.data.len || 1;
+                }
+
+                if (pos != null && typeof pos !== 'undefined') {
+                    if (pos < line.length) {
                         let start = htmlEncode(line.substring(0, pos));
                         let one = htmlEncode(line.substring(pos, pos + len));
                         let end = htmlEncode(line.substring(pos + len + 1));
-                        htmlLine = `<span>${start}</span><span class='highlight' title='${mainInfo}'>${one}</span><span>${end}</span>`;
+                        htmlLine = `<span>${start}</span><span class='${multilight || "highlight"}' title='${mainInfo}'>${one}</span><span>${end}</span>`;
+                        highlight = "class='highlight'";
+
                     }
+                    pos = null;
                 }
                 else {
                     let trim = line.trim();
@@ -82,7 +104,9 @@ module.exports = class RazorError extends Error {
                 code += `<li ${comment || highlight}><span>`;
                 code += htmlLine ? htmlLine : htmlEncode(line);
                 code += "</span></li>";
-            }
+
+                textCursor = textCursorEnd;
+            }// for
 
             code += "</ol>";
             code = `
@@ -133,6 +157,11 @@ module.exports = class RazorError extends Error {
         }
         ol li span.highlight {
             border: solid 1px red;
+        }
+        ol li span.multilight {
+            background-color: #ebef00;
+            font-weight: bold;
+            color: red;
         }
         ol li.comment {
             color: lightgray;

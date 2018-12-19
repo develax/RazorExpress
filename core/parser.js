@@ -25,6 +25,9 @@ function compilePage(Html, Model, ViewData, debug, done) {
         return Html.__renderLayout(done);
     }
     catch (exc) {
+        if (Html.__dbg)
+            exc.__pos = Html.__dbg.__pos;
+
         done(exc);
     }
 }
@@ -64,7 +67,7 @@ module.exports = function (opts) {
 
         // User section.
         if (debugMode)
-            this.__dbg = { viewName: args.filePath, template: args.template }
+            this.__dbg = { viewName: args.filePath, template: args.template, __pos: null }
 
         this.$ =
             this.layout = null;
@@ -231,7 +234,7 @@ module.exports = function (opts) {
     }
 
     function toScript(block, jsValues) {
-        if (block.type === type.section) {
+        if (block.type === blockType.section) {
             let secMarker = `\r\nHtml.__sec("${block.name}");`;
             let script = secMarker;
 
@@ -247,13 +250,21 @@ module.exports = function (opts) {
             let i;
 
             switch (block.type) {
-                case type.html:
+                case blockType.html:
                     i = jsValues.enq(block.text);
                     return "\r\nHtml.raw(Html.__val(" + i + "));";
-                case type.expr:
+                case blockType.expr:
                     i = jsValues.enq(block.text);
-                    return "\r\nHtml.encode(eval(Html.__val(" + i + ")));";
-                case type.code:
+                    return  `
+Html.__dbg.__pos = { start:${block.posStart}, end: ${block.posEnd} };
+Html.encode(eval(Html.__val(${i})));
+Html.__dbg.__pos = null`;
+                case blockType.code:
+                    if (debugMode)
+                        return `
+Html.__dbg.__pos = { start:${block.posStart}, end: ${block.posEnd} };
+${block.text}
+Html.__dbg.__pos = null`;
                     return "\r\n" + block.text; // to be on a separate line
                 default:
                     throw new Error(`Unexpected block type = "${blockType}".`);
@@ -287,7 +298,7 @@ module.exports = function (opts) {
 
     const _sectionKeyword = "section";
     //const _functionKeyword = "function";
-    const type = { none: 0, html: 1, code: 2, expr: 3, section: 4 };
+    const blockType = { none: 0, html: 1, code: 2, expr: 3, section: 4 };
 
     const RazorError = require('./errors/RazorError');
     const ErrorsFactory = require('./errors/errors');
@@ -417,7 +428,7 @@ module.exports = function (opts) {
             const tagKinds = { open: 0, close: 1, selfclose: 2 };
             var openTags = [];
             var tag = '', lineLastLiteral = '', lastLiteral = '';
-            var block = newBlock(type.html, blocks);
+            var block = newBlock(blockType.html, blocks, this.pos);
             let stop = false, inComments = false;
             let inJs = "script".equal(outerWaitTag, true);
             var lastCh = '';
@@ -456,7 +467,7 @@ module.exports = function (opts) {
                         if (tag === '<' || tag === '</')
                             tag = '';
 
-                        block = newBlock(type.html, blocks);
+                        block = newBlock(blockType.html, blocks, this.pos);
                         continue;
                     }
                 }
@@ -606,7 +617,7 @@ module.exports = function (opts) {
             var quotes = [];
             var tag = '', openTag = '', openTagName = '', lineLastLiteral = '';
             let openTagLineNum, openTagPos;
-            var block = newBlock(type.html, blocks);
+            var block = newBlock(blockType.html, blocks, this.pos);
             var lastCh = '';
             let stop = false, inComments = false, inJs = false;
 
@@ -643,7 +654,7 @@ module.exports = function (opts) {
                         if (tag && (tag === '<' || tag === '</'))
                             tag += '@' + blocks[blocks.length - 1].text + this.padding; // just to be considered as a tag later (for the case of '<@tag>')
 
-                        block = newBlock(type.html, blocks);
+                        block = newBlock(blockType.html, blocks, this.pos);
                         continue;
                     }
                     else {
@@ -806,7 +817,7 @@ module.exports = function (opts) {
             function processInnerHtml() {
                 this.stepBack(blocks, tag.length);
                 this.parseHtml(blocks, openTagName);
-                block = newBlock(type.html, blocks);
+                block = newBlock(blockType.html, blocks, this.pos);
                 tag = lastCh = lineLastLiteral = '';
             }
         }
@@ -840,7 +851,7 @@ module.exports = function (opts) {
             let lastCh = '';
             let padding = this.padding;
             this.padding = '';
-            let block = newBlock(type.expr, blocks);
+            let block = newBlock(blockType.expr, blocks, this.pos);
             var checkForBlockCode = false;
             let inText = false;
             let operatorName = '';
@@ -853,7 +864,7 @@ module.exports = function (opts) {
                     else if (ch === '{') {
                         //this.flushPadding(blocks);
                         this.padding = padding;
-                        block.type = type.code;
+                        block.type = blockType.code;
                         return this.parseJsBlock(blocks, block, operatorName);
                     }
                     else {
@@ -990,7 +1001,7 @@ module.exports = function (opts) {
             let skipCh = true;
             let inText = false;
             let hasOperator = !!block;
-            block = block || newBlock(type.code, blocks);
+            block = block || newBlock(blockType.code, blocks, this.pos);
             let firstLine = this.line, firstLineNum = this.lineNum, trackFirstLine = true;
             let waitOperator = null, waitAcc = '', operatorExpectScope;
 
@@ -1113,7 +1124,7 @@ module.exports = function (opts) {
                             if (lastLiteral === '' || lastLiteral === '{' || lastLiteral === ';') {
                                 this.stepBack(blocks, 0);
                                 this.parseHtmlInsideCode(blocks);
-                                block = newBlock(type.code, blocks);
+                                block = newBlock(blockType.code, blocks, this.pos);
                                 continue;
                             }
                         }
@@ -1244,7 +1255,7 @@ module.exports = function (opts) {
             //if (ch !== '}')
             //    throw this.er.sectionBlockIsMissingClosingBrace(sectionName, sectionLine, sectionStartPos); // Tests: "Section 9".
 
-            var block = newBlock(type.section, this.blocks, sectionName);
+            var block = newBlock(blockType.section, this.blocks, this.pos, sectionName);
             block.blocks = sectionBlocks;
             this.inSection = false;
         }
@@ -1312,7 +1323,7 @@ module.exports = function (opts) {
             }
 
             // adjust blocks..
-            if (!block.text.length || block.type === type.code && String.isWhiteSpace(block.text)) {
+            if (!block.text.length || block.type === blockType.code && String.isWhiteSpace(block.text)) {
                 blocks.pop();
             }
             else if (count > 0) {
@@ -1380,8 +1391,15 @@ module.exports = function (opts) {
         return ch === '_' || ch === '$' || Char.isLetter(ch) || Char.isDigit(ch);
     }
 
-    function newBlock(type, blocks, name) {
+    function newBlock(type, blocks, textPos, name) {
+        textPos = (type === blockType.html) ? textPos : textPos - 1; // -1 for the skipped "@" symbol in code-blocks and expressions.
+
+        if (blocks.length)
+            blocks[blocks.length - 1].posEnd = textPos;
+
         var block = new Block(type, name);
+        block.posStart = textPos;
+        
         blocks.push(block);
         return block;
     }
@@ -1429,7 +1447,7 @@ module.exports = function (opts) {
             return err;
         }
 
-        let parserError = errorFactory.customError(err.message || err, toParserError);
+        let parserError = errorFactory.customError(err.message || err, toParserError, { start: err.__pos.start, end: err.__pos.end });
 
         if (err.stack)
             parserError.stack = err.stack;

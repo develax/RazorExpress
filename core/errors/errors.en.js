@@ -180,8 +180,8 @@ class ParserErrorFactory {
     //     return new ParserError(message, this.args);
     // }
 
-    customError(message, capture) {
-        return RazorError.new({ message, info: this.info, capture: capture || this.customError });
+    customError(message, capture, posRange) {
+        return RazorError.new({ message, info: this.info, capture: capture || this.customError, posRange });
     }
 }
 
