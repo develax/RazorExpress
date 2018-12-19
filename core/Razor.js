@@ -7,7 +7,7 @@ const dbg = require('./dbg/debugger');
 
 'use strict';
 const ext = "raz", viewStartName = '_viewStart';
-const _eol_ = require('os').EOL;
+const EOL = require('os').EOL;
 
 module.exports = class Razor {
     constructor(options) {
@@ -236,10 +236,13 @@ module.exports = class Razor {
     }
 
     addFileNameIfDev(data, filename) {
-        if (dbg.isDebug(this.env))
-            return this.wrapInHtmlComment(filename) + _eol_ + data.toString();
+        data = data.toString();
+        let endNL = (data[data.length - 1] === '\n') ? '' : '\n';
 
-        return data.toString();
+        if (dbg.isDebug(this.env))
+            return this.wrapInHtmlComment(filename) + EOL + data + endNL;
+
+        return data + endNL;
     }
 
     wrapInHtmlComment(text) {
