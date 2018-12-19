@@ -1447,7 +1447,7 @@ Html.__dbg.__pos = null`;
             return err;
         }
 
-        let parserError = errorFactory.customError(err.message || err, toParserError, { start: err.__pos.start, end: err.__pos.end });
+        let parserError = errorFactory.customError(err.message || err, toParserError, err.__pos && { start: err.__pos.start, end: err.__pos.end });
 
         if (err.stack)
             parserError.stack = err.stack;
