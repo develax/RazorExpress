@@ -1,4 +1,4 @@
-# RAZ: Razor-Express view template engine
+# RAZ: Razor-Express view template engine for NodeJS
 
 > <pre>$ npm install <b>raz</b> --save</pre>
 
