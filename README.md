@@ -157,7 +157,7 @@ which is just a *JavaScript object*. And we want to get some HTML displaying the
 </ul>
 ```
 
-As you can see the **view-template** (or just **view**) is nothing more than *HTML markup mixed with JavaScript syntax*. This is exactly what [Razor-Express syntax](https://github.com/DevelAx/RazorExpress/blob/master/docs/syntax.md) is.
+As you can see the [*view-template*](/docs/overview.md#views-and-view-template-engine) (or just *view*) is nothing more than *HTML markup mixed with JavaScript syntax*. This is exactly what [Razor-Express syntax](https://github.com/DevelAx/RazorExpress/blob/master/docs/syntax.md) is.
 
 Now we are going to take these two components and "compile" them into pure HTML.   
 

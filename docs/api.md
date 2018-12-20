@@ -28,7 +28,7 @@ This method is meant to be called by the [Express library](https://expressjs.com
 
 ```JavaScript
 const app = require('express')(); // the Express web server app.
-const razor = require('razor'); // the Razor-Express engine 
+const razor = require('raz'); // the Razor-Express engine 
 app.engine('raz', function (filePath, options, callback) {
   razor.renderFile(filePath, options, callback);
 })
@@ -43,7 +43,6 @@ app.set('view engine', 'raz'); // register the template engine
 If any view engine is set in one line of code, like in this example:
 ```JavaScript
 const app = require('express')(); // the Express web server app
-const razor = require('razor'); // the Razor-Express engine 
 app.set('view engine', 'raz'); // register the RAZ template engine
 // ...
 ```
@@ -58,8 +57,8 @@ the [Express looks](https://expressjs.com/en/guide/using-template-engines.html) 
 Registers the Razor-Express engine so you don't have to do it via `app.set('view engine', 'raz')`:
 ```JavaScript
 const app = require('express')(); // the Express web server app
-const razor = require('razor'); // the Razor-Express engine 
-razor.register(app);  // register the RAZ template engine
+const raz = require('raz'); // the Razor-Express engine 
+raz.register(app);  // register the RAZ template engine
 // ...
 ```
 
@@ -72,7 +71,7 @@ razor.register(app);  // register the RAZ template engine
 Sets the engine's built-in error handler, after which all Razor-Express errors will be converted to the HTML format with the specified error code. This handler will work only if the mode specified in the `mode` parameter matches the value of the `NODE_ENV` environment variable. 
 ```js
 const app = require('express')(); // the Express web server app
-const razor = require('razor'); // the Razor-Express engine 
+const raz = require('raz'); // the Razor-Express engine 
 raz.handleErrors(app); // set default error-handler for Razor-Express errors
 ```
 See also the ["Errors handling"](Debugging.md#errors-handling) section.

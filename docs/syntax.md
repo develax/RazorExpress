@@ -1,6 +1,7 @@
+[<< Back to start](../README.md)
+
 # Razor-Express syntax reference for NodeJS & Express
 
-[<< Back to start](../README.md)
 - [**A simple example**](#a-simple-example-of-razor-express-markup)
 - [**Escaping `@` character**](#escaping--character)
 - [**Expressions**](#expressions)
