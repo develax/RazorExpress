@@ -143,12 +143,12 @@ class ParserErrorFactory {
 
     sectionsAlreadyRendered(sectionName, renderedBy, attemptedBy) {
         var message = `Sections named '${sectionName}' have already been rendered by '${renderedBy}'. There is an atempt to rendered it again by '${attemptedBy}'.`;
-        return RazorError.new({ message, info: this.info, capture: this.sectionBeenRendered });
+        return RazorError.new({ message, info: this.info, capture: this.sectionsAlreadyRendered });
     }
 
     sectionNeverRendered(sectionName, viewPath) {
         var message = `Section '${sectionName}' in '${viewPath}' has never been rendered. If a section exists it must be rendered.`;
-        return RazorError.new({ message, info: this.info, capture: this.sectionBeenRendered });
+        return RazorError.new({ message, info: this.info, capture: this.sectionNeverRendered });
     }
 
     partialViewNotFound(partialView, searchedLocations) {
