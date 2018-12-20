@@ -1,4 +1,4 @@
-# RAZ: Razor-Express view template engine
+# RAZ: Razor-Express view template engine for NodeJS
 
 > <pre>$ npm install <b>raz</b> --save</pre>
 
@@ -130,7 +130,7 @@ I won't go much into all the aspects I don't like in other engines syntax just s
 In these examples I don't compare logic constructions because some of the view engines have logic-less templating syntax.
 With *Razor* you can implement amost any logic that is available with normal *JavaScript* without learning a new syntax.
 
-Given all the mentioned and unmentioned pros and cons, I decided not to part with *Razor-syntax* and create something similar for using with [ExpressJS](https://expressjs.com) library (currently it works only in *NodeJS* environment, not in browsers).
+Given all the mentioned and unmentioned pros and cons, I decided not to part with *Razor-syntax* and create something similar for using with [ExpressJS library](https://expressjs.com).
 
 -----------------------
 
