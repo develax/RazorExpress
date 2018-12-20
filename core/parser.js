@@ -255,7 +255,7 @@ module.exports = function (opts) {
                     return "\r\nHtml.raw(Html.__val(" + i + "));";
                 case blockType.expr:
                     i = jsValues.enq(block.text);
-                    return  `
+                    return `
 Html.__dbg.__pos = { start:${block.posStart}, end: ${block.posEnd} };
 Html.encode(eval(Html.__val(${i})));
 Html.__dbg.__pos = null`;
@@ -428,7 +428,7 @@ Html.__dbg.__pos = null`;
             const tagKinds = { open: 0, close: 1, selfclose: 2 };
             var openTags = [];
             var tag = '', lineLastLiteral = '', lastLiteral = '';
-            var block = newBlock(blockType.html, blocks, this.pos);
+            var block = this.newBlock(blockType.html, blocks);
             let stop = false, inComments = false;
             let inJs = "script".equal(outerWaitTag, true);
             var lastCh = '';
@@ -467,7 +467,7 @@ Html.__dbg.__pos = null`;
                         if (tag === '<' || tag === '</')
                             tag = '';
 
-                        block = newBlock(blockType.html, blocks, this.pos);
+                        block = this.newBlock(blockType.html, blocks);
                         continue;
                     }
                 }
@@ -617,7 +617,7 @@ Html.__dbg.__pos = null`;
             var quotes = [];
             var tag = '', openTag = '', openTagName = '', lineLastLiteral = '';
             let openTagLineNum, openTagPos;
-            var block = newBlock(blockType.html, blocks, this.pos);
+            var block = this.newBlock(blockType.html, blocks);
             var lastCh = '';
             let stop = false, inComments = false, inJs = false;
 
@@ -654,7 +654,7 @@ Html.__dbg.__pos = null`;
                         if (tag && (tag === '<' || tag === '</'))
                             tag += '@' + blocks[blocks.length - 1].text + this.padding; // just to be considered as a tag later (for the case of '<@tag>')
 
-                        block = newBlock(blockType.html, blocks, this.pos);
+                        block = this.newBlock(blockType.html, blocks);
                         continue;
                     }
                     else {
@@ -817,7 +817,7 @@ Html.__dbg.__pos = null`;
             function processInnerHtml() {
                 this.stepBack(blocks, tag.length);
                 this.parseHtml(blocks, openTagName);
-                block = newBlock(blockType.html, blocks, this.pos);
+                block = this.newBlock(blockType.html, blocks);
                 tag = lastCh = lineLastLiteral = '';
             }
         }
@@ -851,7 +851,7 @@ Html.__dbg.__pos = null`;
             let lastCh = '';
             let padding = this.padding;
             this.padding = '';
-            let block = newBlock(blockType.expr, blocks, this.pos);
+            let block = this.newBlock(blockType.expr, blocks);
             var checkForBlockCode = false;
             let inText = false;
             let operatorName = '';
@@ -1001,7 +1001,7 @@ Html.__dbg.__pos = null`;
             let skipCh = true;
             let inText = false;
             let hasOperator = !!block;
-            block = block || newBlock(blockType.code, blocks, this.pos);
+            block = block || this.newBlock(blockType.code, blocks);
             let firstLine = this.line, firstLineNum = this.lineNum, trackFirstLine = true;
             let waitOperator = null, waitAcc = '', operatorExpectScope;
 
@@ -1124,7 +1124,7 @@ Html.__dbg.__pos = null`;
                             if (lastLiteral === '' || lastLiteral === '{' || lastLiteral === ';') {
                                 this.stepBack(blocks, 0);
                                 this.parseHtmlInsideCode(blocks);
-                                block = newBlock(blockType.code, blocks, this.pos);
+                                block = this.newBlock(blockType.code, blocks);
                                 continue;
                             }
                         }
@@ -1255,7 +1255,7 @@ Html.__dbg.__pos = null`;
             //if (ch !== '}')
             //    throw this.er.sectionBlockIsMissingClosingBrace(sectionName, sectionLine, sectionStartPos); // Tests: "Section 9".
 
-            var block = newBlock(blockType.section, this.blocks, this.pos, sectionName);
+            var block = this.newBlock(blockType.section, this.blocks, sectionName);
             block.blocks = sectionBlocks;
             this.inSection = false;
         }
@@ -1371,6 +1371,21 @@ Html.__dbg.__pos = null`;
             if (this.blocks.length && !this.blocks[this.blocks.length - 1].text)
                 this.blocks.pop();
         }
+
+
+        newBlock(type, blocks, name) {
+            let textPos = (type === blockType.html) ? this.pos : this.pos - 1; // -1 for the skipped "@" symbol in code-blocks and expressions.
+            textPos -= this.padding.length;
+
+            if (blocks.length)
+                blocks[blocks.length - 1].posEnd = textPos;
+
+            var block = new Block(type, name);
+            block.posStart = textPos;
+
+            blocks.push(block);
+            return block;
+        }
     }
 
     // class Parser helpers:
@@ -1389,19 +1404,6 @@ Html.__dbg.__pos = null`;
     function canExpressionEndWith(ch) {
 
         return ch === '_' || ch === '$' || Char.isLetter(ch) || Char.isDigit(ch);
-    }
-
-    function newBlock(type, blocks, textPos, name) {
-        textPos = (type === blockType.html) ? textPos : textPos - 1; // -1 for the skipped "@" symbol in code-blocks and expressions.
-
-        if (blocks.length)
-            blocks[blocks.length - 1].posEnd = textPos;
-
-        var block = new Block(type, name);
-        block.posStart = textPos;
-        
-        blocks.push(block);
-        return block;
     }
 
     function getTagName(tag) {
