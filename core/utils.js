@@ -93,6 +93,10 @@ Char.isWhiteSpace = Char.isWhiteSpace || function (c) {
     return String.whitespaces.indexOf(c) !== -1;
 };
 
+Char.isIdentifier = function(c){
+    return Char.isLetter(c) || Char.isDigit(c) || '_$'.includes(c);
+}
+
 
 ////////////////////////////////////////////////
 // path

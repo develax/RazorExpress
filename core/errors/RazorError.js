@@ -29,17 +29,33 @@ module.exports = class RazorError extends Error {
         for (let i = 0; i < lines.length; i++) {
             let line = lines[i];
 
-            if (i === 0 && line.startsWith("evalmachine."))
-                continue; // ignore the very first line like "evalmachine.<anonymous>:22"
+            if (i === 0 && (line.startsWith("evalmachine.") || line.startsWith("undefined:"))) {
+                let nextLineExists = i < lines.length + 1;
+
+                if (nextLineExists && this.data.jshtml && this.data.posRange) { // This is likely HTML parsing error (not code runtime error).
+                    // Let's try to narrow the error area by the data from the stack.
+                    let codeLine = lines[i + 1].trimRight();
+                    let errorCodeFragment = this.data.jshtml.substring(this.data.posRange.start, this.data.posRange.end);
+                    let codePos = errorCodeFragment.indexOf(codeLine);
+                    // Check if it exists and only once in the `errorCodeFragment`.
+                    if (codePos !== -1 && codePos === errorCodeFragment.lastIndexOf(codeLine)) {
+                        // Set a more precise location of the error.
+                        this.data.posRange.start = this.data.posRange.start + codePos;
+                        this.data.posRange.end = this.data.posRange.start + codeLine.length;
+
+                        // Include '@' symbol.
+                        if (this.data.posRange.start > 0 && this.data.jshtml[this.data.posRange.start - 1] === '@')
+                            this.data.posRange.start -= 1;
+                    }
+                }
+
+                continue; // skip the very first line like "evalmachine.<anonymous>:22"
+            }
 
             let nextLine = (i < lines.length - 1) ? lines[i + 1] : null;
             let encodedLine = htmlEncode(line);
             let style = '';
 
-            // if (line && line.trim() === "^" || nextLine && nextLine.trim() === "^" || regex.exec(line)) {
-            //     style = 'class="main"';
-            //     mainInfo += encodedLine;
-            // }
             if (line && !line.trim().startsWith("at ")) {
                 style = 'class="main"';
                 mainInfo += encodedLine;
@@ -184,3 +200,17 @@ module.exports = class RazorError extends Error {
         return html;
     }
 }
+
+// /**
+//  * HELPERS
+//  */
+// function getIndentifier(codeLine, startPos){
+//     let ch = codeLine[startPos];
+//     let isIdn = Char.isLetter(ch) || '_$'.includes(ch); // is it identifier
+//     let result = ch;
+
+//     for(let i = startPos + 1, ch = codeLine[i]; i < codeLine.length && (isIdn ? Char.isIdentifier(ch) : !Char.isIdentifier(ch)); i++, ch = codeLine[i])
+//         result += ch;
+
+//     return result;
+// }
