@@ -55,7 +55,7 @@ function handleErrors(app, errorCode, mode) {
 
         var env = app.get('env');
 
-        if (env === mode && err instanceof RazorError) {
+        if (env === mode && err.name === RazorError.name) {
             var errorHtml = err.html();
             res.status(errorCode || 500);
             res.send(errorHtml);

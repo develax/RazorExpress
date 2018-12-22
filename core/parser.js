@@ -25,9 +25,6 @@ function compilePage(Html, Model, ViewData, debug, done) {
         return Html.__renderLayout(done);
     }
     catch (exc) {
-        if (Html.__dbg)
-            exc.__pos = Html.__dbg.__pos;
-
         done(exc);
     }
 }
@@ -67,7 +64,7 @@ module.exports = function (opts) {
 
         // User section.
         if (debugMode)
-            this.__dbg = { viewName: args.filePath, template: args.template, __pos: null }
+            this.__dbg = { viewName: args.filePath, template: args.template, pos: [] }
 
         this.$ =
             this.layout = null;
@@ -256,15 +253,15 @@ module.exports = function (opts) {
                 case blockType.expr:
                     i = jsValues.enq(block.text);
                     return `
-Html.__dbg.__pos = { start:${block.posStart}, end: ${block.posEnd} };
+Html.__dbg.pos = { start:${block.posStart}, end: ${block.posEnd} };
 Html.encode(eval(Html.__val(${i})));
-Html.__dbg.__pos = null`;
+Html.__dbg.pos = null;`;
                 case blockType.code:
                     if (debugMode)
                         return `
-Html.__dbg.__pos = { start:${block.posStart}, end: ${block.posEnd} };
+Html.__dbg.pos = { start:${block.posStart}, end: ${block.posEnd} };
 ${block.text}
-Html.__dbg.__pos = null`;
+Html.__dbg.pos = null;`;
                     return "\r\n" + block.text; // to be on a separate line
                 default:
                     throw new Error(`Unexpected block type = "${blockType}".`);
@@ -319,28 +316,28 @@ Html.__dbg.__pos = null`;
             let errorFactory = this.er;
 
             try {
-                var html = this.getHtml({}, done);
+                var htmlObj = this.getHtml({}, done);
             }
             catch (exc) {
-                return onError(exc);
+                return error(exc);
             }
 
-            compilePage(html, this.args.model, this.args.viewData, isDebugMode(opts), (err, html) => {
+            compilePage(htmlObj, this.args.model, this.args.viewData, isDebugMode(opts), (err, html) => {
                 if (err)
-                    return onError(err);
+                    return error(err, htmlObj.__dbg);
 
                 try {
-                    if (this.args.root)
-                        this.checkSections();
+                    this.checkSections();
                 }
                 catch (exc) {
-                    return onError(exc);
+                    return error(exc, htmlObj.__dbg);
                 }
 
                 return done(null, html);
             });
 
-            function onError(err) {
+            function error(err, dbg) {
+                err.__dbg = dbg;
                 var parserError = toParserError(err, errorFactory);
                 return Promise.resolve().then(() => done(parserError)), null;
             }
@@ -352,15 +349,11 @@ Html.__dbg.__pos = null`;
                 var htmlArgs = {};
                 var html = this.getHtml(htmlArgs);
                 compilePageSync(html, this.args.model, this.args.viewData, isDebugMode(opts));
-
-                if (this.args.root)
-                    this.checkSections();
+                this.checkSections();
             }
             catch (exc) {
-                if (this.args.root)
-                    throw toParserError(exc, this.er);
-                else
-                    throw exc;
+                exc.__dbg = html.__dbg;
+                throw toParserError(exc, this.er);
             }
 
             return { html: htmlArgs.html, precompiled: { js: htmlArgs.js, jsValues: htmlArgs.jsValues } };
@@ -406,6 +399,9 @@ Html.__dbg.__pos = null`;
 
         // Check if all sections have been rendered.
         checkSections() {
+            if (!this.args.root)
+                return;
+
             let sections = this.args.parsedSections;
 
             for (var key in sections) {
@@ -1434,7 +1430,7 @@ Html.__dbg.__pos = null`;
     }
 
     function toParserError(err, errorFactory) {
-        if (err instanceof RazorError) {
+        if (err.name === RazorError.name) {
             // it could be the 2-nd or most time here from the stack
             // Error.captureStackTrace(err, toParserError);
 
@@ -1442,19 +1438,18 @@ Html.__dbg.__pos = null`;
             // d:\Projects\NodeJS\RazorExpressFullExample\node_modules\raz\core\Razor.js:117
             // throw errorsFactory.partialViewNotFound(path.basename(partialViewName), searchedLocations); // [#2.3]
             // ^
-            let pos = err.stack.indexOf("RazorError: ");
+            let pos = err.stack.indexOf(`${RazorError.name}: `);
+
             if (pos > 0)
                 err.stack = err.stack.substring(pos);
-
-            return err;
         }
+        
+        errorFactory.extendError(err);
 
-        let parserError = errorFactory.customError(err.message || err, toParserError, err.__pos && { start: err.__pos.start, end: err.__pos.end });
+        // if (err.stack)
+        //     parserError.stack = err.stack;
 
-        if (err.stack)
-            parserError.stack = err.stack;
-
-        return parserError;
+        return err;
     }
 
     ////////////////
