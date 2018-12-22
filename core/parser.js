@@ -33,7 +33,7 @@ module.exports = function (opts) {
     opts = opts || {};
     const dbg = require('./dbg/debugger');
     const debugMode = isDebugMode(opts);
-    
+
     const allowLoggingInDebugModel = false;
     const log = require('./dbg/logger')({ on: debugMode && allowLoggingInDebugModel });
     log.debug(`Parse debug mode is '${!!debugMode}'.`);
@@ -1448,7 +1448,8 @@ Html.__dbg.pos = null;`;
                 err.stack = err.stack.substring(pos);
         }
         
-        errorFactory.extendError(err);
+        if ((err.__dbg && err.__dbg.viewName) !== (err.data && err.data.filename)) // check if it's already done
+            errorFactory.extendError(err);
 
         // if (err.stack)
         //     parserError.stack = err.stack;

@@ -20,7 +20,7 @@ module.exports = class RazorError extends Error {
 
     static new(args) {
         let exc = new RazorError(args.message, args, args.capture || this.new);
-        this.extend(exc, args.info);
+        this.extend(exc, args);
         return exc;
     }
 

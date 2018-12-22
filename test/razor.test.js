@@ -186,7 +186,7 @@ describe("Testing 'Razor' module.", () => {
             let viewPath = viewErrorPath(viewName);
             razor({ layout: layoutName }).renderFile(viewPath, (err, html) => {
                 expect(html).not.to.exist;
-                expectPartialViewNotFound(err, viewName, `${layoutName}.raz`, null);
+                expectLayoutViewNotFound(err, viewName, `${layoutName}.raz`, null);
                 done();
             });
         });
@@ -368,7 +368,19 @@ describe("Testing 'Razor' module.", () => {
         //expect(err.data.filename).to.endsWith(errorViewName);
     }
 
+    function expectLayoutViewNotFound(err, errorView, partialView, method) {
+        expectViewNotFound(err, errorView, method);
+        let expectedMessage = `${errorView}" cannot find the layout view "${partialView}".`;
+        expect(err.message).to.have.string(expectedMessage);
+    }
+
     function expectPartialViewNotFound(err, errorView, partialView, method) {
+        expectViewNotFound(err, errorView, method);
+        let expectedMessage = `${errorView}" cannot find the partial view "${partialView}".`;
+        expect(err.message).to.have.string(expectedMessage);
+    }
+
+    function expectViewNotFound(err, errorView, method){
         expect(err).to.exist;
         expect(err).to.be.an.instanceOf(RazorError);
 
@@ -376,8 +388,6 @@ describe("Testing 'Razor' module.", () => {
             expect(err.stack).to.have.string(`at Razor.${method} `);
 
         expect(err.data.filename).to.endsWith(errorView);
-        let expectedMessage = `${errorView}" cannot find the partial view "${partialView}".`;
-        expect(err.message).to.have.string(expectedMessage);
     }
 
 }); // "Testing 'Razor' module."
