@@ -1,4 +1,5 @@
 const htmlEncode = require('js-htmlencode');
+const path = require('path');
 
 /////////////////////////////////////////////////////////////////////////
 // https://gist.github.com/slavafomin/b164e3e710a6fc9352c934b9073e7216
@@ -8,197 +9,251 @@ const htmlEncode = require('js-htmlencode');
 // const regex = /.*Error:/;
 
 module.exports = class RazorError extends Error {
-    constructor(message, templateInfo, line, pos, len, captureFrame, posRange) {
+    constructor(message, args, captureFrame) {
         super(message);
-        this.name = this.constructor.name;
-        this.data = Object.assign({ line, pos, len, posRange }, templateInfo);
+        // this.name = this.constructor.name;
+        this.data = Object.assign({ line: args.line, pos: args.pos, len: args.len }, templateInfo);
 
         if (Error.captureStackTrace)
             Error.captureStackTrace(this, captureFrame || this.constructor);
     }
 
     static new(args) {
-        return new RazorError(args.message, args.info, args.line, args.pos, args.len, args.capture || this.new, args.posRange);
+        let exc = new RazorError(args.message, args, args.capture || this.new);
+        this.extend(exc, args.info);
+        return exc;
+    }
+
+    static extend(exc, info) {
+        exc.name = RazorError.name;
+
+        if (exc.data) {
+            var oldData = exc.data;
+        }
+
+        exc.data = info;
+
+        if (exc.__dbg.pos)
+            exc.data = Object.assign({ posRange: { start: exc.__dbg.pos.start, end: exc.__dbg.pos.end } }, exc.data);
+
+        if (oldData)
+            exc.data.inner = oldData;
+
+        exc.html = RazorError.prototype.html;
     }
 
     html() {
-        let mainInfo = '';
-        let lines = this.stack.split('\n');
-        let stack = '<div>';
+        let codeHtml = '', mainInfo = { title: '' };
+        let stackHtml = stackToHtml(this, this.data, mainInfo);
+
+        for (var data = this.data; data; data = data.inner) {
+            codeHtml += "<div class='arrow'>&#8681;</div>"
+            codeHtml += dataToHtml(data, mainInfo);
+            codeHtml += '<hr />'
+        }
+
+        var html = `
+        <!DOCTYPE html>
+        <html>
+        <head>
+        <style type="text/css" scoped>
+            h1, h2, h3{
+                font-weight: normal;
+            }
+            div.filepath {
+                font-weight: bold;
+                font-size: 1.05rem;
+            }
+            body { 
+                font-size: .813em;
+                font-family: Consolas, "Courier New", courier, monospace;
+            }
+            .stack{
+                color: orange;
+                white-space: pre;
+            }
+            .stack .main{
+                color: #e20000;
+                white-space: pre-wrap;
+                font-weight: bold;
+            }
+            ol {
+                color: darkgray;
+            }
+            ol li {
+                background-color: #fbfbfb;
+                white-space: pre;
+            }
+            ol li.highlight{
+                color: red;// darkslategray;
+                background-color: #f8f9b3; 
+            }
+            ol li span {
+                color: #196684;//darkslategray;
+            }
+            ol li.highlight span {
+                color: black;
+            }
+            ol li span.highlight {
+                border: solid 1px red;
+            }
+            ol li span.multilight {
+                background-color: #ebef00;
+                font-weight: bold;
+                color: red;
+            }
+            ol li.comment {
+                color: lightgray;
+            }
+            ol li.comment span {
+                color: darkgray;
+            }
+            .arrow{
+                font-size: 1.5rem;
+                color: orange;
+                margin-left: 1rem;
+            }
+            hr {
+                opacity: 0.5;
+            }
+        </style>
+        </head>
+        <body>
+            <h1>A template compilation error occured</h1>
+            <div class="stack">${stackHtml}</div>
+            <hr />
+            ${codeHtml}
+        </body>
+        </html>
+        `;
+        return html;
+    }
+}
+
+
+function stackToHtml(exc, data, mainInfo) {
+    let lines = exc.stack.split('\n');
+    let html = '<div>';
+
+    for (let i = 0; i < lines.length; i++) {
+        let line = lines[i];
+
+        if (i === 0 && (line.startsWith("evalmachine.") || line.startsWith("undefined:"))) {
+            let nextLineExists = i < lines.length + 1;
+
+            if (nextLineExists && data.jshtml && data.posRange) { // This is likely HTML parsing error (not code runtime error).
+                // Let's try to narrow the error area by the data from the stack.
+                let codeLine = lines[i + 1].trimRight();
+                let errorCodeFragment = data.jshtml.substring(data.posRange.start, data.posRange.end);
+                let codePos = errorCodeFragment.indexOf(codeLine);
+                // Check if it exists and only once in the `errorCodeFragment`.
+                if (codePos !== -1 && codePos === errorCodeFragment.lastIndexOf(codeLine)) {
+                    // Set a more precise location of the error.
+                    data.posRange.start = data.posRange.start + codePos;
+                    data.posRange.end = data.posRange.start + codeLine.length;
+
+                    // Include '@' symbol.
+                    if (data.posRange.start > 0 && data.jshtml[data.posRange.start - 1] === '@')
+                        data.posRange.start -= 1;
+                }
+            }
+
+            continue; // skip the very first line like "evalmachine.<anonymous>:22"
+        }
+
+        let encodedLine = htmlEncode(line);
+        let style = '';
+        let trim = line.trim();
+
+        if (trim && trim !== '^' && !trim.startsWith("at ")) {
+            style = 'class="main"';
+
+            if (mainInfo.title)
+                mainInfo.title += '\r\n';
+
+            mainInfo.title += encodedLine;
+        }
+
+        html += `<span ${style}>${encodedLine}</span><br/>`;
+    }
+
+    html += '</div>';
+    return html;
+}
+
+function dataToHtml(data, mainInfo) {
+    let html;
+
+    if (data.jshtml) {
+        let textCursor = 0;
+        lines = data.jshtml.split('\n');
+        html = "<ol start='1'>";
 
         for (let i = 0; i < lines.length; i++) {
             let line = lines[i];
+            let highlight, htmlLine, comment, multilight;
+            let textCursorEnd = textCursor + line.length + 1; // + '\n'
 
-            if (i === 0 && (line.startsWith("evalmachine.") || line.startsWith("undefined:"))) {
-                let nextLineExists = i < lines.length + 1;
+            if (data.posRange && data.posRange.start < data.posRange.end) {
+                if (data.posRange.start >= textCursor && data.posRange.start < textCursorEnd) {
+                    var pos = data.posRange.start - textCursor;
 
-                if (nextLineExists && this.data.jshtml && this.data.posRange) { // This is likely HTML parsing error (not code runtime error).
-                    // Let's try to narrow the error area by the data from the stack.
-                    let codeLine = lines[i + 1].trimRight();
-                    let errorCodeFragment = this.data.jshtml.substring(this.data.posRange.start, this.data.posRange.end);
-                    let codePos = errorCodeFragment.indexOf(codeLine);
-                    // Check if it exists and only once in the `errorCodeFragment`.
-                    if (codePos !== -1 && codePos === errorCodeFragment.lastIndexOf(codeLine)) {
-                        // Set a more precise location of the error.
-                        this.data.posRange.start = this.data.posRange.start + codePos;
-                        this.data.posRange.end = this.data.posRange.start + codeLine.length;
-
-                        // Include '@' symbol.
-                        if (this.data.posRange.start > 0 && this.data.jshtml[this.data.posRange.start - 1] === '@')
-                            this.data.posRange.start -= 1;
+                    if (data.posRange.end < textCursorEnd) {
+                        var len = data.posRange.end - data.posRange.start;
+                        data.posRange = null; // prevent further useless computation during the next iterations of this cycle
                     }
-                }
+                    else {
+                        len = line.length;
+                        data.posRange.start = textCursorEnd; // move to the beginning of the next line
+                    }
 
-                continue; // skip the very first line like "evalmachine.<anonymous>:22"
+                    multilight = "multilight";
+                }
+            }
+            else if (data.line === i) {
+                pos = data.pos;
+                len = data.len || 1;
             }
 
-            let nextLine = (i < lines.length - 1) ? lines[i + 1] : null;
-            let encodedLine = htmlEncode(line);
-            let style = '';
+            if (pos != null && typeof pos !== 'undefined') {
+                if (pos < line.length) {
+                    let start = htmlEncode(line.substring(0, pos));
+                    let one = htmlEncode(line.substring(pos, pos + len));
+                    let end = htmlEncode(line.substring(pos + len + 1));
+                    htmlLine = `<span>${start}</span><span class='${multilight || "highlight"}' title='${mainInfo.title}'>${one}</span><span>${end}</span>`;
+                    highlight = "class='highlight'";
 
-            if (line && !line.trim().startsWith("at ")) {
-                style = 'class="main"';
-                mainInfo += encodedLine;
+                }
+                pos = null;
+            }
+            else {
+                let trim = line.trim();
+
+                if (trim.length > 6 && trim.startsWith("<!--") && trim.endsWith("-->"))
+                    comment = "class='comment'";
+                //htmlLine = `<span class="comment">${htmlEncode(trim)}</span>`;
             }
 
-            stack += `<span ${style}>${encodedLine}</span><br/>`;
-        }
+            html += `<li ${comment || highlight}><span>`;
+            html += htmlLine ? htmlLine : htmlEncode(line);
+            html += "</span></li>";
 
-        stack += '</div>';
-        let code;
+            textCursor = textCursorEnd;
+        }// for
 
-        if (this.data.jshtml) {
-            let textCursor = 0;
-            lines = this.data.jshtml.split('\n');
-            code = "<ol start='1'>";
+        let fileFolder = path.dirname(data.filename);
+        let fileName = path.basename(data.filename);
 
-            for (let i = 0; i < lines.length; i++) {
-                let line = lines[i];
-                let highlight, htmlLine, comment, multilight;
-                let textCursorEnd = textCursor + line.length + 1; // + '\n'
-
-                if (this.data.posRange && this.data.posRange.start < this.data.posRange.end) {
-                    if (this.data.posRange.start >= textCursor && this.data.posRange.start < textCursorEnd) {
-                        var pos = this.data.posRange.start - textCursor;
-
-                        if (this.data.posRange.end < textCursorEnd) {
-                            var len = this.data.posRange.end - this.data.posRange.start;
-                            this.data.posRange = null; // prevent further useless computation during the next iterations of this cycle
-                        }
-                        else {
-                            len = line.length;
-                            this.data.posRange.start = textCursorEnd; // move to the beginning of the next line
-                        }
-
-                        multilight = "multilight";
-                    }
-                }
-                else if (this.data.line === i) {
-                    pos = this.data.pos;
-                    len = this.data.len || 1;
-                }
-
-                if (pos != null && typeof pos !== 'undefined') {
-                    if (pos < line.length) {
-                        let start = htmlEncode(line.substring(0, pos));
-                        let one = htmlEncode(line.substring(pos, pos + len));
-                        let end = htmlEncode(line.substring(pos + len + 1));
-                        htmlLine = `<span>${start}</span><span class='${multilight || "highlight"}' title='${mainInfo}'>${one}</span><span>${end}</span>`;
-                        highlight = "class='highlight'";
-
-                    }
-                    pos = null;
-                }
-                else {
-                    let trim = line.trim();
-
-                    if (trim.length > 6 && trim.startsWith("<!--") && trim.endsWith("-->"))
-                        comment = "class='comment'";
-                    //htmlLine = `<span class="comment">${htmlEncode(trim)}</span>`;
-                }
-
-                code += `<li ${comment || highlight}><span>`;
-                code += htmlLine ? htmlLine : htmlEncode(line);
-                code += "</span></li>";
-
-                textCursor = textCursorEnd;
-            }// for
-
-            code += "</ol>";
-            code = `
-<h2>${this.data.filename}</h2></div>
+        html += "</ol>";
+        html = `
+<div class="filepath">${fileName}</div></div>
 <div class="code">
-    ${code}
+${html}
 <div>
 `;
-        }// if (this.data.jshtml)
+    }// if (this.data.jshtml)
 
-        var html = `
-<!DOCTYPE html>
-<html>
-<head>
-    <style type="text/css" scoped>
-        h1, h2, h3{
-            font-weight: normal;
-        }
-        body { 
-            font-size: .813em;
-            font-family: Consolas, "Courier New", courier, monospace;
-        }
-        .stack{
-            color: orange;
-            white-space: pre;
-        }
-        .stack .main{
-            color: #e20000;
-            white-space: pre-wrap;
-            font-weight: bold;
-        }
-        ol {
-            color: darkgray;
-        }
-        ol li {
-            background-color: #fbfbfb;
-            white-space: pre;
-        }
-        ol li.highlight{
-            color: red;// darkslategray;
-            background-color: #f8f9b3; 
-        }
-        ol li span {
-            color: #196684;//darkslategray;
-        }
-        ol li.highlight span {
-            color: black;
-        }
-        ol li span.highlight {
-            border: solid 1px red;
-        }
-        ol li span.multilight {
-            background-color: #ebef00;
-            font-weight: bold;
-            color: red;
-        }
-        ol li.comment {
-            color: lightgray;
-        }
-        ol li.comment span {
-            color: darkgray;
-        }
-    </style>
-</head>
-<body>
-    <h1>
-        A template compilation error occured
-    </h1>
-    <div class="stack">${stack}</div>
-    <hr />
-    ${code}
-</body>
-</html>
-`;
-        return html;
-    }
+    return html;
 }
 
 // /**

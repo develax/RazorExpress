@@ -180,8 +180,12 @@ class ParserErrorFactory {
     //     return new ParserError(message, this.args);
     // }
 
-    customError(message, capture, posRange) {
-        return RazorError.new({ message, info: this.info, capture: capture || this.customError, posRange });
+    /**
+     * 
+     * Doesn't produce a `ParserError`, just extends the existant one in other prevent VM from adding additional lines to the `.Stack` when rethrowing.
+     */
+    extendError(exc) {
+        RazorError.extend(exc, this.info);
     }
 }
 
