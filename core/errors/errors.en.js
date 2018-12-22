@@ -51,7 +51,7 @@ class ParserErrorFactory {
         return RazorError.new({ message, info: this.info, line, capture: this.jsCodeBlockMissingClosingChar });
     }
 
-    wordExpected(word, line, pos, len){
+    wordExpected(word, line, pos, len) {
         var message = `'${word}' expected at line ${line + 1} pos ${pos + 1}.`;
         return RazorError.new({ message, info: this.info, line, pos, len, capture: this.wordExpected });
     }
@@ -152,7 +152,8 @@ class ParserErrorFactory {
     }
 
     partialViewNotFound(partialView, searchedLocations) {
-        let message = `The view "${this.info.filename}" cannot find the partial view "${partialView}".\nThe following locations were searched:\n${searchedLocations.join("\n")}`;
+        let viewTypeName = (this.isLayout) ? "layout" : "partial";
+        let message = `The view "${this.info.filename}" cannot find the ${viewTypeName} view "${partialView}".\nThe following locations were searched:\n${searchedLocations.map(l => `"${l}"`).join("\n")}`;
         return RazorError.new({ message, info: this.info, capture: this.partialViewNotFound });
     }
 
@@ -185,7 +186,7 @@ class ParserErrorFactory {
      * Doesn't produce a `ParserError`, just extends the existant one in other prevent VM from adding additional lines to the `.Stack` when rethrowing.
      */
     extendError(exc) {
-        RazorError.extend(exc, this.info);
+        RazorError.extend(exc, { info: this.info });
     }
 }
 

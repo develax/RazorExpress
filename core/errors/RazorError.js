@@ -12,7 +12,7 @@ module.exports = class RazorError extends Error {
     constructor(message, args, captureFrame) {
         super(message);
         // this.name = this.constructor.name;
-        this.data = Object.assign({ line: args.line, pos: args.pos, len: args.len }, templateInfo);
+        //this.data = Object.assign({ line: args.line, pos: args.pos, len: args.len }, this.data || {});
 
         if (Error.captureStackTrace)
             Error.captureStackTrace(this, captureFrame || this.constructor);
@@ -24,16 +24,16 @@ module.exports = class RazorError extends Error {
         return exc;
     }
 
-    static extend(exc, info) {
+    static extend(exc, args) {
         exc.name = RazorError.name;
 
         if (exc.data) {
             var oldData = exc.data;
         }
 
-        exc.data = info;
+        exc.data = Object.assign({ line: args.line, pos: args.pos, len: args.len }, args.info); ;
 
-        if (exc.__dbg.pos)
+        if (exc.__dbg && exc.__dbg.pos)
             exc.data = Object.assign({ posRange: { start: exc.__dbg.pos.start, end: exc.__dbg.pos.end } }, exc.data);
 
         if (oldData)

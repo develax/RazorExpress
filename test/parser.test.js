@@ -1,4 +1,5 @@
 (function () {
+    console.clear();
     console.log("=============================================");
     console.log("STARTED: parser.test.js");
 

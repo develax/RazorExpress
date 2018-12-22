@@ -32,9 +32,11 @@ function compilePage(Html, Model, ViewData, debug, done) {
 module.exports = function (opts) {
     opts = opts || {};
     const dbg = require('./dbg/debugger');
-    const log = require('./dbg/logger')({ on: opts.debug });
-    log.debug(`Parse debug mode is '${!!opts.debug}'.`);
     const debugMode = isDebugMode(opts);
+    
+    const allowLoggingInDebugModel = false;
+    const log = require('./dbg/logger')({ on: debugMode && allowLoggingInDebugModel });
+    log.debug(`Parse debug mode is '${!!debugMode}'.`);
 
     const HtmlString = require('./HtmlString');
     const htmlEncode = require('js-htmlencode');
@@ -81,7 +83,9 @@ module.exports = function (opts) {
                 return Promise.resolve().then(() => done(null, args.html)), null;
 
             // looking for the `Layout`..
+            args.er.isLayout = true; // the crutch
             args.findPartial(this.layout, args.filePath, args.er, (err, result) => {
+                args.er.isLayout = false;
                 if (err) return done(err);
                 let compileOpt = {
                     template: result.data,
@@ -352,7 +356,7 @@ Html.__dbg.pos = null;`;
                 this.checkSections();
             }
             catch (exc) {
-                exc.__dbg = html.__dbg;
+                exc.__dbg = html && html.__dbg;
                 throw toParserError(exc, this.er);
             }
 
@@ -360,6 +364,7 @@ Html.__dbg.pos = null;`;
         }
 
         getHtml(htmlArgs) {
+            log.debug(this.args.filePath);
             this.args.parsedSections = this.args.parsedSections || {};
             this.args.viewData = this.args.viewData || this.args.ViewData || {};
             this.args.partialsCache = this.args.partialsCache || {};
@@ -373,7 +378,6 @@ Html.__dbg.pos = null;`;
                 if (!isString)
                     throw new Error(ErrorsFactory.templateShouldBeString);
 
-                log.debug(`HTML = \`${template}\``);
                 this.text = template;
                 this.line = '', this.lineNum = 0, this.pos = 0, this.padding = '';
                 this.inSection = false;
