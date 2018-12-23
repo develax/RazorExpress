@@ -462,6 +462,21 @@ else{
             expected: "\n    <span>B</span>\n"
         },
         {
+            name: "Code 54.1",
+            template: `
+@{
+    var a = 1, b = 2;
+}
+@if (a > b) {
+    <span>A</span>
+}
+else if (a === 1) {
+    <span>B</span>
+}
+`,
+            expected: "\n    <span>B</span>\n"
+        },
+        {
             name: "Code 55",
             template: `
 @{
