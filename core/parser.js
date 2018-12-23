@@ -1015,7 +1015,7 @@ Html.__dbg.pos = null;`;
 
                 skipCh = false;
 
-                if (waitOperator) {
+                if (waitOperator && ch !== operatorExpectScope) {
                     if (!Char.isWhiteSpace(ch)) {
                         waitAcc += ch;
 
@@ -1024,10 +1024,17 @@ Html.__dbg.pos = null;`;
                                 operatorName = waitOperator;
                                 waitOperator = null;
 
-                                if (["while", "catch"].some(e => waitAcc === e))
-                                    operatorExpectScope = '(';
-                                else if (["else", "finally"].some(e => waitAcc === e))
+                                if (["while", "catch", "if"].some(e => waitAcc === e)){
+                                   operatorExpectScope = '('; 
+                                }
+                                else if ("finally" === waitAcc){
                                     operatorExpectScope = '{';
+                                }
+                                else if ("else" === waitAcc){
+                                    operatorExpectScope = '{';
+                                    waitOperator = 'if';
+                                    waitAcc = '';
+                                }
                             }
                         }
                         else {
@@ -1056,8 +1063,10 @@ Html.__dbg.pos = null;`;
                     if (!firstScope && ch !== '{')
                         throw this.er.characterExpected('{', this.lineNum, this.linePos());
 
-                    if (operatorExpectScope && !Char.isWhiteSpace(ch) && ch !== operatorExpectScope)
+                    if (operatorExpectScope && !Char.isWhiteSpace(ch) && ch !== operatorExpectScope){
+                        if (!waitOperator)
                         throw this.er.characterExpectedAfter(operatorExpectScope, this.lineNum, this.linePos(), operatorName); // [Code 58, Code 66.1, Code 67.1]
+                    }
 
                     let pos = startScopes.indexOf(ch);
                     // IF it's a start-scope literal
@@ -1074,6 +1083,7 @@ Html.__dbg.pos = null;`;
                         if (operatorExpectScope == ch) {
                             //firstScope = wait;
                             operatorExpectScope = null;
+                            waitOperator = null;
                         }
                     }
                     else if (wait) {
