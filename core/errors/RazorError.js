@@ -31,7 +31,7 @@ module.exports = class RazorError extends Error {
             var oldData = exc.data;
         }
 
-        exc.data = Object.assign({ line: args.line, pos: args.pos, len: args.len }, args.info); ;
+        exc.data = Object.assign({ line: args.line, pos: args.pos, len: args.len }, args.info);
 
         if (exc.__dbg && exc.__dbg.pos)
             exc.data = Object.assign({ posRange: { start: exc.__dbg.pos.start, end: exc.__dbg.pos.end } }, exc.data);
@@ -72,7 +72,7 @@ module.exports = class RazorError extends Error {
                 color: orange;
                 white-space: pre;
             }
-            .stack .main{
+            .stack .error{
                 color: #e20000;
                 white-space: pre-wrap;
                 font-weight: bold;
@@ -162,14 +162,17 @@ function stackToHtml(exc, data, mainInfo) {
         }
 
         let encodedLine = htmlEncode(line);
-        let style = '';
         let trim = line.trim();
+        let style = '';
 
         if (trim && trim !== '^' && !trim.startsWith("at ")) {
-            style = 'class="main"';
-
-            if (mainInfo.title)
+            if (mainInfo.title) {
+                style = 'id="error" class="error"'; // the second line is the error description
                 mainInfo.title += '\r\n';
+            }
+            else {
+                style = 'class="error"';
+            }
 
             mainInfo.title += encodedLine;
         }
@@ -219,7 +222,7 @@ function dataToHtml(data, mainInfo) {
                 if (pos < line.length) {
                     let start = htmlEncode(line.substring(0, pos));
                     let one = htmlEncode(line.substring(pos, pos + len));
-                    let end = htmlEncode(line.substring(pos + len + 1));
+                    let end = htmlEncode(line.substring(pos + len));
                     htmlLine = `<span>${start}</span><span class='${multilight || "highlight"}' title='${mainInfo.title}'>${one}</span><span>${end}</span>`;
                     highlight = "class='highlight'";
 
@@ -241,15 +244,15 @@ function dataToHtml(data, mainInfo) {
             textCursor = textCursorEnd;
         }// for
 
-        let fileFolder = path.dirname(data.filename);
+        //let fileFolder = path.dirname(data.filename);
         let fileName = path.basename(data.filename);
 
         html += "</ol>";
         html = `
-<div class="filepath">${fileName}</div></div>
 <div class="code">
-${html}
-<div>
+    <div class="filepath">${fileName}</div></div>
+    ${html}
+</div>
 `;
     }// if (this.data.jshtml)
 
