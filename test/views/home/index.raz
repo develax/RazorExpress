@@ -17,4 +17,8 @@
     Html.partial("../sections/_partialForSection", 2);
 }
 
-Html.partial("_error")
+<div style="background-color: white">
+    <h2>Test Links</h2>
+    <h3>Error tests</h3>
+    <a href="/errors/index">Test layout error</a>
+</div>

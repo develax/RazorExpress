@@ -1,0 +1,25 @@
+@{
+    var name = "_layout";
+    var footer = "This is a footer";
+}
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+</head>
+<body>
+    <h1>Error Tests</h1>
+    <div>
+        @if (ViewData.layoutError) {
+            <div>
+                @temp
+            </div>
+        } else if (ViewData.partialError) {
+            Html.partial("_partial");
+        }
+        @Html.body()
+    </div>
+</body>
+</html>

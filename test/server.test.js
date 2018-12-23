@@ -10,6 +10,8 @@ const jquery = require('jquery');
 // const path = require('path');
 // const fs = require('fs');
 
+const errorHeader = "A template compilation error occured";
+
 // blog-post: https://groundberry.github.io/development/2016/12/10/testing-express-with-mocha-and-chai.html
 // https://davidbeath.com/posts/testing-http-responses-in-nodejs.html
 // json testing: https://scotch.io/tutorials/test-a-node-restful-api-with-mocha-and-chai
@@ -100,7 +102,7 @@ describe("server routes", () => {
                     expect(partial1.attr('id'), '#partial_1').to.be.equal('partial_1');
                     let partial2 = partial1.next();
                     expect(partial2.attr('id'), '#partial_2').to.be.equal('partial_2');
-  
+
                     for (var i = 0; i < layouts.length; i++) {
                         let layout = layouts[i];
                         let name = layoutNames[i];
@@ -147,7 +149,7 @@ describe("server routes", () => {
                     let $ = jQuery(res.text);
                     let h1 = $('h1');
                     expect(h1.length).to.be.equal(1);
-                    expect(h1.text()).to.have.string("A template compilation error occured");
+                    expect(h1.text()).to.have.string(errorHeader);
                     let layouts = $(`:contains(invalid.raz" cannot find the layout view)`);
                     expect(layouts, "error message").to.have.lengthOf.above(0);
                     console.log(`> testing rote "/invalid"...done`);
@@ -155,4 +157,67 @@ describe("server routes", () => {
                 });
         });
     });
+
+    {
+        let route = "/errors/laytouterror";
+        describe(route, () => {
+            console.log(`> testing rote ${route}...`);
+            it("check failure of rendering layout", (done) => {
+                chai.request(server)
+                    .get(route)
+                    .end((err, res) => {
+                        expect(res).to.have.status(500);
+                        let $ = jQuery(res.text);
+                        let h1 = $('h1');
+                        expect(h1.length).to.be.equal(1);
+                        expect(h1.text()).to.have.string(errorHeader);
+                        let errorMainLines = $('.error');
+                        expect(errorMainLines, '2 error lines are expected').to.have.lengthOf(2);
+                        let layouts = $(`#error:contains(temp is not defined)`);
+                        expect(layouts, '"temp is not defined" text is expected').to.have.lengthOf(1);
+                        let errorViews = $('.code');
+                        expect(errorViews, '2 error views are expected').to.have.lengthOf(2);
+                        let viewSourceHeader = errorViews.find(`:contains(laytouterror.raz)`);
+                        expect(viewSourceHeader, '"laytouterror.raz" header is expected').to.have.lengthOf(1);
+                        let layoutSourceHeader = errorViews.find(`:contains(_layout.raz)`);
+                        expect(layoutSourceHeader, '"_layout.raz" header is expected').to.have.lengthOf(1);
+                        console.log(`> testing rote  ${route} is done`);
+                        done();
+                    });
+            });
+        });
+    }
+
+    {
+        let route = "/errors/partialerror";
+        describe(route, () => {
+            console.log(`> testing rote ${route}...`);
+            it("check failure of rendering layout", (done) => {
+                chai.request(server)
+                    .get(route)
+                    .end((err, res) => {
+                        expect(res).to.have.status(500);
+                        let $ = jQuery(res.text);
+                        let h1 = $('h1');
+                        expect(h1.length).to.be.equal(1);
+                        expect(h1.text()).to.have.string(errorHeader);
+                        let errorMainLines = $('.error');
+                        expect(errorMainLines, '2 error lines are expected').to.have.lengthOf(2);
+                        let layouts = $(`#error:contains(temp is not defined)`);
+                        expect(layouts, '"temp is not defined" text is expected').to.have.lengthOf(1);
+                        let errorViews = $('.code');
+                        expect(errorViews, '3 error views are expected').to.have.lengthOf(3);
+                        let viewSourceHeader = errorViews.find(`:contains(partialerror.raz)`);
+                        expect(viewSourceHeader, '"partialerror.raz" header is expected').to.have.lengthOf(1);
+                        let layoutSourceHeader = errorViews.find(`:contains(_layout.raz)`);
+                        expect(layoutSourceHeader, '"_layout.raz" header is expected').to.have.lengthOf(1);
+                        let partialSourceHeader = errorViews.find(`:contains(_partial.raz)`);
+                        expect(partialSourceHeader, '"_partial.raz" header is expected').to.have.lengthOf(1);
+                        console.log(`> testing rote  ${route} is done`);
+                        done();
+                    });
+            });
+        });
+    }
+
 });
