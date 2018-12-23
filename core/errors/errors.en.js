@@ -38,7 +38,7 @@ class ParserErrorFactory {
 
     characterExpectedAfter(ch, line, pos, after) {
         var message = `'${ch}' character is expected after '${after}' at line ${line + 1} pos ${pos + 1}.`;
-        return RazorError.new({ message, info: this.info, line, pos, capture: this.characterExpected });
+        return RazorError.new({ message, info: this.info, line, pos, capture: this.characterExpectedAfter });
     }
 
     expressionMissingEnd(expr, ch, line, pos) {
