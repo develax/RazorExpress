@@ -200,26 +200,33 @@ A `switch` statement example:
 @switch (new Date().getDay()) {
   case 0:
     var day = "Sunday";
+    <strong>Today is @day</strong>
     break;
   case 1:
     day = "Monday";
+    <strong>Today is @day</strong>
     break;
   case 2:
     day = "Tuesday";
+    <strong>Today is @day</strong>
     break;
   case 3:
     day = "Wednesday";
+    <strong>Today is @day</strong>
     break;
   case 4:
     day = "Thursday";
+    <strong>Today is @day</strong>
     break;
   case 5:
     day = "Friday";
+    <strong>Today is @day</strong>
     break;
   case 6:
     day = "Saturday";
+    <strong>Today is @day</strong>
+    break;
 }
-<strong>Today is @day</strong>
 ```
 <sup>[^ try these code examples](https://runkit.com/develax/razor-conditional-control-structures)</sup>
 
