@@ -96,4 +96,44 @@ So you may wonder why you need to know all this if this separation exists only i
 ## Error visualization in the inner templates
 When an error is rendered as formatted HTML, the source code of the view template in which the error occurred is displayed with the location of the error code highlighted in there. But what if the error occurred not in the main template, but in a partial view? What template source code should be displayed in this case?
 
-For a more visual representation of where the error took place, the entire chain of the view templates will be presented in the order they are compiled. Let's look at an example where an error occurs in a partial view.
+For a more visual representation of where the error took place, the entire chain of the view templates will be presented in the order they are compiled. Let's look at an example where an error occurs in a partial view. You can find this example in [RazorExpressErrors](https://github.com/DevelAx/RazorExpressErrors) repository, there you should run the [inner-error-example.js](https://github.com/DevelAx/RazorExpressErrors/blob/master/inner-error-example.js) file under the NodeJS and open [http://localhost:1337/](http://localhost:1337/) in the browser.
+
+This example consists of two view templates: *"index.raz"* is the main view which has a reference to a partial view *"_people.raz"*. And the list of some people is passed via Model (defined in the [inner-error-example.js](https://github.com/DevelAx/RazorExpressErrors/blob/master/inner-error-example.js) file).
+
+**Model**
+```JS
+var people = [
+    { name: "Willis Wethington", age: 42 },
+    { name: "Georgie Graddy", age: 36 },
+    { name: "Ileen Irizarry", age: 24},
+    { name: "Arnoldo Abreu", age: 10 },
+    { name: "Rosa Robb", age: 18 },
+    { name: "Otelia Orman", age: 65 },
+     ];
+```
+
+**index.raz**
+```HTML+RAZOR
+<div>
+    Index page content...
+    @Html.partial("_people")
+</div>
+```
+
+**__people.raz**
+```HTML+RAZOR
+<div>
+    <h2>People</h2>
+    <ul>
+        @for(var i = 0; i <= Model.people.length; i++){
+            <li><strong>@Model.people[i].name</strong><span> - </span><span>@Model.people[i].age</span></li>
+        }
+    </ul>
+</div>
+```
+
+As you can seen the partial view should render a list of people and where we have intentionally added the error of going beyond the array. As a result you will see the next error views chain in the browser:
+
+![Visualization of Razor-Express error through views chain](https://github.com/DevelAx/RazorExpressErrors/blob/master/docs/inner-error-example/ErrorView.jpg?raw=true)
+
+The first is the error itself with the call stack. Then, the *"index.raz"* view template that is compiled first and references the partial view *"_people.raz"*, which is compiled after the "index.raz" and displayed at the very bottom of the page. In both sources, the code fragment in which the error occurred is highlighted in red.
