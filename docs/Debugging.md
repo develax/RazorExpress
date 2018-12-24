@@ -9,7 +9,7 @@
 - [**Errors visualization in the inner templates**](#errors-visualization-in-the-inner-templates)
 
 ## Production & development modes
-[Express](https://expressjs.com) distinguishes between 2 startup modes: development mode and [production mode](https://expressjs.com/en/advanced/best-practice-performance.html#set-node_env-to-production). If the `NODE_ENV` environment variable has a value not equal to `"production"` or it is not set at all ([express], [stackoverflow](https://stackoverflow.com/a/16979503/1844247)) then it considered to as if it were set to `"development"`. So does the Razor-Express - in development mode it generates additional debugging information to help localize the error location.
+[Express](https://expressjs.com) distinguishes between 2 startup modes: development mode and [production mode](https://expressjs.com/en/advanced/best-practice-performance.html#set-node_env-to-production). If the `NODE_ENV` environment variable has a value not equal to `"production"` or it is not set at all ([stackoverflow](https://stackoverflow.com/a/16979503/1844247)) then it considered to as if it were set to `"development"`. So does the Razor-Express - in development mode it generates additional debugging information to help localize the error location.
 
 ## Errors handling
 
@@ -59,7 +59,7 @@ Now it looks a little nicer and you can see not only the exception stack and err
 
 The [`handleErrors`](api.md#handleerrorsapp-errorcode-mode) method has two additional parameters (`errorCode` and `mode`) by which you can pass the server response code and mode in which this error handler will be triggered. 
 
-By default `errorCode` is `500`. This means that by default you'll get an HTML-formatted error and HTTP response with code 500 only if the app is run in [development mode](#).
+By default `errorCode` is `500`. This means that by default you'll get an HTML-formatted error and HTTP response with code 500 only if the app is run in [development mode](#production--development-modes).
 
 
 ### Custom error handler
