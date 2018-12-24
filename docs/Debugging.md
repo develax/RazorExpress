@@ -53,7 +53,7 @@ Now it looks a little nicer and you can see not only the exception stack and err
 
 The [`handleErrors`](api.md#handleerrorsapp-errorcode-mode) method has two additional parameters (`errorCode` and `mode`) by which you can pass the server response code and mode in which this error handler will be triggered. 
 
-By default `errorCode` is `500`  and `mode` is `"development"`. This means that by default you'll get an HTML-formatted error and HTTP response with code 500 only if the `NODE_ENV` environment variable has a value equal to `"development"` ([express](https://expressjs.com/en/advanced/best-practice-performance.html#set-node_env-to-production), [stackoverflow](https://stackoverflow.com/a/16979503/1844247)). If the `NODE_ENV` variable is not set at all then it's considered (by the Express) to be `"development"` by default.
+By default `errorCode` is `500`. This means that by default you'll get an HTML-formatted error and HTTP response with code 500 only if the `NODE_ENV` environment variable has a value not equal to `"production"` ([express](https://expressjs.com/en/advanced/best-practice-performance.html#set-node_env-to-production), [stackoverflow](https://stackoverflow.com/a/16979503/1844247)). If the `NODE_ENV` variable is not set at all then it's considered (by the Express) to be `"development"` by default.
 
 
 ### Custom error handler
@@ -69,7 +69,7 @@ function appErrorHandler(err, req, res, next) {
 
     var env = app.get('env');
 
-    if (env === "development" && err.name == "RazorError") {
+    if (env !== "production" && err.name == "RazorError") {
         var errorHtml = err.html();
         res.status(500);
         res.send(errorHtml);
