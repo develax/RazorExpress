@@ -88,4 +88,4 @@ Please, go to [expressjs.com](https://expressjs.com/en/guide/error-handling.html
 In this case, if you are not in "production" mode, then you can see the source code of the page with the highlighted error location. All errors are exposed to the user as an exception named *"RazorError"*, although in fact there are 2 types of errors and they occur at different stages of template processing. They are parser errors and runtime errors.
 
 ### Parser errors
-You have already seen an example of a parser error in the ["Errors handling"](#errors-handling) section. Obviously, these errors occur in the process of parsing the template when the parser detects that something is wrong with the structure of this template. In that case, it is an HTML tag structure error. 
+You have already seen an example of a parser error in the ["Errors handling"](#errors-handling) section. Obviously, these errors occur in the process of parsing the template when the parser detects that there is something wrong with the structure of the template. In that case, it is an HTML tag structure error. 
