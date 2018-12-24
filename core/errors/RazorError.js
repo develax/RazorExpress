@@ -250,7 +250,7 @@ function dataToHtml(data, mainInfo) {
         html += "</ol>";
         html = `
 <div class="code">
-    <div class="filepath">${fileName}</div></div>
+    <div class="filepath">${fileName}</div>
     ${html}
 </div>
 `;
