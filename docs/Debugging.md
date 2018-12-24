@@ -14,6 +14,7 @@
 ## Errors handling
 
 Let's consider a minimum example of the Express web-server application which tries to render a view with incorrect HTML. 
+
 <sup>* This exapmle is included into the [RazorExpressErrors](https://github.com/DevelAx/RazorExpressErrors) repository as [error-handling-1.js](https://github.com/DevelAx/RazorExpressErrors/blob/master/error-handling-1.js).</sup>
 
 **Express web-server:**
