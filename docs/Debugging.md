@@ -2,11 +2,11 @@
 
 # Debugging & Errors handling in Razor-Express
 
-- [Production & development modes](#production--development-modes)
-- [Errors handling](#errors-handling)
-  - [Custom error handler](#custom-error-handler)
-- [Parser errors & runtime errors](#parser-errors--runtime-errors)
-- [Errors visualization in the inner templates](#errors-visualization-in-the-inner-templates)
+- [**Production & development modes**](#production--development-modes)
+- [**Errors handling**](#errors-handling)
+  - [**Custom error handler**](#custom-error-handler)
+- [**Parser errors & runtime errors**](#parser-errors--runtime-errors)
+- [**Errors visualization in the inner templates**](#errors-visualization-in-the-inner-templates)
 
 ## Production & development modes
 [Express](https://expressjs.com) distinguishes between 2 startup modes: development mode and [production mode](https://expressjs.com/en/advanced/best-practice-performance.html#set-node_env-to-production). If the `NODE_ENV` environment variable has a value not equal to `"production"` or it is not set at all ([express], [stackoverflow](https://stackoverflow.com/a/16979503/1844247)) then it considered to as if it were set to `"development"`. So does the Razor-Express - in development mode it generates additional debugging information to help localize the error location.
