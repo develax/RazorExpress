@@ -8,7 +8,7 @@
 ## Errors handling
 
 Let's consider a minimum example of the Express web-server application which tries to render a view with incorrect HTML. 
-> This exapmle is included into the [RazorExpressExamples](https://github.com/DevelAx/RazorExpressExamples) repository as [error-handling-1.js](https://github.com/DevelAx/RazorExpressExamples/blob/master/error-handling-1.js).
+> This exapmle is included into the [RazorExpressErrors](https://github.com/DevelAx/RazorExpressErrors) repository as [error-handling-1.js](https://github.com/DevelAx/RazorExpressErrors/blob/master/error-handling-1.js).
 
 **Express web-server:**
 ```JS
@@ -38,7 +38,7 @@ app.listen(port, () => {
 
 When you run this JavaScript code and open http://localhost:1337 in your browser you'll see the error like this:
 
-![Razor-Express plain error](https://github.com/DevelAx/RazorExpressExamples/blob/master/docs/error-handling/PlainError.jpg?raw=true)
+![Razor-Express plain error](https://github.com/DevelAx/RazorExpressErrors/blob/master/docs/error-handling/PlainError.jpg?raw=true)
 
 This is a standard error of `RazorError` type. However, in debug mode, you would most likely want to see something more informative. To get this you just need to register a default error handler. To fulfil your wish you just need to register the Razor default error handler. 
 ```JS
@@ -47,7 +47,7 @@ raz.handleErrors(app);
 ```
 Now run the app again and refresh the browser page. You will see the same error in HTML format:
 
-![Razor-Express HTML error](https://github.com/DevelAx/RazorExpressExamples/blob/master/docs/error-handling/HtmlError.jpg)
+![Razor-Express HTML error](https://github.com/DevelAx/RazorExpressErrors/blob/master/docs/error-handling/HtmlError.jpg)
 
 Now it looks a little nicer and you can see not only the exception stack and error message but also the name of the file that caused the error as well as its content.   
 
@@ -79,7 +79,7 @@ function appErrorHandler(err, req, res, next) {
     return next(err);
 }
 ```
->The working example is located in the same [RazorExpressExamples](https://github.com/DevelAx/RazorExpressExamples) repository in the [error-handling-2.js](https://github.com/DevelAx/RazorExpressExamples/blob/master/error-handling-1.js) file.
+>The working example is located in the same [RazorExpressErrors](https://github.com/DevelAx/RazorExpressErrors) repository in the [error-handling-2.js](https://github.com/DevelAx/RazorExpressErrors/blob/master/error-handling-1.js) file.
 
 Please, go to [expressjs.com](https://expressjs.com/en/guide/error-handling.html) to read more on *"The default error handler"* & *"Writing error handlers"* topics. Or at least take note of this qoute:
 > You define error-handling middleware last, after other app.use() and routes calls...
