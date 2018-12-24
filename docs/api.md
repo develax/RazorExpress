@@ -63,12 +63,11 @@ raz.register(app);  // register the RAZ template engine
 ```
 
 <a name="handleErrors"></a>
-### handleErrors(app, errorCode, mode)
+### handleErrors(app, errorCode)
 * **app** `<express>` instance of the Express app
 * **errorCode** `<integer>`, *default:* 500
-* **mode** `<String>`, *default:* "development"
 
-Sets the engine's built-in error handler, after which all Razor-Express errors will be converted to the HTML format with the specified error code. This handler will work only if the mode specified in the `mode` parameter matches the value of the `NODE_ENV` environment variable. 
+Sets the engine's built-in error handler, after which all Razor-Express errors will be converted to the HTML format with the specified error code. This handler will work only if the `NODE_ENV` environment variable is not equal to *"production"*. 
 ```js
 const app = require('express')(); // the Express web server app
 const raz = require('raz'); // the Razor-Express engine 
