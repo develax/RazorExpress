@@ -87,7 +87,6 @@ Please, go to [expressjs.com](https://expressjs.com/en/guide/error-handling.html
 ## Parser and runtime errors
 Although all errors are exposed to the user as an exception named *"RazorError"*, in fact, there are 2 types of errors and they occur at different stages of template processing. They are *parser errors* and *runtime errors*.
 
-### Parser errors
 You have already seen an example of the *parser error* in the ["Errors handling"](#errors-handling) section. Obviously, these errors occur in the process of parsing the template when the parser detects that there is something wrong with its structure. This can be both HTML errors and JavaScript syntax errors. But mostly at this stage HTML structure errors are detected (as in the example in the ["Errors handling"](#errors-handling) section).
 
 It should be noted that the parser does not perform full validation of HTHL, but only separates JavaScript code fragments. This allows it not to do extra work and stay fast. At the same time, this means that it does not detect all HTML or JavaScript structure errors. However, this does not mean that the engine will not catch them at all - all JavaScript errors will be detected by the virtual machine when the template is compiled and then they will be caught by the engine. All this happens at the second stage of processing of the template and these errors are called *runtime errors*.
