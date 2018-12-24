@@ -31,8 +31,6 @@
   - [Missing semicolon](#missing-semicolon)
   - [Expressions & code blocks confusion](#expressions--code-blocks-confusion)
 - [**Debugging & Errors handling in Razor-Express**](https://github.com/DevelAx/RazorExpress/blob/master/docs/Debugging.md)
-  - Debugging view template code
-  - [Errors handling](https://github.com/DevelAx/RazorExpress/blob/master/docs/Debugging.md#errors-handling)
 - [**Misc**](#misc)
   - [TODO list](#todo-list)
 -----------------------
