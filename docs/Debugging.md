@@ -14,7 +14,7 @@
 ## Errors handling
 
 Let's consider a minimum example of the Express web-server application which tries to render a view with incorrect HTML. 
-> This exapmle is included into the [RazorExpressErrors](https://github.com/DevelAx/RazorExpressErrors) repository as [error-handling-1.js](https://github.com/DevelAx/RazorExpressErrors/blob/master/error-handling-1.js).
+<sup>* This exapmle is included into the [RazorExpressErrors](https://github.com/DevelAx/RazorExpressErrors) repository as [error-handling-1.js](https://github.com/DevelAx/RazorExpressErrors/blob/master/error-handling-1.js).</sup>
 
 **Express web-server:**
 ```JS
@@ -85,7 +85,7 @@ function appErrorHandler(err, req, res, next) {
     return next(err);
 }
 ```
->The working example is located in the same [RazorExpressErrors](https://github.com/DevelAx/RazorExpressErrors) repository in the [error-handling-2.js](https://github.com/DevelAx/RazorExpressErrors/blob/master/error-handling-1.js) file.
+<sup>* The working example is located in the same [RazorExpressErrors](https://github.com/DevelAx/RazorExpressErrors) repository in the [error-handling-2.js](https://github.com/DevelAx/RazorExpressErrors/blob/master/error-handling-1.js) file.</sup>
 
 Please, go to [expressjs.com](https://expressjs.com/en/guide/error-handling.html) to read more on *"The default error handler"* & *"Writing error handlers"* topics. Or at least take note of this qoute:
 > You define error-handling middleware last, after other app.use() and routes calls...
@@ -102,7 +102,9 @@ So you may wonder why you need to know all this if this separation exists only i
 ## Errors visualization in the inner templates
 When an error is rendered as formatted HTML, the source code of the view template in which the error occurred is displayed with the location of the error code highlighted in there. But what if the error occurred not in the main template, but in a partial view? What template source code should be displayed in this case?
 
-For a more visual representation of where the error took place, the entire chain of the view templates will be presented in the order they are compiled. Let's look at an example where an error occurs in a partial view. You can find this example in [RazorExpressErrors](https://github.com/DevelAx/RazorExpressErrors) repository, there you should run the [inner-error-example.js](https://github.com/DevelAx/RazorExpressErrors/blob/master/inner-error-example.js) file under the NodeJS and open [http://localhost:1337/](http://localhost:1337/) in the browser.
+For a more visual representation of where the error took place, the entire chain of the view templates will be presented in the order they are compiled. Let's look at an example where an error occurs in a partial view. 
+
+<sup>* You can find this example in [RazorExpressErrors](https://github.com/DevelAx/RazorExpressErrors) repository, there you should run the [inner-error-example.js](https://github.com/DevelAx/RazorExpressErrors/blob/master/inner-error-example.js) file under the NodeJS and open [http://localhost:1337/](http://localhost:1337/) in the browser.</sup>
 
 This example consists of two view templates: *"index.raz"* is the main view which has a reference to a partial view *"_people.raz"*. And the list of some people is passed via Model (defined in the [inner-error-example.js](https://github.com/DevelAx/RazorExpressErrors/blob/master/inner-error-example.js) file).
 
