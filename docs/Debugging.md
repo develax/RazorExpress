@@ -85,9 +85,9 @@ Please, go to [expressjs.com](https://expressjs.com/en/guide/error-handling.html
 > You define error-handling middleware last, after other app.use() and routes calls...
 
 ## Parser and runtime errors
-In fact, all errors are exposed to the user as an exception named *"RazorError"*, although there are 2 types of errors and they occur at different stages of template processing. They are *parser errors* and *runtime errors*.
+Although all errors are exposed to the user as an exception named *"RazorError"*, in fact, there are 2 types of errors and they occur at different stages of template processing. They are *parser errors* and *runtime errors*.
 
 ### Parser errors
-You have already seen an example of a parser error in the ["Errors handling"](#errors-handling) section. Obviously, these errors occur in the process of parsing the template when the parser detects that there is something wrong with the structure of the template. In that case, it is an HTML tag structure error. 
+You have already seen an example of the *parser error* in the ["Errors handling"](#errors-handling) section. Obviously, these errors occur in the process of parsing the template when the parser detects that there is something wrong with the structure of the template. This can be both HTML errors and JavaScript syntax errors. But mostly at this stage errors of HTML tags are detected (as in an example in the ["Errors handling"](#errors-handling) section).
 
-It should be noted that the parser does not perform full validation of HTHL, but only separates JavaScript code fragments. This allows him not to do extra work and stay fast. At the same time, this means that it does not detect all HTML or JavaScript structure errors. At the same time, this means that it does not detect all HTML or JavaScript structure errors. However, this does not also mean that the engine will not catch them - they will still be detected by the virtual machine when the template is compiled.
+It should be noted that the parser does not perform full validation of HTHL, but only separates JavaScript code fragments. This allows him not to do extra work and stay fast. At the same time, this means that it does not detect all HTML or JavaScript structure errors. However, this does not mean that the engine will not catch them at all - they will still be detected by the virtual machine when the template is compiled and cought by the engine.
