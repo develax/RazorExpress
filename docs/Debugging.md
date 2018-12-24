@@ -4,7 +4,7 @@
 
 - [**Production & development modes**](#production--development-modes)
 - [**Errors handling**](#errors-handling)
-  - [**Custom error handler**](#custom-error-handler)
+  - [Custom error handler](#custom-error-handler)
 - [**Parser errors & runtime errors**](#parser-errors--runtime-errors)
 - [**Errors visualization in the inner templates**](#errors-visualization-in-the-inner-templates)
 
