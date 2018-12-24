@@ -1,5 +1,5 @@
 module.exports = {
-    isDebug(env){
-        return env === 'development';
+    isDebugMode(env){
+        return env !== "production";
     }
 }

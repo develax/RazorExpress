@@ -45,8 +45,8 @@ function registerRazorEngine(app) {
     app.set('view engine', ext);
 }
 
-function handleErrors(app, errorCode, mode) {
-    mode = mode || "development";
+function handleErrors(app, errorCode) {
+    const dbg = require('./core/dbg/debugger');
     app.use(appErrorHandler);
 
     function appErrorHandler(err, req, res, next) {
@@ -55,7 +55,7 @@ function handleErrors(app, errorCode, mode) {
 
         var env = app.get('env');
 
-        if (env === mode && err.name === RazorError.name) {
+        if (dbg.isDebugMode(env) && err.name === RazorError.name) {
             var errorHtml = err.html();
             res.status(errorCode || 500);
             res.send(errorHtml);

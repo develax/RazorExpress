@@ -239,7 +239,7 @@ module.exports = class Razor {
         data = data.toString();
         let endNL = (data[data.length - 1] === '\n') ? '' : '\n';
 
-        if (dbg.isDebug(this.env))
+        if (dbg.isDebugMode(this.env))
             return this.wrapInHtmlComment(filename) + EOL + data + endNL;
 
         return data + endNL;

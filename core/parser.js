@@ -256,23 +256,23 @@ module.exports = function (opts) {
                     return "\r\nHtml.raw(Html.__val(" + i + "));";
                 case blockType.expr:
                     i = jsValues.enq(block.text);
-                    return `
-Html.__dbg.pos = { start:${block.posStart}, end: ${block.posEnd} };
-Html.encode(eval(Html.__val(${i})));
-Html.__dbg.pos = null;`;
+                    let code = `Html.encode(eval(Html.__val(${i})));`;
+                    return debugMode ? setDbg(code, block) : "\r\n" + code;
                 case blockType.code:
-                    if (debugMode)
-                        return `
-Html.__dbg.pos = { start:${block.posStart}, end: ${block.posEnd} };
-${block.text}
-Html.__dbg.pos = null;`;
-                    return "\r\n" + block.text; // to be on a separate line
+                    return debugMode ? setDbg(block.text, block) : "\r\n" + block.text;
                 default:
                     throw new Error(`Unexpected block type = "${blockType}".`);
             }
         }
 
         throw new Error(`Unexpected code behaviour, block type = "${blockType}".`);
+    }
+
+    function setDbg(code, block){
+        return `
+Html.__dbg.pos = { start:${block.posStart}, end: ${block.posEnd} };
+${code}
+Html.__dbg.pos = null;`;
     }
 
     class Queue {
@@ -1440,7 +1440,7 @@ Html.__dbg.pos = null;`;
     }
 
     function isDebugMode(opts) {
-        return opts.debug || dbg.isDebug(opts.mode);
+        return opts.debug || dbg.isDebugMode(opts.mode);
     }
 
     function toParserError(err, errorFactory) {
