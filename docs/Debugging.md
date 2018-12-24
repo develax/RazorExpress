@@ -3,8 +3,8 @@
 # Debugging & Errors handling in Razor-Express
 
 - [Errors handling]()
-- [Custom error handler]()
-- [Parser errors & runtime errors]()
+  - [Custom error handler]()
+- [Parser errors & runtime errors](#parser-errors--runtime-errors)
             - []()
                 - []()
                     - []()
@@ -97,7 +97,7 @@ It should be noted that the parser does not perform full validation of HTHL, but
 
 So you may wonder why you need to know all this if this separation exists only inside? Well, that's true, but you'd better know that *highlighting parser errors in the template source code is more accurate* than runtime errors. And all because the virtual machine does not give the exact coordinates of the error occurred. Nevertheless, I tried to make them as accurate as possible and in most cases they really are! 
 
-## Visualization errors in the inner templates
+## Errors visualization in the inner templates
 When an error is rendered as formatted HTML, the source code of the view template in which the error occurred is displayed with the location of the error code highlighted in there. But what if the error occurred not in the main template, but in a partial view? What template source code should be displayed in this case?
 
 For a more visual representation of where the error took place, the entire chain of the view templates will be presented in the order they are compiled. Let's look at an example where an error occurs in a partial view. You can find this example in [RazorExpressErrors](https://github.com/DevelAx/RazorExpressErrors) repository, there you should run the [inner-error-example.js](https://github.com/DevelAx/RazorExpressErrors/blob/master/inner-error-example.js) file under the NodeJS and open [http://localhost:1337/](http://localhost:1337/) in the browser.
