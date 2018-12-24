@@ -92,3 +92,8 @@ You have already seen an example of the *parser error* in the ["Errors handling"
 It should be noted that the parser does not perform full validation of HTHL, but only separates JavaScript code fragments. This allows it not to do extra work and stay fast. At the same time, this means that it does not detect all HTML or JavaScript structure errors. However, this does not mean that the engine will not catch them at all - all JavaScript errors will be detected by the virtual machine when the template is compiled and then they will be caught by the engine. All this happens at the second stage of processing of the template and these errors are called *runtime errors*.
 
 So you may wonder why you need to know all this if this separation exists only inside? Well, that's true, but you'd better know that *highlighting parser errors in the template source code is more accurate* than runtime errors. And all because the virtual machine does not give the exact coordinates of the error occurred. Nevertheless, I tried to make them as accurate as possible and in most cases they really are! 
+
+## Error visualization in the inner templates
+When an error is rendered as formatted HTML, the source code of the view template in which the error occurred is displayed with the location of the error code highlighted in there. But what if the error occurred not in the main template, but in a partial view? What template source code should be displayed in this case?
+
+For a more visual representation of where the error took place, the entire chain of the view templates will be presented in the order they are compiled. Let's look at an example where an error occurs in a partial view.
