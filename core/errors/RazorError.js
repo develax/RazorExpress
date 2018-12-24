@@ -190,7 +190,7 @@ function dataToHtml(data, mainInfo) {
     if (data.jshtml) {
         let textCursor = 0;
         lines = data.jshtml.split('\n');
-        html = "<ol start='1'>";
+        html = "<ol start='0'>";
 
         for (let i = 0; i < lines.length; i++) {
             let line = lines[i];

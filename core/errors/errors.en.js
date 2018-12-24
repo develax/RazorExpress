@@ -7,22 +7,22 @@ class ParserErrorFactory {
     }
 
     endOfFileFoundAfterAtSign(lineNum, posNum) {
-        var message = `End-of-file was found after the "@" character at line ${lineNum + 1} pos ${posNum + 1}. "@" must be followed by a valid code block. If you want to output an "@", escape it using the sequence: "@@"`;
+        var message = `End-of-file was found after the "@" character at line ${lineNum} pos ${posNum + 1}. "@" must be followed by a valid code block. If you want to output an "@", escape it using the sequence: "@@"`;
         return RazorError.new({ message, info: this.info, line: lineNum, pos: posNum, capture: this.endOfFileFoundAfterAtSign });
     }
 
     unexpectedCharacter(ch, lineNum, posNum, line) {
-        var message = `Unexpected '${ch}' character at line ${lineNum + 1} pos ${posNum + 1} after '${line}'`;
+        var message = `Unexpected '${ch}' character at line ${lineNum} pos ${posNum + 1} after '${line}'`;
         return RazorError.new({ message, info: this.info, line: lineNum, pos: posNum, capture: this.unexpectedCharacter });
     }
 
     unexpectedAtCharacter(lineNum, posNum) {
-        var message = `Unexpected '@' character at line ${lineNum + 1} pos ${posNum + 1}. Once inside the body of a code block (@if {}, @{}, etc.) or a section (@section{}) you do not need to use "@" character to switch to code.`;
+        var message = `Unexpected '@' character at line ${lineNum} pos ${posNum + 1}. Once inside the body of a code block (@if {}, @{}, etc.) or a section (@section{}) you do not need to use "@" character to switch to code.`;
         return RazorError.new({ message, info: this.info, line: lineNum, pos: posNum, capture: this.unexpectedAtCharacter });
     }
 
     notValidStartOfCodeBlock(ch, lineNum, posNum) {
-        var message = `"${ch}" is not valid at the start of a code block at line ${lineNum + 1} pos ${posNum + 1}. Only identifiers, keywords, "(" and "{" are valid.`;
+        var message = `"${ch}" is not valid at the start of a code block at line ${lineNum} pos ${posNum + 1}. Only identifiers, keywords, "(" and "{" are valid.`;
         return RazorError.new({ message, info: this.info, line: lineNum, pos: posNum, capture: this.notValidStartOfCodeBlock });
     }
 
@@ -32,17 +32,17 @@ class ParserErrorFactory {
     }
 
     characterExpected(ch, line, pos) {
-        var message = `'${ch}' character is expected at line ${line + 1} pos ${pos + 1}.`;
+        var message = `'${ch}' character is expected at line ${line} pos ${pos + 1}.`;
         return RazorError.new({ message, info: this.info, line, pos, capture: this.characterExpected });
     }
 
     characterExpectedAfter(ch, line, pos, after) {
-        var message = `'${ch}' character is expected after '${after}' at line ${line + 1} pos ${pos + 1}.`;
+        var message = `'${ch}' character is expected after '${after}' at line ${line} pos ${pos + 1}.`;
         return RazorError.new({ message, info: this.info, line, pos, capture: this.characterExpectedAfter });
     }
 
     expressionMissingEnd(expr, ch, line, pos) {
-        var message = `The explicit expression "${expr}" is missing a closing character "${ch}" at line ${line + 1} pos ${pos + 1}.`;
+        var message = `The explicit expression "${expr}" is missing a closing character "${ch}" at line ${line} pos ${pos + 1}.`;
         return RazorError.new({ message, info: this.info, line, pos, capture: this.expressionMissingEnd });
     }
 
@@ -52,7 +52,7 @@ class ParserErrorFactory {
     }
 
     wordExpected(word, line, pos, len) {
-        var message = `'${word}' expected at line ${line + 1} pos ${pos + 1}.`;
+        var message = `'${word}' expected at line ${line} pos ${pos + 1}.`;
         return RazorError.new({ message, info: this.info, line, pos, len, capture: this.wordExpected });
     }
 
@@ -62,17 +62,17 @@ class ParserErrorFactory {
     // }
 
     missingMatchingStartTag(tag, line, pos) {
-        var message = `'${tag}' tag at line ${line + 1} pos ${pos + 1} is missing matching start tag.`;
+        var message = `'${tag}' tag at line ${line} pos ${pos + 1} is missing matching start tag.`;
         return RazorError.new({ message, info: this.info, line, pos, len: tag.length, capture: this.missingMatchingStartTag });
     }
 
     missingMatchingEndTag(tag, line, pos) {
-        var message = `'${tag}' tag at line ${line + 1} pos ${pos + 1} is missing matching end tag.`;
+        var message = `'${tag}' tag at line ${line} pos ${pos + 1} is missing matching end tag.`;
         return RazorError.new({ message, info: this.info, line, pos, len: tag.length, capture: this.missingMatchingEndTag });
     }
 
     invalidExpressionChar(ch, line, pos, afterText) {
-        var message = `Invalid "${ch}" symbol in expression at line ${line + 1} pos ${pos + 1}` + (afterText ? ` after "${afterText}".` : ".");
+        var message = `Invalid "${ch}" symbol in expression at line ${line} pos ${pos + 1}` + (afterText ? ` after "${afterText}".` : ".");
         return RazorError.new({ message, info: this.info, line, pos, capture: this.invalidExpressionChar });
     }
 
@@ -87,37 +87,37 @@ class ParserErrorFactory {
     // }
 
     whiteSpaceExpectedAfter(keyword, line, pos) {
-        var message = `A whitespace expected after the "${keyword}" keyword at line ${line + 1} pos ${pos + 1}.`;
+        var message = `A whitespace expected after the "${keyword}" keyword at line ${line} pos ${pos + 1}.`;
         return RazorError.new({ message, info: this.info, line, pos, capture: this.whiteSpaceExpectedAfter }); // cannot be tested.
     }
 
     tagNameExpected(line, pos) {
-        var message = `Tag name expected at line ${line + 1} pos ${pos + 1}.`;
+        var message = `Tag name expected at line ${line} pos ${pos + 1}.`;
         return RazorError.new({ message, info: this.info, line, pos, capture: this.tagNameExpected });
     }
 
     sectionNameExpectedAfter(keyword, line, pos) {
-        var message = `A section name expected after the "${keyword}" keyword at line ${line + 1} pos ${pos + 1}.`;
+        var message = `A section name expected after the "${keyword}" keyword at line ${line} pos ${pos + 1}.`;
         return RazorError.new({ message, info: this.info, line, pos, capture: this.sectionNameExpectedAfter });
     }
 
     sectionNameCannotStartWith(ch, line, pos) {
-        var message = `A section name cannot start with '${ch}' at line ${line + 1} pos ${pos + 1}.`;
+        var message = `A section name cannot start with '${ch}' at line ${line} pos ${pos + 1}.`;
         return RazorError.new({ message, info: this.info, line, pos, capture: this.sectionNameCannotStartWith });
     }
 
     sectionNameCannotInclude(ch, line, pos) {
-        var message = `A section name cannot include '${ch}' character at line ${line + 1} pos ${pos + 1}.`;
+        var message = `A section name cannot include '${ch}' character at line ${line} pos ${pos + 1}.`;
         return RazorError.new({ message, info: this.info, line, pos, capture: this.sectionNameCannotInclude });
     }
 
     unexpectedLiteralFollowingTheSection(ch, line, pos) {
-        var message = `Unexpected literal '${ch}' following the 'section' directive at line ${line + 1} pos ${pos + 1}. Expected '{'.`;
+        var message = `Unexpected literal '${ch}' following the 'section' directive at line ${line} pos ${pos + 1}. Expected '{'.`;
         return RazorError.new({ message, info: this.info, line, pos, capture: this.unexpectedLiteralFollowingTheSection });
     }
 
     sectionIsAlreadyDefined(sectionName, line, pos, viewFilePath) {
-        var message = `Section '${sectionName}' at line ${line + 1} pos ${pos + 1} has been already defined in the file '${viewFilePath}'. You cannot assign the same name to different sections in the same file.`;
+        var message = `Section '${sectionName}' at line ${line} pos ${pos + 1} has been already defined in the file '${viewFilePath}'. You cannot assign the same name to different sections in the same file.`;
         return RazorError.new({ message, info: this.info, line, pos, len: sectionName.length, capture: this.sectionIsAlreadyDefined });
     }
 
@@ -127,7 +127,7 @@ class ParserErrorFactory {
     // }
 
     sectionsCannotBeNested(line, pos) {
-        var message = `Section blocks cannot be nested at line ${line + 1} pos ${pos + 1}.`;
+        var message = `Section blocks cannot be nested at line ${line} pos ${pos + 1}.`;
         return RazorError.new({ message, info: this.info, line, pos, capture: this.sectionsCannotBeNested });
     }
 
