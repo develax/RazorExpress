@@ -1131,7 +1131,8 @@ Html.__dbg.pos = null;`;
                             throw this.er.unexpectedAtCharacter(this.lineNum, this.linePos(), this.line); // [Invalid-HTML 9], [Section 1]
                         }
                         else if (ch === '<') {
-                            if (lastLiteral === '' || lastLiteral === '{' || lastLiteral === ';') {
+                            // ':' for `switch/case:`
+                            if (lastLiteral === '' || lastLiteral === '{' || lastLiteral === ';' || lastLiteral === ':') {
                                 this.stepBack(blocks, 0);
                                 this.parseHtmlInsideCode(blocks);
                                 block = this.newBlock(blockType.code, blocks);

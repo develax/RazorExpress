@@ -702,6 +702,28 @@ finally
         {
             name: "Code 68",
             template: `
+@{
+    var n = 3;
+}
+@switch(n) {
+    case 1:
+        <div>one</div>
+        break;
+    case 2:
+        <div>two</div>
+        break;
+    case 3:
+        <div>three</div>
+        break;
+    default:
+        <div>--error--</div>
+        break;
+}`,
+            expected: `\n        <div>three</div>\n`
+        },
+        {
+            name: "Code 70",
+            template: `
 @{ 
     var s = "12'3'45";
 }
