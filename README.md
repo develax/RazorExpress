@@ -27,7 +27,7 @@
     - [`@Model`](https://github.com/DevelAx/RazorExpress/blob/master/docs/syntax.md#view-objects)
     - [`@ViewData`](https://github.com/DevelAx/RazorExpress/blob/master/docs/syntax.md#viewdata)
     - [`@Html`](https://github.com/DevelAx/RazorExpress/blob/master/docs/syntax.md#html)
-  - [Syntax highlighting in code editors](https://github.com/DevelAx/RazorExpress/blob/master/docs/#syntax-highlighting-in-code-editors)
+  - [Syntax highlighting in code editors](https://github.com/DevelAx/RazorExpress/blob/master/docs/syntax.md#syntax-highlighting-in-code-editors)
 - [**Common pitfalls & remarks**](#warning-common-pitfalls)
   - [Missing semicolon](#missing-semicolon)
   - [Expressions & code blocks confusion](#expressions--code-blocks-confusion)
