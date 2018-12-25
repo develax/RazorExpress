@@ -32,6 +32,8 @@
     - [@Html.encode](#htmlencode)
     - [@Html.raw](#htmlraw)
     - [@Html.getPartial](#htmlgetPartial)
+- [**Syntax highlighting in code editors**](#syntax-highlighting-in-code-editors)
+    - [Syntax highlighting in Visual Studio Code](#syntax-highlighting-in-visual-studio-code)
   
 Razor is a markup syntax for embedding server-based code into webpages based on [ASP.NET Razor syntax](https://docs.microsoft.com/en-us/aspnet/core/mvc/views/razor). Although I tried to make the Razor-Express syntax as close as possible to [ASP.NET Razor](https://docs.microsoft.com/en-us/aspnet/core/mvc/views/razor) there are some differences that need to be taken into account. 
 
@@ -657,6 +659,28 @@ Returns a partial view as a string (not HTML encoded).
 ```
 
 <sup>* also see the ["Partial views"](overview.md#partial-views) section</sup>
+
+## Syntax highlighting in code editors
+To turn on Razor-Express syntax highlighting in your code editor create an association for files with the `'raz'` extension to the *ASP.NET MVC Razor* syntax. In most cases, this will be enough to have a pretty good Razor-Express syntax highlighting. Some code editors may require a plugin to support Razor syntax highlighting. If so, just search and install this kind of plugin for the *ASP.NET MVC Razor* syntax and associate it with the `raz` extension. In the end, if it is not found you can use the HTML syntax highlighting - it would better than nothing.
+
+### Syntax highlighting in Visual Studio Code
+To turn on syntax highlighting for Razor-Express in [Visual Studio Code](https://code.visualstudio.com/) go to **`File` > `Preferences` > `Settings`** or use the [**`Ctrl`+`,`**] / [**`Cmd`+`,`**] shortcut (see [User and Workspace Settings in Visual Studio Code](https://code.visualstudio.com/docs/getstarted/settings)):
+
+![Visual Studio Code: path to Settings](./syntax/VSC-path-to-Settings.jpg?raw=true)
+
+Having the *"Settings editor"* open, go to **`Text Editor` > `Files` > `Association`**:
+
+![Visual Studio Code: Settings](syntax/VSC-Settings.jpg?raw=true)
+
+Then click on **"Edit in settings.json"** to open it in a text editor:
+
+In the **"USER SETTINGS"** tab find the parameter `"files.associations"` or create it and add the `"*.raz": "cshtml"` key-value pair to it: 
+
+![Visual Studio Code: editing the "file-associations" parameter](syntax/VSC-user-settings-tab.jpg?raw=true)
+
+The Razor-Express syntax in Visual Studio Code is now being highlighted. 
+
+
 
 --------------------
 
