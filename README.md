@@ -31,8 +31,6 @@
   - [Missing semicolon](#missing-semicolon)
   - [Expressions & code blocks confusion](#expressions--code-blocks-confusion)
 - [**Debugging & Errors handling in Razor-Express**](https://github.com/DevelAx/RazorExpress/blob/master/docs/Debugging.md)
-  - Debugging view template code
-  - [Errors handling](https://github.com/DevelAx/RazorExpress/blob/master/docs/Debugging.md#errors-handling)
 - [**Misc**](#misc)
   - [TODO list](#todo-list)
 -----------------------
@@ -392,7 +390,7 @@ What is to be done soon:
 
 1. Finish the documentation for the current version (debugging, other syntax examples, RAZ-API).
 2. Implement [Razor-style `@* *@` comments](https://github.com/DevelAx/RazorExpress/blob/master/docs/syntax.md#comments).
-3. Improve debugging info.
+3. ~~Complete debugging reference page.~~
 4. Make the library available for use on the client side (in the browser).
 5. Implement caching compiled templates.
 6. Async partial views.

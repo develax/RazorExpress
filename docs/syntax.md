@@ -197,31 +197,33 @@ The same could be written a little differently:
 
 A `switch` statement example:
 ```HTML+Razor
+<span>Today is 
 @switch (new Date().getDay()) {
   case 0:
-    var day = "Sunday";
+    <strong>Sunday</strong>
     break;
   case 1:
-    day = "Monday";
+    <strong>Monday</strong>
     break;
   case 2:
-    day = "Tuesday";
+    <strong>Tuesday</strong>
     break;
   case 3:
-    day = "Wednesday";
+    <strong>Wednesday</strong>
     break;
   case 4:
-    day = "Thursday";
+    <strong>Thursday</strong>
     break;
   case 5:
-    day = "Friday";
+    <strong>Friday</strong>
     break;
   case 6:
-    day = "Saturday";
+    <strong>Saturday</strong>
+    break;
 }
-<strong>Today is @day</strong>
+</span>
 ```
-<sup>[^ try these code examples](https://runkit.com/develax/razor-conditional-control-structures)</sup>
+<sup>[^ try these code examples](https://runkit.com/develax/razor-conditionals-if-else-switch)</sup>
 
 ### Looping `@for`, `@while`, and `@do while`
 You can use looping control statements to render a templated HTML. In the following examples, we will use different kinds of loops to render a list of countries. 
