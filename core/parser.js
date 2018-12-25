@@ -1459,7 +1459,7 @@ Html.__dbg.pos = null;`;
                 err.stack = err.stack.substring(pos);
         }
         
-        if (err.__dbg && err.__dbg.viewName !== (err.data && err.data.filename)) // check if it's already done
+        if (!err.__dbg || err.__dbg.viewName !== (err.data && err.data.filename))
             errorFactory.extendError(err);
 
         // if (err.stack)

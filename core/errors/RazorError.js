@@ -39,7 +39,8 @@ module.exports = class RazorError extends Error {
         if (oldData)
             exc.data.inner = oldData;
 
-        exc.html = RazorError.prototype.html;
+        if (!exc.html)
+            exc.html = RazorError.prototype.html;
     }
 
     html() {

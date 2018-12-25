@@ -194,7 +194,7 @@ describe("server routes", () => {
         let route = "/errors/partialerror";
         describe(route, () => {
             console.log(`> testing rote ${route}...`);
-            it("check failure of rendering layout", (done) => {
+            it("check failure of rendering partial view", (done) => {
                 chai.request(server)
                     .get(route)
                     .end((err, res) => {
