@@ -658,6 +658,24 @@ Returns a partial view as a string (not HTML encoded).
 
 <sup>* also see the ["Partial views"](overview.md#partial-views) section</sup>
 
+## Syntax highlighting in code editors
+To turn on Razor-Express syntax highlighting in your code editor create an association for files with the `'raz'` extension to the *ASP.NET MVC Razor* syntax. In most cases, this will be enough to have a pretty good Razor-Express syntax highlighting. Some code editors may require a plugin to support Razor syntax highlighting. If so, just search and install this kind of plugin for the *ASP.NET MVC Razor* syntax and associate it with the `raz` extension.
+
+### Syntax highlighting in Visual Studio Code
+To turn on syntax highlighting for Razor-Express in [Visual Studio Code](https://code.visualstudio.com/) go to **`File` > `Preferences` > `Settings`** or use the **[`Ctrl`+`,`]** / **[`Cmd`+`,`]** shortcut:
+
+![Visual Studio Code: path to Settings](./syntax/VSC-path-to-Settings.jpg?raw=true)
+
+Having the *"Settings editor"* open, go to **`Text Editor > Files > Association`**:
+
+![Visual Studio Code: Settings](syntax/VSC-Settings.jpg?raw=true)
+
+Then click on **`Edit in settings.json`** to open it in a text editor:
+
+. In the *"USER SETTINGS"* tab find the parameter `"files.associations"` or create it and add the `"*.raz": "cshtml"` key-value pair to it: 
+
+![Visual Studio Code: editing the "file-associations" parameter](syntax/VSC-user-settings-tab.jpg?raw=true)
+
 --------------------
 
 <sub>
