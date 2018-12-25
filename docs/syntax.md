@@ -666,15 +666,20 @@ To turn on syntax highlighting for Razor-Express in [Visual Studio Code](https:/
 
 ![Visual Studio Code: path to Settings](./syntax/VSC-path-to-Settings.jpg?raw=true)
 
-Having the *"Settings editor"* open, go to **`Text Editor > Files > Association`**:
+Having the *"Settings editor"* open, go to **`Text Editor` > `Files` > `Association`**:
 
 ![Visual Studio Code: Settings](syntax/VSC-Settings.jpg?raw=true)
 
-Then click on **`Edit in settings.json`** to open it in a text editor:
+Then click on **"Edit in settings.json"** to open it in a text editor:
 
-. In the *"USER SETTINGS"* tab find the parameter `"files.associations"` or create it and add the `"*.raz": "cshtml"` key-value pair to it: 
+In the **"USER SETTINGS"** tab find the parameter `"files.associations"` or create it and add the `"*.raz": "cshtml"` key-value pair to it: 
 
 ![Visual Studio Code: editing the "file-associations" parameter](syntax/VSC-user-settings-tab.jpg?raw=true)
+
+The Razor-Express syntax in Visual Studio Code is now being highlighted. 
+
+
+
 
 --------------------
 
