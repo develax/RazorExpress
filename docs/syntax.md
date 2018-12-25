@@ -664,7 +664,7 @@ Returns a partial view as a string (not HTML encoded).
 To turn on Razor-Express syntax highlighting in your code editor create an association for files with the `'raz'` extension to the *ASP.NET MVC Razor* syntax. In most cases, this will be enough to have a pretty good Razor-Express syntax highlighting. Some code editors may require a plugin to support Razor syntax highlighting. If so, just search and install this kind of plugin for the *ASP.NET MVC Razor* syntax and associate it with the `raz` extension. In the end, if it is not found you can use the HTML syntax highlighting - it would better than nothing.
 
 ### Syntax highlighting in Visual Studio Code
-To turn on syntax highlighting for Razor-Express in [Visual Studio Code](https://code.visualstudio.com/) go to **`File` > `Preferences` > `Settings`** or use the [**`Ctrl`+`,`**] / [**`Cmd`+`,`**] shortcut:
+To turn on syntax highlighting for Razor-Express in [Visual Studio Code](https://code.visualstudio.com/) go to **`File` > `Preferences` > `Settings`** or use the [**`Ctrl`+`,`**] / [**`Cmd`+`,`**] shortcut (see [User and Workspace Settings in Visual Studio Code](https://code.visualstudio.com/docs/getstarted/settings)):
 
 ![Visual Studio Code: path to Settings](./syntax/VSC-path-to-Settings.jpg?raw=true)
 
@@ -679,7 +679,6 @@ In the **"USER SETTINGS"** tab find the parameter `"files.associations"` or crea
 ![Visual Studio Code: editing the "file-associations" parameter](syntax/VSC-user-settings-tab.jpg?raw=true)
 
 The Razor-Express syntax in Visual Studio Code is now being highlighted. 
-
 
 
 
