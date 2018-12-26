@@ -387,7 +387,7 @@ Misc
 The source code examples
 ---
 Here are the links to all repositories with examples used in the documentation:
-- [A Razor-Express website example](https://github.com/DevelAx/RazorExpressFullExample) of using some features of the library.
+- [An example](https://github.com/DevelAx/RazorExpressFullExample) of using some features of the Razor-Express library.
 - [An example](https://github.com/DevelAx/RazorExpressExample) from the [Quick-Start](#express-web-server-example) section.
 - [An example](https://github.com/DevelAx/RazorExpressErrors) from the [Debugging & Errors handling in Razor-Express](https://github.com/DevelAx/RazorExpress/blob/master/docs/Debugging.md).
 
