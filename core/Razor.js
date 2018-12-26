@@ -13,7 +13,7 @@ module.exports = class Razor {
     constructor(options) {
         this.options = options;
         this.env = options.settings.env;
-        this.parser = initParser({ mode: this.env });
+        this.parser = initParser({ mode: this.env, express: true });
         this.viewsDir = path.normalize(this.options.settings.views);
     }
 

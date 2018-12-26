@@ -40,7 +40,7 @@ module.exports = function (opts) {
 
     const HtmlString = require('./HtmlString');
     const htmlEncode = require('js-htmlencode');
-    const vm = isDebugMode(opts) ? require('vm') : null;
+    const vm = debugMode ? require('vm') : null;
 
     ////////////////////
     ///   Html class
@@ -310,9 +310,10 @@ Html.__dbg.pos = null;`;
     ////////////////
     class Parser {
         constructor(args) {
-            args.filePath = args.filePath || "default";
+            args.filePath = args.filePath || "no";
+            let linesBaseNumber = (debugMode && opts.express) ? 0 : 1; // in debug-mode the file-path of a template is added as a very first line comment
             this.args = args;
-            this.er = new ErrorsFactory({ filename: args.filePath, jshtml: args.template });
+            this.er = new ErrorsFactory({ filename: args.filePath, jshtml: args.template }, linesBaseNumber);
         }
 
         compile(done) {

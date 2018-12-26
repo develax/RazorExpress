@@ -204,8 +204,8 @@ describe("server routes", () => {
                         expect(h1.length).to.be.equal(1);
                         expect(h1.text()).to.have.string(errorHeader);
                         let errorMainLines = $('.error');
-                        expect(errorMainLines, '1 error lines are expected').to.have.lengthOf(1);
-                        let errorText = "'</div>' tag at line 7 pos 1 is missing matching start tag";
+                        expect(errorMainLines, '1 error line is expected').to.have.lengthOf(1);
+                        let errorText = "'</div>' tag at line 6 pos 1 is missing matching start tag";
                         let layouts = $(`#error:contains(${errorText})`);
                         expect(layouts, errorText).to.have.lengthOf(1);
                         let errorViews = $('.code');
