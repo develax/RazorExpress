@@ -31,6 +31,7 @@
   - [Expressions & code blocks confusion](#expressions--code-blocks-confusion)
 - [**Debugging & Errors handling in Razor-Express**](https://github.com/DevelAx/RazorExpress/blob/master/docs/Debugging.md)
 - [**Misc**](#misc)
+  - [The source code examples](#the-source-code-examples)
   - [TODO list](#todo-list)
 -----------------------
 
