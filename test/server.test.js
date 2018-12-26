@@ -204,9 +204,10 @@ describe("server routes", () => {
                         expect(h1.length).to.be.equal(1);
                         expect(h1.text()).to.have.string(errorHeader);
                         let errorMainLines = $('.error');
-                        expect(errorMainLines, '2 error lines are expected').to.have.lengthOf(2);
-                        let layouts = $(`#error:contains(temp is not defined)`);
-                        expect(layouts, '"temp is not defined" text is expected').to.have.lengthOf(1);
+                        expect(errorMainLines, '1 error lines are expected').to.have.lengthOf(1);
+                        let errorText = "'</div>' tag at line 7 pos 1 is missing matching start tag";
+                        let layouts = $(`#error:contains(${errorText})`);
+                        expect(layouts, errorText).to.have.lengthOf(1);
                         let errorViews = $('.code');
                         expect(errorViews, '3 error views are expected').to.have.lengthOf(3);
                         let viewSourceHeader = $(errorViews[0]).find(`.filepath:contains(partialerror.raz)`);
@@ -215,8 +216,8 @@ describe("server routes", () => {
                         expect(layoutSourceHeader, '"_layout.raz" header is expected').to.have.lengthOf(1);
                         let partialSourceHeader = $(errorViews[2]).find(`.filepath:contains(_partial.raz)`);
                         expect(partialSourceHeader, '"_partial.raz" header is expected').to.have.lengthOf(1);
-                        let errorText = $(errorViews[2]).find('.multilight').text();
-                        expect(errorText).equal("@temp");
+                        errorText = $(errorViews[2]).find('.highlight').text();
+                        expect(errorText).equal(errorText);
                         console.log(`> testing rote  ${route} is done`);
                         done();
                     });

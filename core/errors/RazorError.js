@@ -167,13 +167,13 @@ function stackToHtml(exc, data, mainInfo) {
         let style = '';
 
         if (trim && trim !== '^' && !trim.startsWith("at ")) {
-            if (mainInfo.title) {
+            if (trim.startsWith('RazorError') || mainInfo.title)
                 style = 'id="error" class="error"'; // the second line is the error description
-                mainInfo.title += '\r\n';
-            }
-            else {
+            else
                 style = 'class="error"';
-            }
+
+            if (mainInfo.title)
+                mainInfo.title += '\r\n';
 
             mainInfo.title += encodedLine;
         }

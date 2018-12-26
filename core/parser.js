@@ -1458,8 +1458,11 @@ Html.__dbg.pos = null;`;
             if (pos > 0)
                 err.stack = err.stack.substring(pos);
         }
+
+        // Is not "born" as RazorError.
+        let isNotRazorError = !err.__dbg && err.name !== RazorError.name;
         
-        if (!err.__dbg || err.__dbg.viewName !== (err.data && err.data.filename))
+        if (isNotRazorError || err.__dbg && err.__dbg.viewName !== (err.data && err.data.filename))
             errorFactory.extendError(err);
 
         // if (err.stack)

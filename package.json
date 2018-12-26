@@ -1,7 +1,7 @@
 {
   "name": "raz",
   "description": "Razor-like Template Engine for NodeJS Express library based on ASP.NET MVC Razor syntax. Template your views by mixing HTML markup with JavaScript server-side code!",
-  "version": "0.0.76",
+  "version": "0.0.77,
   "author": {
     "name": "Sergey Fisun",
     "email": "develax@gmail.com",
