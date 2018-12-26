@@ -2,8 +2,6 @@
 
 > <pre>$ npm install <b>raz</b> --save</pre>
 
-<sup>* *This is a **draft version** of the manual, although the code itself has already been tested and works. While the documentation is under development, use [this repository](https://github.com/DevelAx/RazorExpressFullExample) for more comprehensive examples.*</sup>
-
 - [**Intro**](#intro)
   - [A brief comparison of syntax of Node.JS template engines](#a-brief-comparison-of-syntax-of-nodejs-template-engines)
 - [**Quick Start**](#quick-start)
@@ -385,14 +383,20 @@ However, the best way to avoid such ambiguities is to stick to a plain JavaScrip
 
 Misc
 ===
-TODO list
----
-What is to be done soon:
 
-1. Finish the documentation for the current version (debugging, other syntax examples, RAZ-API).
-2. Implement [Razor-style `@* *@` comments](https://github.com/DevelAx/RazorExpress/blob/master/docs/syntax.md#comments).
-3. ~~Complete debugging reference page.~~
-4. Make the library available for use on the client side (in the browser).
-5. Implement caching compiled templates.
-6. Async partial views.
-7. Make `HtmlString` class public for making functions returnin *raw-values* as expessions.
+The source code examples
+---
+Here are the links to all repositories with examples used in the documentation:
+- [A Razor-Express website example](https://github.com/DevelAx/RazorExpressFullExample) of using some features of the library.
+- [An example](https://github.com/DevelAx/RazorExpressExample) from the [Quick-Start](#express-web-server-example) section.
+- [An example](https://github.com/DevelAx/RazorExpressErrors) from the [Debugging & Errors handling in Razor-Express](https://github.com/DevelAx/RazorExpress/blob/master/docs/Debugging.md).
+
+<a name="todo-list"></a>
+TODO list (Ideas for the next version)
+---
+
+1. Implement [Razor-style `@* *@` comments](https://github.com/DevelAx/RazorExpress/blob/master/docs/syntax.md#comments).
+2. Make the library available for use on the client side (in the browser).
+3. Implement caching compiled templates.
+4. Async partial views.
+5. Make `HtmlString` class public for making functions returnin *raw-values* as expessions.
