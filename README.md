@@ -128,7 +128,7 @@ I won't go much into all the aspects I don't like in other engines syntax just s
 In these examples I don't compare logic constructions because some of the view engines have logic-less templating syntax.
 With *Razor* you can implement amost any logic that is available with normal *JavaScript* without learning a new syntax.
 
-Given all the mentioned and unmentioned pros and cons, I decided not to part with *Razor-syntax* and create something similar for using with [ExpressJS library](https://expressjs.com).
+Given all the mentioned and unmentioned pros and cons, I decided not to part with *Razor-syntax* and create something similar for using with [ExpressJS library](https://expressjs.com) (it can work with other frameworks as well). This library works quite fast since it does not use third-party HTML parsers and regular expressions.
 
 -----------------------
 
