@@ -1,5 +1,4 @@
-const htmlEncode = require('js-htmlencode');
-const path = require('path');
+const htmlEncode = require('../libs/js-htmlencode');
 
 /////////////////////////////////////////////////////////////////////////
 // https://gist.github.com/slavafomin/b164e3e710a6fc9352c934b9073e7216
@@ -8,7 +7,7 @@ const path = require('path');
 
 // const regex = /.*Error:/;
 
-module.exports = class RazorError extends Error {
+class RazorError extends Error {
     constructor(message, args, captureFrame) {
         super(message);
         // this.name = this.constructor.name;
@@ -131,6 +130,7 @@ module.exports = class RazorError extends Error {
     }
 }
 
+module.exports = RazorError;
 
 function stackToHtml(exc, data, mainInfo) {
     let lines = exc.stack.split('\n');
@@ -246,7 +246,7 @@ function dataToHtml(data, mainInfo) {
         }// for
 
         //let fileFolder = path.dirname(data.filename);
-        let fileName = path.basename(data.filename);
+        let fileName = RazorError.path ? RazorError.path.basename(data.filename) : data.filename;
 
         html += "</ol>";
         html = `

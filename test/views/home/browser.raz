@@ -1,0 +1,11 @@
+<div id="browser">
+</div>
+
+@section scriptsAfter{
+    <script type="text/javascript" src="js/raz.js"></script>
+    <script type="text/javascript">
+        var browser = document.getElementById("browser");
+        browser.style.backgroundColor = "white";
+        browser.innerHTML = raz.compile("<h1>@@Model</h1>", "RAZ browser dynamic test");
+    </script>
+}

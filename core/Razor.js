@@ -1,9 +1,24 @@
 require('./utils');
 const fs = require('fs');
+
 const path = require('path');
+require('./errors/RazorError').path = path;
+// path.fileName = function (fullFileName, withExt) {
+//     if (withExt) return path.win32.basename(fullFileName);
+//     let extension = path.extname(fullFileName);
+//     return path.win32.basename(fullFileName, extension);
+// };
+path.cutLastSegment = function (dir) {
+    dir = path.normalize(dir);
+    let pos = dir.lastIndexOf(path.sep);
+    if (pos === -1) return '';
+    return dir.substring(0, pos);
+};
+
 const initParser = require('./parser');
 const ErrorsFactory = require('./errors/errors');
 const dbg = require('./dbg/debugger');
+const allowLoggingInDebugModel = false;
 
 'use strict';
 const ext = "raz", viewStartName = '_viewStart';
@@ -13,7 +28,10 @@ module.exports = class Razor {
     constructor(options) {
         this.options = options;
         this.env = options.settings.env;
-        this.parser = initParser({ mode: this.env, express: true });
+        const debug = dbg.isDebugMode(this.env);
+        const log = require('./dbg/logger')({ on: debug && allowLoggingInDebugModel });
+        const vm = debug ? require('vm') : null;
+        this.parser = initParser({ debug, express: true, dbg, log, vm });
         this.viewsDir = path.normalize(this.options.settings.views);
     }
 

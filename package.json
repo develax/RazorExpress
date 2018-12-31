@@ -1,13 +1,13 @@
 {
   "name": "raz",
   "description": "Razor-like Template Engine for NodeJS Express library based on ASP.NET MVC Razor syntax. Template your views by mixing HTML markup with JavaScript server-side code!",
-  "version": "0.0.78",
+  "version": "0.0.79",
   "author": {
-    "name": "Sergey Fisun",
+    "name": "Sergey F.",
     "email": "develax@gmail.com",
     "url": "https://www.npmjs.com/package/raz"
   },
-  "license" : "MIT",
+  "license": "MIT",
   "keywords": [
     "Razor",
     "View",
@@ -26,13 +26,14 @@
     "url": "git://github.com/DevelAx/RazorExpress"
   },
   "scripts": {
+    "build-js": "browserify ./core/bundle-js.js > raz.js",
+    "buildmon": "nodemon --watch core --exec \"npm run build-js\"",
     "test": "mocha ./test/**/*.test.js",
     "testmon": "nodemon --exec \"npm test\""
   },
-  "dependencies": {
-    "js-htmlencode": "^0.3.0"
-  },
+  "dependencies": {},
   "devDependencies": {
+    "browserify": "^16.2.3",
     "chai": "^4.2.0",
     "chai-http": "^4.2.0",
     "chai-string": "^1.5.0",

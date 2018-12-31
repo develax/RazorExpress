@@ -8,6 +8,7 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    @Html.section("scripts")
 </head>
 <body style="background-color: white;">
     <div class="container body-content">
@@ -22,5 +23,6 @@
             <p>&copy; 2018 - @footer</p>
         </footer>
     </div>
+    @Html.section("scriptsAfter")
 </body>
 </html>

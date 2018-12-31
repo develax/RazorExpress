@@ -69,6 +69,7 @@ describe("server routes", () => {
     });
 
     after(function (done) {
+        this.timeout(5000)
         console.log(`Server is closing port ${port}.`);
         socket.close((err) => {
             var message;
@@ -221,6 +222,32 @@ describe("server routes", () => {
                         console.log(`> testing rote  ${route} is done`);
                         done();
                     });
+            });
+        });
+    }
+
+    {
+        let route = "/browser";
+        describe(route, () => {
+            console.log(`> testing rote ${route}...`);
+            it("razor-js", (done) => {
+                let options = {
+                    //url: "http://localhost:8000" + route,
+                    resources: "usable",
+                    runScripts: "dangerously"
+                };
+                JSDOM.fromURL("http://localhost:8000" + route, options)
+                .then(dom => {
+                    setTimeout(() => {
+                        let $ = jquery(dom.window);
+                        let h1 = $('h1');
+                        expect(h1.length).to.be.equal(1);
+                        expect(h1.text()).to.have.string("RAZ browser dynamic test");
+                        console.log(`> testing rote  ${route} is done`);
+                        done();
+                      }, 1000);
+                }, 
+                err=>done(err));
             });
         });
     }

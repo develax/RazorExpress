@@ -96,28 +96,3 @@ Char.isWhiteSpace = Char.isWhiteSpace || function (c) {
 Char.isIdentifier = function(c){
     return Char.isLetter(c) || Char.isDigit(c) || '_$'.includes(c);
 }
-
-
-////////////////////////////////////////////////
-// path
-////////////////////////////////////////////////
-const path = require('path');
-
-path.fileName = function (fullFileName, withExt) {
-    if (withExt) return path.win32.basename(fullFileName);
-    let extension = path.extname(fullFileName);
-    return path.win32.basename(fullFileName, extension);
-};
-
-path.cutLastSegment = function (dir) {
-    dir = path.normalize(dir);
-    let pos = dir.lastIndexOf(path.sep);
-    if (pos === -1) return '';
-    return dir.substring(0, pos);
-};
-
-        //deleteObjectProperties(obj) {
-        //    for (var p in obj)
-        //        if (Object.prototype.hasOwnProperty.call(obj, p))
-        //            delete obj[p];
-        //}

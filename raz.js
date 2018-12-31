@@ -1,3 +1,812 @@
+(function(){function r(e,n,t){function o(i,f){if(!n[i]){if(!e[i]){var c="function"==typeof require&&require;if(!f&&c)return c(i,!0);if(u)return u(i,!0);var a=new Error("Cannot find module '"+i+"'");throw a.code="MODULE_NOT_FOUND",a}var p=n[i]={exports:{}};e[i][0].call(p.exports,function(r){var n=e[i][1][r];return o(n||r)},p,p.exports,r,e,n,t)}return n[i].exports}for(var u="function"==typeof require&&require,i=0;i<t.length;i++)o(t[i]);return o}return r})()({1:[function(require,module,exports){
+module.exports = class HtmlString {
+    constructor(html) {
+        this.html = html;
+    }
+
+    toString() {
+        return this.html;
+    }
+}
+},{}],2:[function(require,module,exports){
+// Version: 1.0.0
+
+const parser = require('./parser')();
+
+raz = {
+    compile: (template, model) => {
+        return parser.compileSync(template, model);
+    }
+}
+},{"./parser":7}],3:[function(require,module,exports){
+const htmlEncode = require('../libs/js-htmlencode');
+
+/////////////////////////////////////////////////////////////////////////
+// https://gist.github.com/slavafomin/b164e3e710a6fc9352c934b9073e7216
+// https://rclayton.silvrback.com/custom-errors-in-node-js
+/////////////////////////////////////////////////////////////////////////
+
+// const regex = /.*Error:/;
+
+class RazorError extends Error {
+    constructor(message, args, captureFrame) {
+        super(message);
+        // this.name = this.constructor.name;
+        //this.data = Object.assign({ line: args.line, pos: args.pos, len: args.len }, this.data || {});
+
+        if (Error.captureStackTrace)
+            Error.captureStackTrace(this, captureFrame || this.constructor);
+    }
+
+    static new(args) {
+        let exc = new RazorError(args.message, args, args.capture || this.new);
+        this.extend(exc, args);
+        return exc;
+    }
+
+    static extend(exc, args) {
+        exc.name = RazorError.name;
+
+        if (exc.data) {
+            var oldData = exc.data;
+        }
+
+        exc.data = Object.assign({ line: args.line, pos: args.pos, len: args.len }, args.info);
+
+        if (exc.__dbg && exc.__dbg.pos)
+            exc.data = Object.assign({ posRange: { start: exc.__dbg.pos.start, end: exc.__dbg.pos.end } }, exc.data);
+
+        if (oldData)
+            exc.data.inner = oldData;
+
+        if (!exc.html)
+            exc.html = RazorError.prototype.html;
+    }
+
+    html() {
+        let codeHtml = '', mainInfo = { title: '' };
+        let stackHtml = stackToHtml(this, this.data, mainInfo);
+
+        for (var data = this.data; data; data = data.inner) {
+            codeHtml += "<div class='arrow'>&#8681;</div>"
+            codeHtml += dataToHtml(data, mainInfo);
+            codeHtml += '<hr />'
+        }
+
+        var html = `
+        <!DOCTYPE html>
+        <html>
+        <head>
+        <style type="text/css" scoped>
+            h1, h2, h3{
+                font-weight: normal;
+            }
+            div.filepath {
+                font-weight: bold;
+                font-size: 1.05rem;
+            }
+            body { 
+                font-size: .813em;
+                font-family: Consolas, "Courier New", courier, monospace;
+            }
+            .stack{
+                color: orange;
+                white-space: pre;
+            }
+            .stack .error{
+                color: #e20000;
+                white-space: pre-wrap;
+                font-weight: bold;
+            }
+            ol {
+                color: darkgray;
+            }
+            ol li {
+                background-color: #fbfbfb;
+                white-space: pre;
+            }
+            ol li.highlight{
+                color: red;// darkslategray;
+                background-color: #f8f9b3; 
+            }
+            ol li span {
+                color: #196684;//darkslategray;
+            }
+            ol li.highlight span {
+                color: black;
+            }
+            ol li span.highlight {
+                border: solid 1px red;
+            }
+            ol li span.multilight {
+                background-color: #ebef00;
+                font-weight: bold;
+                color: red;
+            }
+            ol li.comment {
+                color: lightgray;
+            }
+            ol li.comment span {
+                color: darkgray;
+            }
+            .arrow{
+                font-size: 1.5rem;
+                color: orange;
+                margin-left: 1rem;
+            }
+            hr {
+                opacity: 0.5;
+            }
+        </style>
+        </head>
+        <body>
+            <h1>A template compilation error occured</h1>
+            <div class="stack">${stackHtml}</div>
+            <hr />
+            ${codeHtml}
+        </body>
+        </html>
+        `;
+        return html;
+    }
+}
+
+module.exports = RazorError;
+
+function stackToHtml(exc, data, mainInfo) {
+    let lines = exc.stack.split('\n');
+    let html = '<div>';
+
+    for (let i = 0; i < lines.length; i++) {
+        let line = lines[i];
+
+        if (i === 0 && (line.startsWith("evalmachine.") || line.startsWith("undefined:"))) {
+            let nextLineExists = i < lines.length + 1;
+
+            if (nextLineExists && data.jshtml && data.posRange) { // This is likely HTML parsing error (not code runtime error).
+                // Let's try to narrow the error area by the data from the stack.
+                let codeLine = lines[i + 1].trimRight();
+                let errorCodeFragment = data.jshtml.substring(data.posRange.start, data.posRange.end);
+                let codePos = errorCodeFragment.indexOf(codeLine);
+                // Check if it exists and only once in the `errorCodeFragment`.
+                if (codePos !== -1 && codePos === errorCodeFragment.lastIndexOf(codeLine)) {
+                    // Set a more precise location of the error.
+                    data.posRange.start = data.posRange.start + codePos;
+                    data.posRange.end = data.posRange.start + codeLine.length;
+
+                    // Include '@' symbol.
+                    if (data.posRange.start > 0 && data.jshtml[data.posRange.start - 1] === '@')
+                        data.posRange.start -= 1;
+                }
+            }
+
+            continue; // skip the very first line like "evalmachine.<anonymous>:22"
+        }
+
+        let encodedLine = htmlEncode(line);
+        let trim = line.trim();
+        let style = '';
+
+        if (trim && trim !== '^' && !trim.startsWith("at ")) {
+            if (trim.startsWith('RazorError') || mainInfo.title)
+                style = 'id="error" class="error"'; // the second line is the error description
+            else
+                style = 'class="error"';
+
+            if (mainInfo.title)
+                mainInfo.title += '\r\n';
+
+            mainInfo.title += encodedLine;
+        }
+
+        html += `<span ${style}>${encodedLine}</span><br/>`;
+    }
+
+    html += '</div>';
+    return html;
+}
+
+function dataToHtml(data, mainInfo) {
+    let html;
+
+    if (data.jshtml) {
+        let textCursor = 0;
+        lines = data.jshtml.split('\n');
+        html = "<ol start='0'>";
+
+        for (let i = 0; i < lines.length; i++) {
+            let line = lines[i];
+            let highlight, htmlLine, comment, multilight;
+            let textCursorEnd = textCursor + line.length + 1; // + '\n'
+
+            if (data.posRange && data.posRange.start < data.posRange.end) {
+                if (data.posRange.start >= textCursor && data.posRange.start < textCursorEnd) {
+                    var pos = data.posRange.start - textCursor;
+
+                    if (data.posRange.end < textCursorEnd) {
+                        var len = data.posRange.end - data.posRange.start;
+                        data.posRange = null; // prevent further useless computation during the next iterations of this cycle
+                    }
+                    else {
+                        len = line.length;
+                        data.posRange.start = textCursorEnd; // move to the beginning of the next line
+                    }
+
+                    multilight = "multilight";
+                }
+            }
+            else if (data.line === i) {
+                pos = data.pos;
+                len = data.len || 1;
+            }
+
+            if (pos != null && typeof pos !== 'undefined') {
+                if (pos < line.length) {
+                    let start = htmlEncode(line.substring(0, pos));
+                    let one = htmlEncode(line.substring(pos, pos + len));
+                    let end = htmlEncode(line.substring(pos + len));
+                    htmlLine = `<span>${start}</span><span class='${multilight || "highlight"}' title='${mainInfo.title}'>${one}</span><span>${end}</span>`;
+                    highlight = "class='highlight'";
+
+                }
+                pos = null;
+            }
+            else {
+                let trim = line.trim();
+
+                if (trim.length > 6 && trim.startsWith("<!--") && trim.endsWith("-->"))
+                    comment = "class='comment'";
+                //htmlLine = `<span class="comment">${htmlEncode(trim)}</span>`;
+            }
+
+            html += `<li ${comment || highlight}><span>`;
+            html += htmlLine ? htmlLine : htmlEncode(line);
+            html += "</span></li>";
+
+            textCursor = textCursorEnd;
+        }// for
+
+        //let fileFolder = path.dirname(data.filename);
+        let fileName = RazorError.path ? RazorError.path.basename(data.filename) : data.filename;
+
+        html += "</ol>";
+        html = `
+<div class="code">
+    <div class="filepath">${fileName}</div>
+    ${html}
+</div>
+`;
+    }// if (this.data.jshtml)
+
+    return html;
+}
+
+// /**
+//  * HELPERS
+//  */
+// function getIndentifier(codeLine, startPos){
+//     let ch = codeLine[startPos];
+//     let isIdn = Char.isLetter(ch) || '_$'.includes(ch); // is it identifier
+//     let result = ch;
+
+//     for(let i = startPos + 1, ch = codeLine[i]; i < codeLine.length && (isIdn ? Char.isIdentifier(ch) : !Char.isIdentifier(ch)); i++, ch = codeLine[i])
+//         result += ch;
+
+//     return result;
+// }
+},{"../libs/js-htmlencode":6}],4:[function(require,module,exports){
+const RazorError = require('./RazorError');
+
+
+class ParserErrorFactory {
+    constructor(templateInfo, linesBaseNumber) {
+        this.startLineNum = linesBaseNumber;
+        this.info = templateInfo;
+    }
+
+    endOfFileFoundAfterAtSign(lineNum, posNum) {
+        var message = `End-of-file was found after the "@" character at line ${lineNum + this.startLineNum} pos ${posNum + 1}. "@" must be followed by a valid code block. If you want to output an "@", escape it using the sequence: "@@"`;
+        return RazorError.new({ message, info: this.info, line: lineNum, pos: posNum, capture: this.endOfFileFoundAfterAtSign });
+    }
+
+    unexpectedCharacter(ch, lineNum, posNum, line) {
+        var message = `Unexpected '${ch}' character at line ${lineNum + this.startLineNum} pos ${posNum + 1} after '${line}'`;
+        return RazorError.new({ message, info: this.info, line: lineNum, pos: posNum, capture: this.unexpectedCharacter });
+    }
+
+    unexpectedAtCharacter(lineNum, posNum) {
+        var message = `Unexpected '@' character at line ${lineNum + this.startLineNum} pos ${posNum + 1}. Once inside the body of a code block (@if {}, @{}, etc.) or a section (@section{}) you do not need to use "@" character to switch to code.`;
+        return RazorError.new({ message, info: this.info, line: lineNum, pos: posNum, capture: this.unexpectedAtCharacter });
+    }
+
+    notValidStartOfCodeBlock(ch, lineNum, posNum) {
+        var message = `"${ch}" is not valid at the start of a code block at line ${lineNum + this.startLineNum} pos ${posNum + 1}. Only identifiers, keywords, "(" and "{" are valid.`;
+        return RazorError.new({ message, info: this.info, line: lineNum, pos: posNum, capture: this.notValidStartOfCodeBlock });
+    }
+
+    unexpectedEndOfFile(text) {
+        var message = `Unexpected end of file after '${text}'.`;
+        return RazorError.new({ message, info: this.info, capture: this.unexpectedEndOfFile });
+    }
+
+    characterExpected(ch, line, pos) {
+        var message = `'${ch}' character is expected at line ${line + this.startLineNum} pos ${pos + 1}.`;
+        return RazorError.new({ message, info: this.info, line, pos, capture: this.characterExpected });
+    }
+
+    characterExpectedAfter(ch, line, pos, after) {
+        var message = `'${ch}' character is expected after '${after}' at line ${line + this.startLineNum} pos ${pos + 1}.`;
+        return RazorError.new({ message, info: this.info, line, pos, capture: this.characterExpectedAfter });
+    }
+
+    expressionMissingEnd(expr, ch, line, pos) {
+        var message = `The explicit expression "${expr}" is missing a closing character "${ch}" at line ${line + this.startLineNum} pos ${pos + 1}.`;
+        return RazorError.new({ message, info: this.info, line, pos, capture: this.expressionMissingEnd });
+    }
+
+    jsCodeBlockMissingClosingChar(line, codeFirstLine) {
+        var message = `The code or section block is missing a closing "}" character. Make sure you have a matching "}" character for all the "{" characters within this block, and that none of the "}" characters are being interpreted as markup. The block starts at line ${line + 1} with text: "${codeFirstLine}"`;
+        return RazorError.new({ message, info: this.info, line, capture: this.jsCodeBlockMissingClosingChar });
+    }
+
+    wordExpected(word, line, pos, len) {
+        var message = `'${word}' expected at line ${line + this.startLineNum} pos ${pos + 1}.`;
+        return RazorError.new({ message, info: this.info, line, pos, len, capture: this.wordExpected });
+    }
+
+    // invalidHtmlChar(ch, lineNum, posNum, afterText, expected) {
+    //     var message = `"${ch}" is not a valid HTML character at line ${lineNum} pos ${posNum}` + (afterText ? ` after "${afterText}"` : expected ? ` (expected char = "${expected}")` : '.');
+    //     return new RazorError(message, this.args, lineNum, posNum);
+    // }
+
+    missingMatchingStartTag(tag, line, pos) {
+        var message = `'${tag}' tag at line ${line + this.startLineNum} pos ${pos + 1} is missing matching start tag.`;
+        return RazorError.new({ message, info: this.info, line, pos, len: tag.length, capture: this.missingMatchingStartTag });
+    }
+
+    missingMatchingEndTag(tag, line, pos) {
+        var message = `'${tag}' tag at line ${line + this.startLineNum} pos ${pos + 1} is missing matching end tag.`;
+        return RazorError.new({ message, info: this.info, line, pos, len: tag.length, capture: this.missingMatchingEndTag });
+    }
+
+    invalidExpressionChar(ch, line, pos, afterText) {
+        var message = `Invalid "${ch}" symbol in expression at line ${line + this.startLineNum} pos ${pos + 1}` + (afterText ? ` after "${afterText}".` : ".");
+        return RazorError.new({ message, info: this.info, line, pos, capture: this.invalidExpressionChar });
+    }
+
+    invalidHtmlTag(tag, line, pos) {
+        var message = `Invalid HTML-tag: '${tag}'`;
+        return RazorError.new({ message, info: this.info, line, pos, len: tag && tag.length, capture: this.invalidHtmlTag });
+    }
+
+    // forbiddenViewName(viewName) {
+    //     var message = `The file "${viewName}" is not available.`;
+    //     return new RazorError(message, this.info);
+    // }
+
+    whiteSpaceExpectedAfter(keyword, line, pos) {
+        var message = `A whitespace expected after the "${keyword}" keyword at line ${line + this.startLineNum} pos ${pos + 1}.`;
+        return RazorError.new({ message, info: this.info, line, pos, capture: this.whiteSpaceExpectedAfter }); // cannot be tested.
+    }
+
+    tagNameExpected(line, pos) {
+        var message = `Tag name expected at line ${line + this.startLineNum} pos ${pos + 1}.`;
+        return RazorError.new({ message, info: this.info, line, pos, capture: this.tagNameExpected });
+    }
+
+    sectionNameExpectedAfter(keyword, line, pos) {
+        var message = `A section name expected after the "${keyword}" keyword at line ${line + this.startLineNum} pos ${pos + 1}.`;
+        return RazorError.new({ message, info: this.info, line, pos, capture: this.sectionNameExpectedAfter });
+    }
+
+    sectionNameCannotStartWith(ch, line, pos) {
+        var message = `A section name cannot start with '${ch}' at line ${line + this.startLineNum} pos ${pos + 1}.`;
+        return RazorError.new({ message, info: this.info, line, pos, capture: this.sectionNameCannotStartWith });
+    }
+
+    sectionNameCannotInclude(ch, line, pos) {
+        var message = `A section name cannot include '${ch}' character at line ${line + this.startLineNum} pos ${pos + 1}.`;
+        return RazorError.new({ message, info: this.info, line, pos, capture: this.sectionNameCannotInclude });
+    }
+
+    unexpectedLiteralFollowingTheSection(ch, line, pos) {
+        var message = `Unexpected literal '${ch}' following the 'section' directive at line ${line + this.startLineNum} pos ${pos + 1}. Expected '{'.`;
+        return RazorError.new({ message, info: this.info, line, pos, capture: this.unexpectedLiteralFollowingTheSection });
+    }
+
+    sectionIsAlreadyDefined(sectionName, line, pos, viewFilePath) {
+        var message = `Section '${sectionName}' at line ${line + this.startLineNum} pos ${pos + 1} has been already defined in the file '${viewFilePath}'. You cannot assign the same name to different sections in the same file.`;
+        return RazorError.new({ message, info: this.info, line, pos, len: sectionName.length, capture: this.sectionIsAlreadyDefined });
+    }
+
+    // sectionBlockIsMissingClosingBrace(sectionName) {
+    //     var message = `The section block '${sectionName}' is missing a closing "}" character.`;
+    //     return new RazorError(message, this.info);
+    // }
+
+    sectionsCannotBeNested(line, pos) {
+        var message = `Section blocks cannot be nested at line ${line + this.startLineNum} pos ${pos + 1}.`;
+        return RazorError.new({ message, info: this.info, line, pos, capture: this.sectionsCannotBeNested });
+    }
+
+    sectionIsNotFound(sectionName, filePath) {
+        var message = `View '${filePath}' requires the section '${sectionName}' which cannot be found.`;
+        return RazorError.new({ message, info: this.info, capture: this.sectionIsNotFound });
+    }
+
+    sectionIsNotCompiled(sectionName, filePath) {
+        var message = `You try to render the section '${sectionName}' from the '${filePath}' view. This section has not been compiled yet. Make sure it is defined before the '@Html.section' method is called.`;
+        return RazorError.new({ message, info: this.info, capture: this.sectionIsNotCompiled });
+    }
+
+    sectionsAlreadyRendered(sectionName, renderedBy, attemptedBy) {
+        var message = `Sections named '${sectionName}' have already been rendered by '${renderedBy}'. There is an atempt to rendered it again by '${attemptedBy}'.`;
+        return RazorError.new({ message, info: this.info, capture: this.sectionsAlreadyRendered });
+    }
+
+    sectionNeverRendered(sectionName, viewPath) {
+        var message = `Section '${sectionName}' in '${viewPath}' has never been rendered. If a section exists it must be rendered.`;
+        return RazorError.new({ message, info: this.info, capture: this.sectionNeverRendered });
+    }
+
+    partialViewNotFound(partialView, searchedLocations) {
+        let viewTypeName = (this.isLayout) ? "layout" : "partial";
+        let message = `The view "${this.info.filename}" cannot find the ${viewTypeName} view "${partialView}".\nThe following locations were searched:\n${searchedLocations.map(l => `"${l}"`).join("\n")}`;
+        return RazorError.new({ message, info: this.info, capture: this.partialViewNotFound });
+    }
+
+    errorReadingFile(error) {
+        let message = `Reading file '${this.info.filename}' caused an error: ${error}`;
+        let parserError = RazorError.new({ message, info: this.info, capture: this.errorReadingFile });
+        setInnerError(parserError, error);
+        return parserError;
+    }
+
+    errorReadingView(filename, error) {
+        let message = `Reading view file '${filename}' caused an error: ${error}`;
+        let parserError = RazorError.new({ message, info: this.info, capture: this.errorReadingView });
+        setInnerError(parserError, error);
+        return parserError;
+    }
+
+    partialLayoutNameExpected() {
+        let message = "Partial layout name is expected."
+        return RazorError.new({ message, info: this.info, capture: this.partialLayoutNameExpected });
+    }
+
+    // invalidViewExtension(viewName, expectedExtension){
+    //     let message = `The view '${viewName}' includes invalid extension. Expected extension '${expectedExtension}'`;
+    //     return new ParserError(message, this.args);
+    // }
+
+    /**
+     * 
+     * Doesn't produce a `ParserError`, just extends the existant one in other prevent VM from adding additional lines to the `.Stack` when rethrowing.
+     */
+    extendError(exc) {
+        RazorError.extend(exc, { info: this.info });
+    }
+}
+
+ParserErrorFactory.templateShouldBeString = 'The [template] argument should be a string.';
+
+function setInnerError(parserError, error) {
+    if (error.message)
+        parserError.inner = error;
+}
+
+
+module.exports = ParserErrorFactory;
+},{"./RazorError":3}],5:[function(require,module,exports){
+module.exports = require("./errors.en");
+},{"./errors.en":4}],6:[function(require,module,exports){
+(function (global){
+/**
+ * [js-htmlencode]{@link https://github.com/emn178/js-htmlencode}
+ *
+ * @version 0.3.0
+ * @author Chen, Yi-Cyuan [emn178@gmail.com]
+ * @copyright Chen, Yi-Cyuan 2014-2017
+ * @license MIT
+ */
+/*jslint bitwise: true */
+(function () {
+    'use strict';
+  
+    const isBrowser = typeof window !== 'undefined';
+    var root = isBrowser ? window : global;
+    var AMD = typeof define === 'function' && define.amd;
+  
+    var HTML_ENTITIES = {
+      '&nbsp;' : '\u00A0',
+      '&iexcl;' : '\u00A1',
+      '&cent;' : '\u00A2',
+      '&pound;' : '\u00A3',
+      '&curren;' : '\u00A4',
+      '&yen;' : '\u00A5',
+      '&brvbar;' : '\u00A6',
+      '&sect;' : '\u00A7',
+      '&uml;' : '\u00A8',
+      '&copy;' : '\u00A9',
+      '&ordf;' : '\u00AA',
+      '&laquo;' : '\u00AB',
+      '&not;' : '\u00AC',
+      '&shy;' : '\u00AD',
+      '&reg;' : '\u00AE',
+      '&macr;' : '\u00AF',
+      '&deg;' : '\u00B0',
+      '&plusmn;' : '\u00B1',
+      '&sup2;' : '\u00B2',
+      '&sup3;' : '\u00B3',
+      '&acute;' : '\u00B4',
+      '&micro;' : '\u00B5',
+      '&para;' : '\u00B6',
+      '&middot;' : '\u00B7',
+      '&cedil;' : '\u00B8',
+      '&sup1;' : '\u00B9',
+      '&ordm;' : '\u00BA',
+      '&raquo;' : '\u00BB',
+      '&frac14;' : '\u00BC',
+      '&frac12;' : '\u00BD',
+      '&frac34;' : '\u00BE',
+      '&iquest;' : '\u00BF',
+      '&Agrave;' : '\u00C0',
+      '&Aacute;' : '\u00C1',
+      '&Acirc;' : '\u00C2',
+      '&Atilde;' : '\u00C3',
+      '&Auml;' : '\u00C4',
+      '&Aring;' : '\u00C5',
+      '&AElig;' : '\u00C6',
+      '&Ccedil;' : '\u00C7',
+      '&Egrave;' : '\u00C8',
+      '&Eacute;' : '\u00C9',
+      '&Ecirc;' : '\u00CA',
+      '&Euml;' : '\u00CB',
+      '&Igrave;' : '\u00CC',
+      '&Iacute;' : '\u00CD',
+      '&Icirc;' : '\u00CE',
+      '&Iuml;' : '\u00CF',
+      '&ETH;' : '\u00D0',
+      '&Ntilde;' : '\u00D1',
+      '&Ograve;' : '\u00D2',
+      '&Oacute;' : '\u00D3',
+      '&Ocirc;' : '\u00D4',
+      '&Otilde;' : '\u00D5',
+      '&Ouml;' : '\u00D6',
+      '&times;' : '\u00D7',
+      '&Oslash;' : '\u00D8',
+      '&Ugrave;' : '\u00D9',
+      '&Uacute;' : '\u00DA',
+      '&Ucirc;' : '\u00DB',
+      '&Uuml;' : '\u00DC',
+      '&Yacute;' : '\u00DD',
+      '&THORN;' : '\u00DE',
+      '&szlig;' : '\u00DF',
+      '&agrave;' : '\u00E0',
+      '&aacute;' : '\u00E1',
+      '&acirc;' : '\u00E2',
+      '&atilde;' : '\u00E3',
+      '&auml;' : '\u00E4',
+      '&aring;' : '\u00E5',
+      '&aelig;' : '\u00E6',
+      '&ccedil;' : '\u00E7',
+      '&egrave;' : '\u00E8',
+      '&eacute;' : '\u00E9',
+      '&ecirc;' : '\u00EA',
+      '&euml;' : '\u00EB',
+      '&igrave;' : '\u00EC',
+      '&iacute;' : '\u00ED',
+      '&icirc;' : '\u00EE',
+      '&iuml;' : '\u00EF',
+      '&eth;' : '\u00F0',
+      '&ntilde;' : '\u00F1',
+      '&ograve;' : '\u00F2',
+      '&oacute;' : '\u00F3',
+      '&ocirc;' : '\u00F4',
+      '&otilde;' : '\u00F5',
+      '&ouml;' : '\u00F6',
+      '&divide;' : '\u00F7',
+      '&oslash;' : '\u00F8',
+      '&ugrave;' : '\u00F9',
+      '&uacute;' : '\u00FA',
+      '&ucirc;' : '\u00FB',
+      '&uuml;' : '\u00FC',
+      '&yacute;' : '\u00FD',
+      '&thorn;' : '\u00FE',
+      '&yuml;' : '\u00FF',
+      '&quot;' : '\u0022',
+      '&amp;' : '\u0026',
+      '&lt;' : '\u003C',
+      '&gt;' : '\u003E',
+      '&apos;' : '\u0027',
+      '&OElig;' : '\u0152',
+      '&oelig;' : '\u0153',
+      '&Scaron;' : '\u0160',
+      '&scaron;' : '\u0161',
+      '&Yuml;' : '\u0178',
+      '&circ;' : '\u02C6',
+      '&tilde;' : '\u02DC',
+      '&ensp;' : '\u2002',
+      '&emsp;' : '\u2003',
+      '&thinsp;' : '\u2009',
+      '&zwnj;' : '\u200C',
+      '&zwj;' : '\u200D',
+      '&lrm;' : '\u200E',
+      '&rlm;' : '\u200F',
+      '&ndash;' : '\u2013',
+      '&mdash;' : '\u2014',
+      '&lsquo;' : '\u2018',
+      '&rsquo;' : '\u2019',
+      '&sbquo;' : '\u201A',
+      '&ldquo;' : '\u201C',
+      '&rdquo;' : '\u201D',
+      '&bdquo;' : '\u201E',
+      '&dagger;' : '\u2020',
+      '&Dagger;' : '\u2021',
+      '&permil;' : '\u2030',
+      '&lsaquo;' : '\u2039',
+      '&rsaquo;' : '\u203A',
+      '&euro;' : '\u20AC',
+      '&fnof;' : '\u0192',
+      '&Alpha;' : '\u0391',
+      '&Beta;' : '\u0392',
+      '&Gamma;' : '\u0393',
+      '&Delta;' : '\u0394',
+      '&Epsilon;' : '\u0395',
+      '&Zeta;' : '\u0396',
+      '&Eta;' : '\u0397',
+      '&Theta;' : '\u0398',
+      '&Iota;' : '\u0399',
+      '&Kappa;' : '\u039A',
+      '&Lambda;' : '\u039B',
+      '&Mu;' : '\u039C',
+      '&Nu;' : '\u039D',
+      '&Xi;' : '\u039E',
+      '&Omicron;' : '\u039F',
+      '&Pi;' : '\u03A0',
+      '&Rho;' : '\u03A1',
+      '&Sigma;' : '\u03A3',
+      '&Tau;' : '\u03A4',
+      '&Upsilon;' : '\u03A5',
+      '&Phi;' : '\u03A6',
+      '&Chi;' : '\u03A7',
+      '&Psi;' : '\u03A8',
+      '&Omega;' : '\u03A9',
+      '&alpha;' : '\u03B1',
+      '&beta;' : '\u03B2',
+      '&gamma;' : '\u03B3',
+      '&delta;' : '\u03B4',
+      '&epsilon;' : '\u03B5',
+      '&zeta;' : '\u03B6',
+      '&eta;' : '\u03B7',
+      '&theta;' : '\u03B8',
+      '&iota;' : '\u03B9',
+      '&kappa;' : '\u03BA',
+      '&lambda;' : '\u03BB',
+      '&mu;' : '\u03BC',
+      '&nu;' : '\u03BD',
+      '&xi;' : '\u03BE',
+      '&omicron;' : '\u03BF',
+      '&pi;' : '\u03C0',
+      '&rho;' : '\u03C1',
+      '&sigmaf;' : '\u03C2',
+      '&sigma;' : '\u03C3',
+      '&tau;' : '\u03C4',
+      '&upsilon;' : '\u03C5',
+      '&phi;' : '\u03C6',
+      '&chi;' : '\u03C7',
+      '&psi;' : '\u03C8',
+      '&omega;' : '\u03C9',
+      '&thetasym;' : '\u03D1',
+      '&upsih;' : '\u03D2',
+      '&piv;' : '\u03D6',
+      '&bull;' : '\u2022',
+      '&hellip;' : '\u2026',
+      '&prime;' : '\u2032',
+      '&Prime;' : '\u2033',
+      '&oline;' : '\u203E',
+      '&frasl;' : '\u2044',
+      '&weierp;' : '\u2118',
+      '&image;' : '\u2111',
+      '&real;' : '\u211C',
+      '&trade;' : '\u2122',
+      '&alefsym;' : '\u2135',
+      '&larr;' : '\u2190',
+      '&uarr;' : '\u2191',
+      '&rarr;' : '\u2192',
+      '&darr;' : '\u2193',
+      '&harr;' : '\u2194',
+      '&crarr;' : '\u21B5',
+      '&lArr;' : '\u21D0',
+      '&uArr;' : '\u21D1',
+      '&rArr;' : '\u21D2',
+      '&dArr;' : '\u21D3',
+      '&hArr;' : '\u21D4',
+      '&forall;' : '\u2200',
+      '&part;' : '\u2202',
+      '&exist;' : '\u2203',
+      '&empty;' : '\u2205',
+      '&nabla;' : '\u2207',
+      '&isin;' : '\u2208',
+      '&notin;' : '\u2209',
+      '&ni;' : '\u220B',
+      '&prod;' : '\u220F',
+      '&sum;' : '\u2211',
+      '&minus;' : '\u2212',
+      '&lowast;' : '\u2217',
+      '&radic;' : '\u221A',
+      '&prop;' : '\u221D',
+      '&infin;' : '\u221E',
+      '&ang;' : '\u2220',
+      '&and;' : '\u2227',
+      '&or;' : '\u2228',
+      '&cap;' : '\u2229',
+      '&cup;' : '\u222A',
+      '&int;' : '\u222B',
+      '&there4;' : '\u2234',
+      '&sim;' : '\u223C',
+      '&cong;' : '\u2245',
+      '&asymp;' : '\u2248',
+      '&ne;' : '\u2260',
+      '&equiv;' : '\u2261',
+      '&le;' : '\u2264',
+      '&ge;' : '\u2265',
+      '&sub;' : '\u2282',
+      '&sup;' : '\u2283',
+      '&nsub;' : '\u2284',
+      '&sube;' : '\u2286',
+      '&supe;' : '\u2287',
+      '&oplus;' : '\u2295',
+      '&otimes;' : '\u2297',
+      '&perp;' : '\u22A5',
+      '&sdot;' : '\u22C5',
+      '&lceil;' : '\u2308',
+      '&rceil;' : '\u2309',
+      '&lfloor;' : '\u230A',
+      '&rfloor;' : '\u230B',
+      '&lang;' : '\u2329',
+      '&rang;' : '\u232A',
+      '&loz;' : '\u25CA',
+      '&spades;' : '\u2660',
+      '&clubs;' : '\u2663',
+      '&hearts;' : '\u2665',
+      '&diams;' : '\u2666'
+    };
+  
+    var decodeEntity = function (code) {
+      // name type
+      if (code.charAt(1) !== '#') {
+        return HTML_ENTITIES[code] || code;
+      }
+  
+      var n, c = code.charAt(2);
+      // hex number
+      if (c === 'x' || c === 'X') {
+        c = code.substring(3, code.length - 1);
+        n = parseInt(c, 16);
+      } else {
+        c = code.substring(2, code.length - 1);
+        n = parseInt(c);
+      }
+      return isNaN(n) ? code : String.fromCharCode(n);
+    };
+  
+    var htmlEncode = function (str) {
+      return str.replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/'/g, '&#39;')
+        .replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    };
+  
+    var htmlDecode = function (str) {
+      return str.replace(/&#?\w+;/g, decodeEntity);
+    };
+  
+    module.exports = htmlEncode;
+    htmlEncode.htmlEncode = htmlEncode;
+    htmlEncode.htmlDecode = htmlDecode;
+  })();
+  
+}).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
+},{}],7:[function(require,module,exports){
 'use strict';
 require('./utils');
 
@@ -1497,3 +2306,106 @@ Html.__dbg.pos = null;`;
     }
 
 }; // module.export
+
+},{"./HtmlString":1,"./errors/RazorError":3,"./errors/errors":5,"./libs/js-htmlencode":6,"./utils":8}],8:[function(require,module,exports){
+(function (global){
+////////////////////////////////////////////////
+// String
+////////////////////////////////////////////////
+
+String.whitespaces = '\r\n\t ';
+
+String.is = function(val){
+    // return typeof val === "string" || val instanceof String;
+    return Object.prototype.toString.call(val) === "[object String]";
+}
+
+String.format = String.format || function (format) {
+    var args = Array.prototype.slice.call(arguments, 1);
+    return format.replace(/{(\d+)}/g, function (match, number) {
+        return typeof args[number] !== 'undefined'
+            ? args[number]
+            : match
+            ;
+    });
+};
+
+String.isWhiteSpace = String.isWhiteSpace || function (str) {
+    return str && str.trim().length === 0;
+};
+
+String.prototype.startsWithIC = String.prototype.startsWithIgnoreCase = function (str, pos) {
+    pos = pos || 0;
+
+    if (this.length - pos < str.length)
+        return false;
+
+    for (let i = 0; i < str.length; i++)
+        if (this[i + pos].toLowerCase() !== str[i].toLowerCase())
+            return false;
+
+    return true;
+};
+
+String.equal = function (s1, s2, ignoreCase, useLocale) {
+    if (s1 == null || s2 == null)
+        return false;
+
+    if (!ignoreCase) {
+        if (s1.length !== s2.length)
+            return false;
+
+        return s1 === s2;
+    }
+
+    if (useLocale) {
+        if (useLocale.length)
+            return s1.toLocaleLowerCase(useLocale) === s2.toLocaleLowerCase(useLocale)
+        else
+            return s1.toLocaleLowerCase() === s2.toLocaleLowerCase()
+    }
+    else {
+        if (s1.length !== s2.length)
+            return false;
+
+        return s1.toLowerCase() === s2.toLowerCase();
+    }
+}
+
+// If you don't mind extending the prototype.
+String.prototype.equal = function (string2, ignoreCase, useLocale) {
+    return String.equal(this.valueOf(), string2, ignoreCase, useLocale);
+}
+
+////////////////////////////////////////////////
+// Char
+////////////////////////////////////////////////
+
+if (!global.Char) {
+    Char = {};
+}
+
+
+if (!Char.isLetter) {
+    Char.isLetter = function (c) {
+        return c.toLowerCase() !== c.toUpperCase();
+    };
+}
+
+Char.isDigit = Char.isDigit || function (c) {
+    if (!c) return false;
+    if (c.length > 1) throw new Error(`Invalid length of argument '${c}'.`);
+    return '0123456789'.indexOf(c) !== -1;
+};
+
+Char.isWhiteSpace = Char.isWhiteSpace || function (c) {
+    if (!c) return false;
+    if (c.length > 1) throw new Error(`Invalid length of argument '${c}'.`);
+    return String.whitespaces.indexOf(c) !== -1;
+};
+
+Char.isIdentifier = function(c){
+    return Char.isLetter(c) || Char.isDigit(c) || '_$'.includes(c);
+}
+}).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
+},{}]},{},[2]);

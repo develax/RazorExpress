@@ -16,6 +16,13 @@
         });
     });
 
+    describe("TEST BROWSER SIGNATURE", () => {
+        it("Test 1", () => {
+            let result = parser.compileSync("", { x: 1 });
+            expect(result).to.equal("");
+        });
+    });
+
     describe("HTML CASES", () => {
         describe("VALID HTML", () => {
             let cases = require('./cases/html');

@@ -3,7 +3,8 @@
 module.exports = function (args) {
     args = args || {};
     const path = require('path');
-    const app = require('express')();
+    const express = require('express');
+    const app = express();
 
     const razor = require("../index");
     razor.register(app);
@@ -20,6 +21,19 @@ module.exports = function (args) {
     //     next();
     // });
 
+    // const raz = require("../index-browser");
+    // var result = raz.compile("<div>@Model</div>", 5);
+
+    var logger = function(req, res, next) {
+        console.log("request url: " + req.url);
+        next(); // Passing the request to the next handler in the stack.
+    }
+
+    app.use(logger);
+    var jsStatic = express.static("./");
+    app.use("/js", jsStatic);
+    
+
     app.get('/', (rq, rs) => {
         rs.render("./home/index", { message: "This is my first NodeJS Express View engine!" });
     });
@@ -32,10 +46,16 @@ module.exports = function (args) {
         rs.render("./home/hidden", { message: "This is my first NodeJS Express View engine!" });
     });
 
+    app.get('/browser', (rq, rs) => {
+        rs.render("./home/browser", { message: "This is my first NodeJS Express View engine!" });
+    });
+
     app.get('*', (rq, rs) => {
         let routePath = "." + rq.path;
         rs.render(routePath, {});
     });
+
+
 
     // app.get('/', (rq, rs) => {
     //     rs.render("./sections/index", { header: "This is a HEADER", content: 'This is CONTENT.', footer: "This is FOOTER" });
