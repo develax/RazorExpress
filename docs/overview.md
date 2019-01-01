@@ -110,7 +110,7 @@ If a partial view is specified *only by a file name* with or without an extensio
 To specify a partial view by a path relative to the *root views directory* use slash `'/'` as the first character of the path. For example, with the path `"/partial-views/_login"` the partial view `"_login.raz"`  file will be searched only in the `"[app-folder]/views/partial-views/"` directory, where `"[app-folder]"` is the full path to your NodeJS application script directory. 
 **_Never include the views root folder name in the relative to the root views directory path_** - it will icluded by default.
 
-To set a *path relative to the *current view directory*, use the relative to the current directory path formats, examples: `'./partial-views/_login'` or `'../partial-views/_login'`.
+To set a path *relative to the current view directory*, use the relative to the current directory path formats, examples: `'./partial-views/_login'` or `'../partial-views/_login'`.
 
 Different partial views with the same file name are allowed when the partial views are in different folders.
 
