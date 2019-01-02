@@ -105,9 +105,12 @@ If this argument is omitted the `Model` of the parent view is passed by default 
 
 ### Partial view search algorithm
 
-* If a partial view is specified *only by a file name* with or without an extension (as in the [Partial views section](#partial-views) example above) then the search begins with the directory in which the view that initiates the search is located. If the partial view is not found in the current directory the search goes on up the directory tree until it reaches the root views folder specified in the [Express app](https://expressjs.com/en/guide/using-template-engines.html) (which is set as `app.set('views', './views')` by default). If the file is still not found an error is returned.
-* In the case where the *full path relative to the root views directory* is specified the file will be searched only in this directory. *Never include the views root folder name in the full path!*
-* To make the search take place *only in the current directory*, use relative to the current directory path format `'./_partialView'`.
+If a partial view is specified *only by a file name* with or without an extension (as in the [Partial views section](#partial-views) example above) then the search begins with the directory in which the view that initiates the search is located. If the partial view is not found in the current directory the search goes on up the directory tree until it reaches the root views folder specified in the [Express app](https://expressjs.com/en/guide/using-template-engines.html) (which is set as `app.set('views', './views')` by default). If the file is still not found an error is returned.
+
+To specify a partial view by a path relative to the *root views directory* use slash `'/'` as the first character of the path. For example, with the path `"/partial-views/_login"` the partial view `"_login.raz"`  file will be searched only in the `"[app-folder]/views/partial-views/"` directory, where `"[app-folder]"` is the full path to your NodeJS application script directory. 
+**_Never include the views root folder name_** in the relative paths - it is added automatically.
+
+To set a path *relative to the current view directory*, use the relative to the current directory path formats, examples: `'./partial-views/_login'` or `'../partial-views/_login'`.
 
 Different partial views with the same file name are allowed when the partial views are in different folders.
 
