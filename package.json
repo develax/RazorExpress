@@ -1,7 +1,7 @@
 {
   "name": "raz",
   "description": "Razor-like Template Engine for NodeJS Express library based on ASP.NET MVC Razor syntax. Template your views by mixing HTML markup with JavaScript server-side code!",
-  "version": "0.0.81",
+  "version": "0.0.82",
   "author": {
     "name": "Sergey F.",
     "email": "develax@gmail.com",
@@ -14,7 +14,6 @@
     "type": "git",
     "url": "git://github.com/DevelAx/RazorExpress"
   },
-  "main": "test/run-test-server.js",
   "scripts": {
     "build-js": "browserify ./core/bundle-js.js > raz.js",
     "buildmon": "nodemon --watch core --exec \"npm run build-js\"",
