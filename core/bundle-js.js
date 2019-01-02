@@ -3,7 +3,7 @@
 const parser = require('./parser')();
 
 raz = {
-    compile: (template, model) => {
+    render: (template, model) => {
         return parser.compileSync(template, model);
     }
 }

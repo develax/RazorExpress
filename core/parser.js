@@ -307,7 +307,7 @@ Html.__dbg.pos = null;`;
     ////////////////
     class Parser {
         constructor(args) {
-            args.filePath = args.filePath || "no";
+            args.filePath = args.filePath || "js-script";
             let linesBaseNumber = (debugMode && opts.express) ? 0 : 1; // in debug-mode the file-path of a template is added as a very first line comment
             this.args = args;
             this.er = new ErrorsFactory({ filename: args.filePath, jshtml: args.template }, linesBaseNumber);
@@ -1439,7 +1439,7 @@ Html.__dbg.pos = null;`;
     }
 
     function toParserError(err, errorFactory) {
-        if (err.name === RazorError.name) {
+        if (err.isRazorError) {
             // it could be the 2-nd or most time here from the stack
             // Error.captureStackTrace(err, toParserError);
 
@@ -1447,20 +1447,17 @@ Html.__dbg.pos = null;`;
             // d:\Projects\NodeJS\RazorExpressFullExample\node_modules\raz\core\Razor.js:117
             // throw errorsFactory.partialViewNotFound(path.basename(partialViewName), searchedLocations); // [#2.3]
             // ^
-            let pos = err.stack.indexOf(`${RazorError.name}: `);
+            let pos = err.stack.indexOf("\nError");
 
             if (pos > 0)
-                err.stack = err.stack.substring(pos);
+                err.stack = err.stack.substring(pos + 1);
         }
 
         // Is not "born" as RazorError.
-        let isNotRazorError = !err.__dbg && err.name !== RazorError.name;
+        let isNotRazorError = !err.__dbg && !err.isRazorError;
 
         if (isNotRazorError || err.__dbg && err.__dbg.viewName !== (err.data && err.data.filename))
             errorFactory.extendError(err);
-
-        // if (err.stack)
-        //     parserError.stack = err.stack;
 
         return err;
     }

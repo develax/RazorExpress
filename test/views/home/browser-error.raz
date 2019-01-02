@@ -1,0 +1,32 @@
+<div id="browser">
+</div>
+
+@section scriptsAfter{
+    <script type="text/javascript" src="/js/raz.js"></script>
+    <script type="text/javascript">
+        // https://developer.mozilla.org/en-US/docs/Web/API/GlobalEventHandlers/onerror
+        window.addEventListener('error', function(e) {            
+            if (!e.error.isRazorError) return;
+            e.preventDefault(); // stop propagating to JsDom virtual-console.
+
+            setTimeout(()=>{
+                document.documentElement.innerHTML = e.error.html();
+            }, 0);
+        })
+        var browser = document.getElementById("browser");
+        browser.style.backgroundColor = "white";
+        var model = {
+            header: "Weekdays",
+            days: ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
+        };
+        var template = `
+<h1>@@Model.header</h1>
+<div>
+@@for (var i = 0; i < Model.days.length; i++){
+    <div>@@Model.days[i]</span>
+}
+</div>`;
+        // https://developer.mozilla.org/en-US/docs/Web/API/Element/insertAdjacentHTML
+        browser.insertAdjacentHTML('afterbegin', raz.render(template, model));
+    </script>
+}

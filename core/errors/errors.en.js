@@ -1,6 +1,5 @@
 const RazorError = require('./RazorError');
 
-
 class ParserErrorFactory {
     constructor(templateInfo, linesBaseNumber) {
         this.startLineNum = linesBaseNumber;
@@ -56,11 +55,6 @@ class ParserErrorFactory {
         var message = `'${word}' expected at line ${line + this.startLineNum} pos ${pos + 1}.`;
         return RazorError.new({ message, info: this.info, line, pos, len, capture: this.wordExpected });
     }
-
-    // invalidHtmlChar(ch, lineNum, posNum, afterText, expected) {
-    //     var message = `"${ch}" is not a valid HTML character at line ${lineNum} pos ${posNum}` + (afterText ? ` after "${afterText}"` : expected ? ` (expected char = "${expected}")` : '.');
-    //     return new RazorError(message, this.args, lineNum, posNum);
-    // }
 
     missingMatchingStartTag(tag, line, pos) {
         var message = `'${tag}' tag at line ${line + this.startLineNum} pos ${pos + 1} is missing matching start tag.`;

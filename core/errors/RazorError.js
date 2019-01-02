@@ -8,23 +8,21 @@ const htmlEncode = require('../libs/js-htmlencode');
 // const regex = /.*Error:/;
 
 class RazorError extends Error {
-    constructor(message, args, captureFrame) {
+    constructor(message, captureFrame) {
         super(message);
-        // this.name = this.constructor.name;
-        //this.data = Object.assign({ line: args.line, pos: args.pos, len: args.len }, this.data || {});
 
         if (Error.captureStackTrace)
             Error.captureStackTrace(this, captureFrame || this.constructor);
     }
 
     static new(args) {
-        let exc = new RazorError(args.message, args, args.capture || this.new);
+        let exc = new RazorError(args.message, args.capture || this.new);
         this.extend(exc, args);
         return exc;
     }
 
     static extend(exc, args) {
-        exc.name = RazorError.name;
+        exc.isRazorError = true;
 
         if (exc.data) {
             var oldData = exc.data;
@@ -47,7 +45,9 @@ class RazorError extends Error {
         let stackHtml = stackToHtml(this, this.data, mainInfo);
 
         for (var data = this.data; data; data = data.inner) {
-            codeHtml += "<div class='arrow'>&#8681;</div>"
+            if (Utils.isServer)
+                codeHtml += "<div class='arrow'>&#8681;</div>"
+
             codeHtml += dataToHtml(data, mainInfo);
             codeHtml += '<hr />'
         }
@@ -134,12 +134,29 @@ module.exports = RazorError;
 
 function stackToHtml(exc, data, mainInfo) {
     let lines = exc.stack.split('\n');
+    let fireFox = (typeof navigator !== 'undefined') && navigator.userAgent.toLowerCase().indexOf('firefox') !== -1; // for compatibility with FireFox
+
+    if (fireFox) {
+        let message = `${exc.name}: ${exc.message}`; 
+        lines.unshift(message);
+    }
+
     let html = '<div>';
 
     for (let i = 0; i < lines.length; i++) {
         let line = lines[i];
+        
+        if (fireFox){
+            let parts = line.split('@');
+            
+            if (parts.length === 2){
+                if (!parts[0]) // empty
+                    parts[0] = "<anonymous>";
 
-        if (i === 0 && (line.startsWith("evalmachine.") || line.startsWith("undefined:"))) {
+                line = `at  ${parts[0]} (${parts[1]})`;
+            }
+        }
+        else if (i === 0 && (line.startsWith("evalmachine.") || line.startsWith("undefined:"))) {
             let nextLineExists = i < lines.length + 1;
 
             if (nextLineExists && data.jshtml && data.posRange) { // This is likely HTML parsing error (not code runtime error).
@@ -224,7 +241,7 @@ function dataToHtml(data, mainInfo) {
                     let start = htmlEncode(line.substring(0, pos));
                     let one = htmlEncode(line.substring(pos, pos + len));
                     let end = htmlEncode(line.substring(pos + len));
-                    htmlLine = `<span>${start}</span><span class='${multilight || "highlight"}' title='${mainInfo.title}'>${one}</span><span>${end}</span>`;
+                    htmlLine = `<span>${start}</span><span class='${multilight || "highlight"} source-error' title='${mainInfo.title}'>${one}</span><span>${end}</span>`;
                     highlight = "class='highlight'";
 
                 }
@@ -246,12 +263,12 @@ function dataToHtml(data, mainInfo) {
         }// for
 
         //let fileFolder = path.dirname(data.filename);
-        let fileName = RazorError.path ? RazorError.path.basename(data.filename) : data.filename;
+        let fileName = `<div class="filepath">${Utils.isServer ? Utils.path.basename(data.filename) : "Template:"}</div>`;
 
         html += "</ol>";
         html = `
 <div class="code">
-    <div class="filepath">${fileName}</div>
+    ${fileName}
     ${html}
 </div>
 `;

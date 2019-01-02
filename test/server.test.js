@@ -7,8 +7,7 @@ chai.use(chaiHttp);
 const jsdom = require("jsdom");
 const { JSDOM } = jsdom;
 const jquery = require('jquery');
-// const path = require('path');
-// const fs = require('fs');
+const port = 8000;
 
 const errorHeader = "A template compilation error occured";
 
@@ -37,7 +36,6 @@ function find(html, selector, text) {
 describe("server routes", () => {
     console.log(`Testing live Server...`);
     const server = require('./server.live')().app;
-    const port = 8000;
     var socket;
 
     function startServer(done) {
@@ -201,24 +199,9 @@ describe("server routes", () => {
                     .end((err, res) => {
                         expect(res).to.have.status(500);
                         let $ = jQuery(res.text);
-                        let h1 = $('h1');
-                        expect(h1.length).to.be.equal(1);
-                        expect(h1.text()).to.have.string(errorHeader);
-                        let errorMainLines = $('.error');
-                        expect(errorMainLines, '1 error line is expected').to.have.lengthOf(1);
-                        let errorText = "'</div>' tag at line 6 pos 1 is missing matching start tag";
-                        let layouts = $(`#error:contains(${errorText})`);
-                        expect(layouts, errorText).to.have.lengthOf(1);
-                        let errorViews = $('.code');
-                        expect(errorViews, '3 error views are expected').to.have.lengthOf(3);
-                        let viewSourceHeader = $(errorViews[0]).find(`.filepath:contains(partialerror.raz)`);
-                        expect(viewSourceHeader, '"partialerror.raz" header is expected').to.have.lengthOf(1);
-                        let layoutSourceHeader = $(errorViews[1]).find(`.filepath:contains(_layout.raz)`);
-                        expect(layoutSourceHeader, '"_layout.raz" header is expected').to.have.lengthOf(1);
-                        let partialSourceHeader = $(errorViews[2]).find(`.filepath:contains(_partial.raz)`);
-                        expect(partialSourceHeader, '"_partial.raz" header is expected').to.have.lengthOf(1);
-                        errorText = $(errorViews[2]).find('.highlight').text();
-                        expect(errorText).equal(errorText);
+                        assertErrorHeader($);
+                        assertErrorText($, "'</div>' tag at line 6 pos 1 is missing matching start tag");
+                        assertSourceViews($, ["partialerror.raz", "_layout.raz", "_partial.raz"], "</div>");
                         console.log(`> testing rote  ${route} is done`);
                         done();
                     });
@@ -232,24 +215,81 @@ describe("server routes", () => {
             console.log(`> testing rote ${route}...`);
             it("razor-js", (done) => {
                 let options = {
-                    //url: "http://localhost:8000" + route,
                     resources: "usable",
                     runScripts: "dangerously"
                 };
-                JSDOM.fromURL("http://localhost:8000" + route, options)
-                .then(dom => {
-                    setTimeout(() => {
-                        let $ = jquery(dom.window);
-                        let h1 = $('h1');
-                        expect(h1.length).to.be.equal(1);
-                        expect(h1.text()).to.have.string("RAZ browser dynamic test");
-                        console.log(`> testing rote  ${route} is done`);
-                        done();
-                      }, 1000);
-                }, 
-                err=>done(err));
+                JSDOM.fromURL("http://localhost:" + port + route, options)
+                    .then(dom => {
+                        setTimeout(() => {
+                            let $ = jquery(dom.window);
+                            let h1 = $('h1');
+                            expect(h1.length).to.be.equal(1);
+                            expect(h1.text()).to.have.string("RAZ browser dynamic test");
+                            console.log(`> testing rote  ${route} is done`);
+                            done();
+                        }, 1000);
+                    },
+                        err => done(err));
             });
         });
+
+        {
+            let route = "/browser-error";
+            describe(route, () => {
+                console.log(`> testing rote ${route}...`);
+                it("razor-js-error", (done) => {
+                    let options = {
+                        resources: "usable",
+                        runScripts: "dangerously"
+                    };
+                    JSDOM.fromURL("http://localhost:" + port + route, options)
+                        .then(dom => {
+                            setTimeout(() => {
+                                let $ = jquery(dom.window);
+                                assertErrorHeader($);
+                                assertErrorText($, "Error: '</span>' tag at line 5 pos 24 is missing matching start tag.");
+                                assertSourceViews($, ["Template:"]);
+                                console.log(`> testing rote  ${route} is done`);
+                                done();
+                            }, 1000);
+                        },
+                        err => {
+                            done(err);
+                        });
+                });
+            });
+        }
+    }
+});
+
+
+function assertErrorHeader($) {
+    let h1 = $('h1');
+    expect(h1.length, "header must exist").to.be.equal(1);
+    expect(h1.text()).to.have.string(errorHeader);
+}
+
+function assertErrorText($, text) {
+    let errorMainLines = $('.error');
+    expect(errorMainLines, '1 error line is expected').to.have.lengthOf(1);
+    expect(errorMainLines.text(), "error message").to.have.string(text);
+}
+
+function assertSourceViews($, viewNames, lastViewNameErrorToken) {
+    let num = viewNames.length;
+    let errorViews = $('.code');
+    expect(errorViews, `${num} error views are expected`).to.have.lengthOf(num);
+
+    if (!viewNames) return;
+
+    for (var i = 0; i < viewNames.length; i++) {
+        let viewName = viewNames[i];
+        let viewSourceHeader = $(errorViews[i]).find(`.filepath:contains(${viewName})`);
+        expect(viewSourceHeader, `"${viewName}" header is expected`).to.have.lengthOf(1);
     }
 
-});
+    if (!lastViewNameErrorToken) return;
+
+    let errorText = $(errorViews[errorViews.length - 1]).find('.source-error').text();
+    expect(lastViewNameErrorToken).equal(errorText);
+}

@@ -55,7 +55,7 @@ function handleErrors(app, errorCode) {
 
         var env = app.get('env');
 
-        if (dbg.isDebugMode(env) && err.name === RazorError.name) {
+        if (dbg.isDebugMode(env) && err.isRazorError) {
             var errorHtml = err.html();
             res.status(errorCode || 500);
             res.send(errorHtml);

@@ -30,7 +30,7 @@ module.exports = function (args) {
     }
 
     app.use(logger);
-    var jsStatic = express.static("./");
+    var jsStatic = express.static(".");
     app.use("/js", jsStatic);
     
 
@@ -50,12 +50,14 @@ module.exports = function (args) {
         rs.render("./home/browser", { message: "This is my first NodeJS Express View engine!" });
     });
 
+    app.get('/browser-error', (rq, rs) => {
+        rs.render("./home/browser-error", { message: "This is my first NodeJS Express View engine!" });
+    });
+
     app.get('*', (rq, rs) => {
         let routePath = "." + rq.path;
         rs.render(routePath, {});
     });
-
-
 
     // app.get('/', (rq, rs) => {
     //     rs.render("./sections/index", { header: "This is a HEADER", content: 'This is CONTENT.', footer: "This is FOOTER" });

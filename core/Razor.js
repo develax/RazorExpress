@@ -2,7 +2,8 @@ require('./utils');
 const fs = require('fs');
 
 const path = require('path');
-require('./errors/RazorError').path = path;
+Utils.path = path;
+Utils.isServer = true;
 // path.fileName = function (fullFileName, withExt) {
 //     if (withExt) return path.win32.basename(fullFileName);
 //     let extension = path.extname(fullFileName);

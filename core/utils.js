@@ -2,6 +2,8 @@
 // String
 ////////////////////////////////////////////////
 
+if (typeof Utils === 'undefined') Utils = {};
+
 String.whitespaces = '\r\n\t ';
 
 String.is = function(val){
@@ -73,7 +75,6 @@ String.prototype.equal = function (string2, ignoreCase, useLocale) {
 if (!global.Char) {
     Char = {};
 }
-
 
 if (!Char.isLetter) {
     Char.isLetter = function (c) {

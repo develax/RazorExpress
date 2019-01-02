@@ -76,7 +76,7 @@ function appErrorHandler(err, req, res, next) {
 
     var env = app.get('env');
 
-    if (env !== "production" && err.name == "RazorError") {
+    if (env !== "production" && err.isRazorError) {
         var errorHtml = err.html();
         res.status(500);
         res.send(errorHtml);
@@ -92,7 +92,7 @@ Please, go to [expressjs.com](https://expressjs.com/en/guide/error-handling.html
 > You define error-handling middleware last, after other app.use() and routes calls...
 
 ## Parser errors & runtime errors
-Although all errors are exposed to the user as an exception named *"RazorError"*, in fact, there are 2 types of errors and they occur at different stages of template processing. They are *parser errors* and *runtime errors*.
+There are 2 types of errors and they occur at different stages of template processing: they are *parser errors* and *runtime errors*.
 
 You have already seen an example of the *parser error* in the ["Errors handling"](#errors-handling) section. Obviously, these errors occur in the process of parsing the template when the parser detects that there is something wrong with its structure. This can be both HTML errors and JavaScript syntax errors. But mostly at this stage HTML structure errors are detected (as in the example in the ["Errors handling"](#errors-handling) section).
 
