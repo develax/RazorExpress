@@ -12,7 +12,7 @@
             setTimeout(()=>{
                 document.documentElement.innerHTML = e.error.html();
             }, 0);
-        })
+        });
         var browser = document.getElementById("browser");
         browser.style.backgroundColor = "white";
         var model = {
