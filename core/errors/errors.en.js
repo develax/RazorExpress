@@ -4,6 +4,7 @@ class ParserErrorFactory {
     constructor(templateInfo, linesBaseNumber) {
         this.startLineNum = linesBaseNumber;
         this.info = templateInfo;
+        this.info.startLine = linesBaseNumber;
     }
 
     endOfFileFoundAfterAtSign(lineNum, posNum) {
@@ -47,7 +48,7 @@ class ParserErrorFactory {
     }
 
     jsCodeBlockMissingClosingChar(line, codeFirstLine) {
-        var message = `The code or section block is missing a closing "}" character. Make sure you have a matching "}" character for all the "{" characters within this block, and that none of the "}" characters are being interpreted as markup. The block starts at line ${line + 1} with text: "${codeFirstLine}"`;
+        var message = `The code or section block is missing a closing "}" character. Make sure you have a matching "}" character for all the "{" characters within this block, and that none of the "}" characters are being interpreted as markup. The block starts at line ${line + this.startLineNum} with text: "${codeFirstLine}"`;
         return RazorError.new({ message, info: this.info, line, capture: this.jsCodeBlockMissingClosingChar });
     }
 
