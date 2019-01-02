@@ -1,8 +1,7 @@
 # RAZ: Razor-Express view template engine for NodeJS
 
 > <pre>$ npm install <b>raz</b> --save</pre>
-
-> [JavaScript (browser) version](https://www.npmjs.com/package/razjs) of the Razor-Express library.
+> <pre>[JavaScript (browser) version](https://www.npmjs.com/package/razjs) of the Razor-Express library.</pre>
 
 
 - [**Intro**](#intro)
