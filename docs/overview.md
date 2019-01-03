@@ -1,5 +1,7 @@
-# The overview of Razor-Express template engine (RAZ)
 [<< Back to start](../README.md)
+
+# The overview of Razor-Express template engine (RAZ)
+
 - [**Views and View Template Engine**](#views-and-view-template-engine)
 - [**Rendering layout system**](#rendering-layout-system)
   - [Processing a view](#processing-a-view)
@@ -43,7 +45,7 @@ When this process is finished the parser starts analyzing that assembled templat
 
 > It's worth noting that the *parser doesn't try to fully analyze the validity of HTML* in a template. For example, it is not much concerned about mistakes in the attributes of HTML tags. *Neither it checks the correctness of JavaScript syntax*, except for the base constructs. It only checks the integrity of the HTML tags tree and extracts snippets of server-side JavaScript code to perform it in the next step. 
 
-After parsing is done the execution process begins. At this point, the template placeholders are substituted with the appropriate values from the *data model* and all the server-side JavaScript code found in this template is executed. In this process, the references to other view templates could be found. If so, each referenced template file is read and processed the same way as the main view (with which the engine has started) with the exception that the *"_viewStart.raz"* files are not considered anymore. *Each referenced template file is processed separately from the main one and from the others.* This means that if you declare a variable in one template it won't be available in any referenced template because each processed file is run in its own scope (and in its own moment). If you need to share some data between those views it is possible to do via the `Model` and `ViewData` objects as will be discussed later [^]. However, the *data model* (represented by the `Model` object in views) is the same for all the view (unless it's explicitly set otherwise).
+After parsing is done the execution process begins. At this point, the template placeholders are substituted with the appropriate values from the *data model* and all the server-side JavaScript code found in this template is executed. In this process, the references to other view templates could be found. If so, each referenced template file is read and processed the same way as the main view (with which the engine has started) with the exception that the *"_viewStart.raz"* files are not considered anymore. *Each referenced template file is processed separately from the main one and from the others.* This means that if you declare a variable in one template it won't be available in any referenced template because each processed file is run in its own scope (and in its own moment). If you need to share some data between those views it is possible to do via the `Model` and `ViewData` objects as will be discussed [later](#access-data-from-a-layout). However, the *data model* (represented by the `Model` object in views) is the same for all the view (unless it's explicitly set otherwise).
 
 There are two types of view templates, which can be explicitly referenced from the rendering page template:
 * [Layout](#layouts)
@@ -130,12 +132,12 @@ Usually, the `_viewStart.raz` file is used to specify a [layout](#layouts) for a
 
 *The order in which views are processed is important to remember* in case you decide to change some data in the model, for example, in one view and then use it in another. The **main view template with all the [*"_viewStart.raz"*](#starting-views-_viewstartraz) views is processed first**, as already mentioned. **Then all the partial views are processed** in the order they are referenced and **all [sections](https://github.com/DevelAx/RazorExpress/blob/master/docs/syntax.md#section) are rendered**. **The last step is to find and render layouts** (with partial views and sections they have references to). Actually, it is not different from *ASP.NET MVC Razor* algorithm.
 
-![The order of processing views](Razor-Express-view-processing-flow.png)
+![The order of processing views](https://github.com/DevelAx/RazDoc/blob/master/Razor-Express-view-processing-flow.png)
 
 ### A page components illustration examples
 
 #### Page design layout
-![Page layout example](./PageLayoutExample.png)
+![Page layout example](https://github.com/DevelAx/RazDoc/blob/master/PageLayoutExample.png?raw=true)
 
 #### Razor-Express layout components
-![Layout elements example](PartsOfLayoutExample.png)
+![Layout elements example](https://github.com/DevelAx/RazDoc/blob/master/PartsOfLayoutExample.png?raw=true)
