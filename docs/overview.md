@@ -130,7 +130,7 @@ Usually, the `_viewStart.raz` file is used to specify a [layout](#layouts) for a
 
 ### The order of processing views
 
-*The order in which views are processed is important to remember* in case you decide to change some data in the model, for example, in one view and then use it in another. The **main view template with all the [*"_viewStart.raz"*](#starting-views-_viewstartraz) views is processed first**, as already mentioned. **Then all the partial views are processed** in the order they are referenced and **all [sections](https://github.com/DevelAx/RazorExpress/blob/master/docs/syntax.md#section) are rendered**. **The last step is to find and render layouts** (with partial views and sections they have references to). Actually, it is not different from *ASP.NET MVC Razor* algorithm.
+*The order in which views are processed is important to remember* in case you decide to change some data in the model, for example, in one view and then use it in another. The **current view template with all the [*"_viewStart.raz"*](#starting-views-_viewstartraz) views are processed first**, as already mentioned. **Then all the partial views are processed** in the order they are referenced and **all [sections](https://github.com/DevelAx/RazorExpress/blob/master/docs/syntax.md#section) are rendered**. **The last step is to find and render layouts** (with partial views and sections they have references to). Actually, it is not different from *ASP.NET MVC Razor* algorithm.
 
 ![The order of processing views](https://github.com/DevelAx/RazDoc/blob/master/Razor-Express-view-processing-flow.png)
 
