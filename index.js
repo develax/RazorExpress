@@ -8,14 +8,6 @@ module.exports = {
     __express: renderFile,
     renderFile: renderFile,
     render: getParser().compileSync,
-    /**
-     * @deprecated Since version "0.0.66". Will be deleted in version "1.0.0". Use 'render' instead.
-     */
-    compileSync: function () {
-        console.warn("The 'compileSync' method is deprecated. Will be deleted in version '1.0.0'. Use 'render' instead.");
-        var parser = getParser();
-        parser.compileSync.apply(parser, arguments);
-    },
     register: registerRazorEngine,
     handleErrors: handleErrors
 };
