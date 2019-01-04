@@ -10,6 +10,7 @@ function compilePageSync(Html, Model, ViewData, debug) {
         sandbox.Html = Html;
         sandbox.Model = Model;
         sandbox.ViewData = ViewData;
+        sandbox.debug = debug;
         vm.runInNewContext(Html._js, sandbox);
     }
     else {
