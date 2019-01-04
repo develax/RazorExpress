@@ -21,10 +21,12 @@ module.exports = {
 };
 
 const Razor = require('./core/Razor');
-const RazorError = require('./core/errors/RazorError');
-var razor, parser;
+var razor, parser, _ext = "raz";
+
 
 function renderFile(filepath, options, done) {
+    options.ext = _ext;
+
     if (!razor)
         razor = new Razor(options);
 
@@ -39,10 +41,10 @@ function getParser() {
     return parser;
 }
 
-function registerRazorEngine(app) {
-    const ext = "raz";
-    app.engine(ext, renderFile);
-    app.set('view engine', ext);
+function registerRazorEngine(app, ext = _ext) {
+    _ext = ext;
+    app.engine(_ext, renderFile);
+    app.set('view engine', _ext);
 }
 
 function handleErrors(app, errorCode) {

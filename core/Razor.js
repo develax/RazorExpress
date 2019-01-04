@@ -22,12 +22,13 @@ const dbg = require('./dbg/debugger');
 const allowLoggingInDebugModel = false;
 
 'use strict';
-const ext = "raz", viewStartName = '_viewStart';
+const viewStartName = '_viewStart';
 const EOL = require('os').EOL;
 
 module.exports = class Razor {
     constructor(options) {
         this.options = options;
+        this.ext = options.settings['view engine'] || options.ext;
         this.env = options.settings.env;
         const debug = dbg.isDebugMode(this.env);
         const log = require('./dbg/logger')({ on: debug && allowLoggingInDebugModel });
@@ -43,7 +44,7 @@ module.exports = class Razor {
         //let viewsPath = path.normalize(this.options.settings.views);
 
         if (!path.extname(filepath))
-            filepath += '.' + this.viewExt();
+            filepath += '.' + this.ext;
 
         fs.readFile(filepath, (err, data) => {
             if (err) {
@@ -110,8 +111,8 @@ module.exports = class Razor {
 
         let viewFileExt = path.extname(partialViewName);
 
-        if (!viewFileExt.equal('.' + ext))
-            partialViewName += '.' + this.viewExt();
+        if (!viewFileExt.equal('.' + this.ext))
+            partialViewName += '.' + this.ext;
 
         if (partialViewName[0] === '/' || partialViewName[0] === '.') {
             let viewPath = path.normalize(partialViewName);
@@ -191,8 +192,8 @@ module.exports = class Razor {
 
         let viewFileExt = path.extname(partialViewName);
 
-        if (!viewFileExt.equal('.' + ext))
-            partialViewName += '.' + this.viewExt();
+        if (!viewFileExt.equal('.' + this.ext))
+            partialViewName += '.' + this.ext;
 
         if (partialViewName[0] === '/' || partialViewName[0] === '.') {
             let viewPath = path.normalize(partialViewName);
@@ -246,12 +247,8 @@ module.exports = class Razor {
         }
     }
 
-    viewExt() {
-        return this.options.settings['view engine'] || ext;
-    }
-
     viewStartName() {
-        return viewStartName + '.' + this.viewExt();
+        return viewStartName + '.' + this.ext;
     }
 
     addFileNameIfDev(data, filename) {
