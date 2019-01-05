@@ -3,7 +3,7 @@
 # Debugging & Errors handling in Razor-Express
 
 - [**Production & development modes**](#production--development-modes)
-  -[Debug mode detection](#debug-mode-detection)
+  - [Debug mode detection](#debug-mode-detection)
 - [**Errors handling**](#errors-handling)
   - [Custom error handler](#custom-error-handler)
 - [**Parser errors & runtime errors**](#parser-errors--runtime-errors)
