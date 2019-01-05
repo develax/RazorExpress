@@ -32,11 +32,11 @@ if (process.env.NODE_ENV !== "production") { /* logging */ }
 **4.** Or if you want to check it in a view template with Razor-Express syntax you can use the `debug` boolean constant:
 ```HTML+Razor
 <head>
-@if(debug){
+@if (debug) {
     <link rel="stylesheet" type="text/css" href="site.css">
     <script defer src="site.js"></script>
 }
-else{
+else {
     <link rel="stylesheet" type="text/css" href="site.min.css">
     <script defer src="site.min.js"></script>
 }
