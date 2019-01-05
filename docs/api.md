@@ -7,6 +7,7 @@
   - [`__express`](#__express)
   - [`register`](#register)
   - [`handleErrors`](#handleErrors)
+  - [`debug`](#debug)
 - [**Direct rendering string templates to HTML:**](#direct-rendering)
   - [`render`](#render)
 
@@ -74,6 +75,16 @@ const raz = require('raz'); // the Razor-Express engine
 raz.handleErrors(app); // set default error-handler for Razor-Express errors
 ```
 See also the ["Errors handling"](Debugging.md#errors-handling) section.
+
+<a name="debug"></a>
+### debug
+A boolean constant that determines whether the code is running in debug mode.
+```js
+const raz = require("raz");
+if (raz.debug) {
+  console.log("debug mode is on");
+}
+```
 
 <a name="direct-rendering"></a>
 ## Direct rendering string templates to HTML:
