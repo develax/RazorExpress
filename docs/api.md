@@ -52,8 +52,9 @@ the [Express looks](https://expressjs.com/en/guide/using-template-engines.html) 
 <sup>(see [RazorExpressExample repository](https://github.com/DevelAx/RazorExpressExample))</sup>
 
 <a name="register"></a>
-### register(app)
+### register(app, ext)
 * **app** `<express>` instance of the Express app
+* **ext** `<String>` view template file extension, *default:* 'raz'
 
 Registers the Razor-Express engine so you don't have to do it via `app.set('view engine', 'raz')`:
 ```JavaScript
