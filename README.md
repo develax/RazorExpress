@@ -223,7 +223,7 @@ Express web-server example
 // Create Express web server app.
 const app = require('express')();
 
-// Register 'Razor-Express' template engine and the default extesnion (raz) for the view-template files.
+// Register 'Razor-Express' template engine.
 // 'Express' will automatically find the Razor-Express module (within the `node-modules` folder) using this extension. 
 // If you decide to skip registering the engine then you will have to explicitly specify the file extension in the route handler.
 app.set('view engine', "raz");
@@ -253,6 +253,7 @@ server.on('error', function (e) {
     }
 });
 ```
+<sup>* The default 'raz' extesnion of view-template files can be changed via the [register](docs/api.md#registerapp-ext) method.</sup>
 4. Create the *"views"* folder. This is the directory defined in Express by default where the template files are located. If you want to use another folder you can change it with `app.set('views', './another-views-folder')` method.
 5. Create a *view-template* file in that folder named *"index.raz"*. It would have pretty much the same content as in the [previous example](#nodejs-example) except we have to add some basic HTML markup. Notice that the *view-template* file has **'.raz'** extension which every Razor-Express *view* file must have.
 
