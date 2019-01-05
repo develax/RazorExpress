@@ -14,7 +14,7 @@
 The Razor-Express module exports the following functions:
 
 <a name="for-express"></a>
-## For NodeJS Express web-server:
+## For NodeJS Express web-server
 
 <a name="renderFile"></a>
 ### renderFile(filepath, options, done)
@@ -87,7 +87,7 @@ if (raz.debug) {
 ```
 
 <a name="direct-rendering"></a>
-## Direct rendering string templates to HTML:
+## Direct rendering string templates to HTML
 
 <a name="render"></a>
 ### render(template)
