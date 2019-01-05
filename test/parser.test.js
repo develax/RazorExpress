@@ -16,6 +16,27 @@
         });
     });
 
+    describe("ENVIRONMENTAL VARIABLES VISIBILITY CASES", () => {
+        describe("HIDDEN", () => {
+            let cases = require('./cases/env-variables');
+
+            for (let i = 0; i < cases.length; i++) {
+                let c = cases[i];
+                it(c.name, () => {
+                    
+                    if (typeof c.expected !== 'undefined') {
+                        let result = parser.compileSync({ template: c.template, model: c.model, filePath: c.name });
+                        expect(c.expected).to.equal(result);
+                    }
+                    else {
+                        let result = () => parser.compileSync({ template: c.template, filePath: c.name });
+                        expect(result).to.throw(c.error);
+                    }
+                });
+            }
+        });
+    });
+
     describe("TEST BROWSER SIGNATURE", () => {
         it("Test 1", () => {
             let result = parser.compileSync("", { x: 1 });
@@ -110,20 +131,6 @@
                         let result = () => parser.compileSync({ template: c.template, filePath: c.name });
                         expect(result).to.throw(c.error);
                     }
-                });
-            }
-        });
-    });
-
-    describe("ENVIRONMENTAL VARIABLES VISIBILITY CASES", () => {
-        describe("HIDDEN", () => {
-            let cases = require('./cases/env-variables');
-
-            for (let i = 0; i < cases.length; i++) {
-                let c = cases[i];
-                it(c.name, () => {
-                    let result = parser.compileSync({ template: c.template, model: c.model, filePath: c.name });
-                    expect(c.expected).to.equal(result);
                 });
             }
         });

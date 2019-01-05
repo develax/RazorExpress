@@ -1,29 +1,36 @@
 'use strict';
 require('./utils');
 
-function compilePageSync(Html, Model, ViewData, debug) {
-    'use strict';
-
-    if (debug) {
-        let sandbox = Html._sandbox;
-        let vm = Html._vm;
-        sandbox.Html = Html;
-        sandbox.Model = Model;
-        sandbox.ViewData = ViewData;
-        sandbox.debug = debug;
-        vm.runInNewContext(Html._js, sandbox);
+function compilePageSync(html, model, viewData, isDebugMode) {
+    if (isDebugMode) {
+        let sandbox = html._sandbox;
+        let vm = html._vm;
+        defineConstant(sandbox, "Html", html);
+        defineConstant(sandbox, "Model", model);
+        defineConstant(sandbox, "ViewData", viewData);
+        defineConstant(sandbox, "debug", isDebugMode);
+        vm.runInNewContext(html._js, sandbox);
     }
     else {
-        eval(Html._js);
+        const Html = html;
+        const Model = model;
+        const ViewData = viewData;
+        const debug = isDebugMode;
+        eval(html._js);
     }
 
-    return;
+    function defineConstant(obj, name, value) {
+        Object.defineProperty(obj, name, {
+            value,
+            writable: false
+        });
+    }
 }
 
-function compilePage(Html, Model, ViewData, debug, done) {
+function compilePage(html, model, viewData, isDebugMode, done) {
     try {
-        compilePageSync(Html, Model, ViewData, debug);
-        return Html.__renderLayout(done);
+        compilePageSync(html, model, viewData, isDebugMode);
+        return html.__renderLayout(done);
     }
     catch (exc) {
         done(exc);
