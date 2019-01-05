@@ -2,13 +2,13 @@
 
 # Razor-Express API
 
-- [**For NodeJS Express web-server:**](#for-express)
+- [**For NodeJS Express web-server**](#for-express)
   - [`renderFile`](#renderFile)
   - [`__express`](#__express)
   - [`register`](#register)
   - [`handleErrors`](#handleErrors)
   - [`debug`](#debug)
-- [**Direct rendering string templates to HTML:**](#direct-rendering)
+- [**Direct rendering string templates to HTML**](#direct-rendering)
   - [`render`](#render)
 
 The Razor-Express module exports the following functions:
