@@ -1,6 +1,8 @@
 'use strict';
 
-//const parser = require('./core/parser')({ debug: false, mode: "dev" });
+const dbg = require('./core/dbg/debugger'); 
+const Razor = require('./core/Razor');
+var razor, parser, _ext = "raz";
 
 module.exports = {
     // https://expressjs.com/en/guide/using-template-engines.html
@@ -9,12 +11,9 @@ module.exports = {
     renderFile: renderFile,
     render: getParser().compileSync,
     register: registerRazorEngine,
-    handleErrors: handleErrors
+    handleErrors: handleErrors,
+    debug: isDebugMode()
 };
-
-const Razor = require('./core/Razor');
-var razor, parser, _ext = "raz";
-
 
 function renderFile(filepath, options, done) {
     options.ext = _ext;
@@ -27,7 +26,7 @@ function renderFile(filepath, options, done) {
 
 function getParser() {
     if (!parser) {
-        var env = process && process.env.NODE_ENV;
+        var env = getEnv();
         parser = require('./core/parser')({ debug: false, mode: env });
     }
     return parser;
@@ -40,16 +39,14 @@ function registerRazorEngine(app, ext = _ext) {
 }
 
 function handleErrors(app, errorCode) {
-    const dbg = require('./core/dbg/debugger');
+    
     app.use(appErrorHandler);
 
     function appErrorHandler(err, req, res, next) {
         if (res.headersSent)
             return next(err); // must
 
-        var env = app.get('env');
-
-        if (dbg.isDebugMode(env) && err.isRazorError) {
+        if (isDebugMode() && err.isRazorError) {
             var errorHtml = err.html();
             res.status(errorCode || 500);
             res.send(errorHtml);
@@ -60,3 +57,10 @@ function handleErrors(app, errorCode) {
     }
 }
 
+function isDebugMode(){
+    return dbg.isDebugMode(getEnv());
+}
+
+function getEnv(){
+    return process && process.env.NODE_ENV;
+}
