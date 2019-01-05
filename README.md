@@ -117,7 +117,7 @@ Or let's consider an example from http://haml.info/tutorial.html
 ```Haml
 .item{:id => "item#{item.id}"}= item.body
 ```
-Maybe I'm wrong and this kind of markup really simplifies the development and perception of the code, but to me, it doesn't seem to be so. Let's just compare it to the equivalent Razor markup:
+Maybe I'm wrong and this kind of markup really simplifies the development and perception of the code, but to me, it doesn't seem to be so. Let's just compare it to the equivalent **Razor markup**:
 ```HTML+Razor
 <div class='item' id='item@item.id'>
   @item.body
@@ -128,9 +128,9 @@ Maybe I'm wrong and this kind of markup really simplifies the development and pe
 I won't go much into all the aspects I don't like in other engines syntax just say that *"[Mustache](https://www.npmjs.com/package/mustache) / [HandleBar](https://handlebarsjs.com/)"*, *"[Pug](https://pugjs.org)"*, and *[Haml](http://haml.info/)* look like I have to learn a new syntax while with *Razor* I virtually know it if I'm already familiar with *HTML* and *JavaScript* languages. [EJS](https://www.npmjs.com/package/ejs) is very close to *Razor* but it is too verbose that makes it difficult to write and read the code.
 
 In these examples I don't compare logic constructions because some of the view engines have logic-less templating syntax.
-With *Razor* you can implement amost any logic that is available with normal *JavaScript* without learning a new syntax.
+With Razor you can implement amost any logic that is available with normal JavaScript without learning a new syntax.
 
-Given all the mentioned and unmentioned pros and cons, I decided not to part with *Razor-syntax* and create something similar for using with [ExpressJS library](https://expressjs.com) (it can work with other frameworks as well). This library works quite fast since it does not use third-party HTML parsers and regular expressions.
+Given all the mentioned and unmentioned pros and cons, I decided not to part with Razor-syntax and create something similar for using with [ExpressJS library](https://expressjs.com) (it can work with other frameworks as well). *This library works quite fast since it does not use third-party HTML parsers and regular expressions.*
 
 -----------------------
 
@@ -253,7 +253,9 @@ server.on('error', function (e) {
     }
 });
 ```
+
 <sup>* The default 'raz' extesnion of view-template files can be changed via the [register](docs/api.md#registerapp-ext) method.</sup>
+
 4. Create the *"views"* folder. This is the directory defined in Express by default where the template files are located. If you want to use another folder you can change it with `app.set('views', './another-views-folder')` method.
 5. Create a *view-template* file in that folder named *"index.raz"*. It would have pretty much the same content as in the [previous example](#nodejs-example) except we have to add some basic HTML markup. Notice that the *view-template* file has **'.raz'** extension which every Razor-Express *view* file must have.
 
