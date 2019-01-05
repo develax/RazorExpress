@@ -23,7 +23,7 @@
 - [**Reserved keywords**](#reserved-keywords)
   - [`@section`](#section)
 - [**View objects**](#view-objects)
-  - [`@debug`](#debug)
+  - [`debug`](#debug)
   - [`@Model`](#model)
   - [`@ViewData`](#viewdata)
   - [`@Html`](#html)
