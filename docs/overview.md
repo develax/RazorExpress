@@ -36,9 +36,7 @@ When you have a *NodeJS Express web app* set up ([Express web-server example](ht
 It is a quite simplified description of the request handling to understand the role of the Razor-Express engine in this process. Now let's take a closer look at what happens in the Razor-Express engine while processing a *view template* and *data model*.
 
 ### Processing a view
-<sup>
-* By default Razor-Experss uses `"raz"` extension for its view template files but you can use any other you'd like, for example `'html'` by passing it either via RazorExpress `[register](api.md#registerapp-ext)` method or via Express [`app.set('view engine', 'ext')`](https://expressjs.com/en/guide/using-template-engines.html) one.
-</sup>
+> By default Razor-Experss uses `'raz'` extension for its view template files but you can use any other you'd like, for example `'html'` by passing it explicitly either via RazorExpress [`register`](api.md#registerapp-ext) method or via Express [`app.set('view engine', 'ext')`](https://expressjs.com/en/guide/using-template-engines.html) one.
 
 When Razor-Express gets control, it also gets the full filename of a *view template* file and *data model* both passed as parameters. The *data model* is optional though. If the *template* is successfully processed the engine returns HTML. If a failure occurs while reading, parsing, or rendering the file RAZ returns an error. In any case at this point, its work is done.  
 
