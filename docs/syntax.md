@@ -23,6 +23,7 @@
 - [**Reserved keywords**](#reserved-keywords)
   - [`@section`](#section)
 - [**View objects**](#view-objects)
+  - [`@debug`](#debug)
   - [`@Model`](#model)
   - [`@ViewData`](#viewdata)
   - [`@Html`](#html)
@@ -568,10 +569,14 @@ In the preceding code, *"/scripts/site.js"* is added to the scripts section on a
 **NOTE:** In *ASP.NET MVC Razor* only the immediate layout page can render a section and they cannot be referenced from partial views. In the current implementation of *Razor-Express* we don't have this limitation. I can't see anything wrong with having some specific script or style in some partial view to be placed in a section. Since partial views can be rendered on a page more than once, each its section is rendered only once. Also, you can have different sections defined in different files (views) with the same name. Then the `@Html.section` method will render all these sections in one specific place. Of course, you should take into account that the order in which the sections will be rendered corresponds to the rendering order of the views, partial views, and layouts. Sections can be defined and rendered even within the same (one) view, in this case the order is also important: definition must go before the reference.
 
 ## View objects
-The following objects are available to server-side JavaScript code in a *view template*:
+The following *constant* objects are available to server-side JavaScript code in a *view template*:
+* `debug`
 * `Model`
 * `ViewData`
 * `Html`
+
+### debug
+The `debug` constant serves for checking whether the code is running in debug mode. See the [Debugging & Errors handling](Debugging.md#debug-mode-detection) page for an example.
 
 ### @Model
 The *model* is meant to pass some data from the router<sup>[1](#ref1)</sup> to the *view* (see [Express web-server example](/README.md#express-web-server-example)) where it is represented by the `Model` object and used via Razor-Express syntax to display some data to a user. It can contain either pure data or data and methods that operate on this data. The *view* depends on the *model*, but the *model* should not have any dependencies.

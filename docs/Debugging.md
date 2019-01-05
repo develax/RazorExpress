@@ -3,13 +3,46 @@
 # Debugging & Errors handling in Razor-Express
 
 - [**Production & development modes**](#production--development-modes)
+  - [Debug mode detection](#debug-mode-detection)
 - [**Errors handling**](#errors-handling)
   - [Custom error handler](#custom-error-handler)
 - [**Parser errors & runtime errors**](#parser-errors--runtime-errors)
 - [**Errors visualization in the inner templates**](#errors-visualization-in-the-inner-templates)
 
 ## Production & development modes
-[Express](https://expressjs.com) distinguishes between 2 startup modes: development mode and [production mode](https://expressjs.com/en/advanced/best-practice-performance.html#set-node_env-to-production). If the `NODE_ENV` environment variable has a value not equal to `"production"` or it is not set at all ([stackoverflow](https://stackoverflow.com/a/16979503/1844247)) then it considered to as if it were set to `"development"`. So does the Razor-Express - in development mode it generates additional debugging information to help localize the error location.
+[Express](https://expressjs.com) distinguishes between 2 startup modes: development mode and [production mode](https://expressjs.com/en/advanced/best-practice-performance.html#set-node_env-to-production). If the `NODE_ENV` environment variable has a value not equal to `"production"` or it is not set at all ([stackoverflow](https://stackoverflow.com/a/16979503/1844247)) then it considered to as if it were set to `"development"` and if an error occurs the Express app shows on the page all the information about it. So does the Razor-Express - in development mode it generates additional debugging information to help localize the error location.
+
+### Debug mode detection
+Sometimes you may need to know whether your code is running in debug mode. It could be helpful for logging for example. There are two ways to determine it:
+**1.** Through the Express API by comparing the value of `app.get('env')` with `"production"` string:
+```JS
+const app = require("express")();
+if (app.get('env') !== "production") { /* logging */ }
+```
+**2.** Through the Razor-Express API by checking the value of `raz.debug` which is boolean:
+```JS
+const raz = require("raz");
+if (raz.debug) { /* logging */ }
+```
+**3.** Directly via the global `process` object:
+```JS
+const raz = require("raz");
+if (process.env.NODE_ENV !== "production") { /* logging */ }
+```
+**4.** Or if you want to check it in a view template with Razor-Express syntax you can use the `debug` boolean constant:
+```HTML+Razor
+<head>
+@if (debug) {
+    <link rel="stylesheet" type="text/css" href="site.css">
+    <script defer src="site.js"></script>
+}
+else {
+    <link rel="stylesheet" type="text/css" href="site.min.css">
+    <script defer src="site.min.js"></script>
+}
+</head>
+```
+<sub>* None of these methods would work in the [RazJS library](https://www.npmjs.com/package/razjs).</sub>
 
 ## Errors handling
 
@@ -61,7 +94,6 @@ Now it looks a little nicer and you can see not only the exception stack and err
 The [`handleErrors`](api.md#handleerrorsapp-errorcode-mode) method has two additional parameters (`errorCode` and `mode`) by which you can pass the server response code and mode in which this error handler will be triggered. 
 
 By default `errorCode` is `500`. This means that by default you'll get an HTML-formatted error and HTTP response with code 500 only if the app is run in [development mode](#production--development-modes).
-
 
 ### Custom error handler
 Where appropriate you can create your own error handler and attach it to the Express app. You just have to make sure the error you get is of `RazorError` type by checking its `name` field. 
