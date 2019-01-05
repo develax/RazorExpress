@@ -37,6 +37,8 @@ It is a quite simplified description of the request handling to understand the r
 
 ### Processing a view
 
+> By default Razor-Experss uses `'raz'` extension for its view template files but you can use any other extension you'd like, for example `'raz'` by passing it either via RazorExpress' `[register](api.md#registerapp-ext)` method or via `[app.set('view engine', 'ext')](https://expressjs.com/en/guide/using-template-engines.html)`.
+
 When Razor-Express gets control, it also gets the full filename of a *view template* file and *data model* both passed as parameters. The *data model* is optional though. If the *template* is successfully processed the engine returns HTML. If a failure occurs while reading, parsing, or rendering the file RAZ returns an error. In any case at this point, its work is done.  
 
 After the file is found and read, the engine tries to find all [starting view files](#starting-views-_viewstartraz) named [*"_viewStart.raz"*](#starting-views-_viewstartraz) following the [partial views standard search algorithm logic](#partial-view-search-algorithm). If they are found they are added to the current file from its beginning in the order the search sequence goes (each next found is added to the very beginning of the current file and so on).
