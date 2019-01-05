@@ -23,6 +23,7 @@
   - [Reserved keywords](https://github.com/DevelAx/RazorExpress/blob/master/docs/syntax.md#reserved-keywords)
     - [`@section`](https://github.com/DevelAx/RazorExpress/blob/master/docs/syntax.md#section)
   - [Reserved View objects]()
+    - [`@debug`](https://github.com/DevelAx/RazorExpress/blob/master/docs/syntax.md#debug)
     - [`@Model`](https://github.com/DevelAx/RazorExpress/blob/master/docs/syntax.md#view-objects)
     - [`@ViewData`](https://github.com/DevelAx/RazorExpress/blob/master/docs/syntax.md#viewdata)
     - [`@Html`](https://github.com/DevelAx/RazorExpress/blob/master/docs/syntax.md#html)
