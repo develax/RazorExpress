@@ -4,7 +4,7 @@ const dbg = require('./core/dbg/debugger');
 const Razor = require('./core/Razor');
 const DefaultContext = require('./core/RazorContext');
 var razor, parser, _requestContext;
-var isContextSet = false;
+var isSetUp = false;
 var _settings = { ext: 'raz', context: DefaultContext };
 
 module.exports = {
@@ -18,6 +18,9 @@ module.exports = {
 }
 
 function setup(app, settings) {
+    if (isSetUp)
+        throw new Error('The RAZ app has been setup already.');
+
     _settings = Object.assign(_settings, settings);
 
     if (_settings.context)
@@ -77,9 +80,6 @@ function getEnv() {
 }
 
 function initContext(app, context) {
-    if (isContextSet)
-        throw new Error('The context has been initialized already.');
-
     const Context = context;
 
     app.use((req, res, next) => {
