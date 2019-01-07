@@ -227,8 +227,8 @@ const app = require('express')();
 // If you decide to skip registering the engine then you will have to explicitly specify the file extension in the route handler.
 app.set('view engine', "raz");
 // There is an alternative way to register Razor-Express engine (see more in Razor-Express API docs):
-//const raz = require('raz')(app);
-//raz.register();
+//const raz = require('raz');
+//razor.setup(app, { register: true });
 
 // Create the route for the "Index.raz" view-template.
 // Note that we do not specify the file extension explicitly in this route because we already did it when registering the engine.
