@@ -1,3 +1,4 @@
+# --gitignore--
 node_modules/
 obj/
 package-lock.json
@@ -8,6 +9,8 @@ bin/
 ./Admin/
 .atom/
 *.psd
+# --npmignore--
 .gitignore
+.npmignore
 docs/
 test/

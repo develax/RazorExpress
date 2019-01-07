@@ -3,22 +3,33 @@
 const dbg = require('./core/dbg/debugger');
 const Razor = require('./core/Razor');
 const DefaultContext = require('./core/RazorContext');
-var razor, parser, _ext = "raz", _app, _settings, _requestContext;
+var razor, parser, _requestContext;
 var isContextSet = false;
+var _settings = { ext: 'raz', context: DefaultContext };
 
-module.exports = function (app, settings) {
-    _app = app;
-    _settings = Object.assign({ ext: 'raz', context: DefaultContext }, settings);
-    initContext();
+module.exports = {
+    __express: renderFile,
+    setup,
+    initContext,
+    renderFile,
+    render: getParser().compileSync,
+    handleErrors,
+    debug: isDebugMode()
+}
 
-    return {
-        register: registerRazorEngine,
-        __express: renderFile,
-        renderFile: renderFile,
-        render: getParser().compileSync,
-        handleErrors: handleErrors,
-        debug: isDebugMode()
-    };
+function setup(app, settings) {
+    _settings = Object.assign(_settings, settings);
+
+    if (_settings.context)
+        initContext(app, _settings.context);
+
+    if (_settings.register || _settings.ext !== "raz")
+        register(app, _settings.ext)
+}
+
+function register(app, ext) {
+    app.engine(ext, renderFile);
+    app.set('view engine', ext);
 }
 
 function renderFile(filepath, options, done) {
@@ -30,12 +41,6 @@ function renderFile(filepath, options, done) {
     razor.renderFile(filepath, done);
 }
 
-function registerRazorEngine() {
-    _ext = _settings.ext;
-    _app.engine(_ext, renderFile);
-    _app.set('view engine', _ext);
-}
-
 
 function getParser() {
     if (!parser) {
@@ -45,8 +50,8 @@ function getParser() {
     return parser;
 }
 
-function handleErrors(errorCode) {
-    _app.use(appErrorHandler);
+function handleErrors(app, errorCode) {
+    app.use(appErrorHandler);
 
     function appErrorHandler(err, req, res, next) {
         if (res.headersSent)
@@ -71,13 +76,13 @@ function getEnv() {
     return process && process.env.NODE_ENV;
 }
 
-function initContext() {
+function initContext(app, context) {
     if (isContextSet)
         throw new Error('The context has been initialized already.');
 
-    const Context = _settings.context;
+    const Context = context;
 
-    _app.use((req, res, next) => {
+    app.use((req, res, next) => {
         _requestContext = new Context(req);
         next();
     });

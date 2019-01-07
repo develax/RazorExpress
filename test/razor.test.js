@@ -397,7 +397,6 @@ describe("Testing 'Razor' module.", () => {
 //////////////////
 // HELPERS
 
-const DefaultContext = require('../core/RazorContext');
 const razorOpts = { ext: 'raz' }
 
 function razor(model) {
