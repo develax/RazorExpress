@@ -3,9 +3,9 @@
 # Razor-Express API
 
 - [**For NodeJS Express web-server**](#for-express)
+  - [`setup`](#setup)
   - [`renderFile`](#renderFile)
   - [`__express`](#__express)
-  - [`register`](#register)
   - [`handleErrors`](#handleErrors)
   - [`debug`](#debug)
 - [**Direct rendering string templates to HTML**](#direct-rendering)
@@ -15,6 +15,19 @@ The Razor-Express module exports the following functions:
 
 <a name="for-express"></a>
 ## For NodeJS Express web-server
+
+<a name="setup"></a>
+### setup(app[, settings])
+* **app** `<express>` instance of the Express app
+* **settings** `<Object>` setup settings
+  * **register** `<boolean>` if it's `true` the method will register the RAZ engine so you won't have to do it via `app.set('view engine', 'raz')`
+  * **ext** <String> view template file extension, *default:* 'raz'
+
+Example:
+```JavaScript
+razor.setup(app, { register: true, ext: "html" });
+// ...
+```
 
 <a name="renderFile"></a>
 ### renderFile(filepath, options, done)
@@ -50,19 +63,6 @@ app.set('view engine', 'raz'); // register the RAZ template engine
 the [Express looks](https://expressjs.com/en/guide/using-template-engines.html) for the `__express()` method and calls it when a view template needs to be rendered. The `__express()` internally calls [`renderFile()`](#renderFile), so there is no difference between them except that the `__express()` function is intended to be used by the Express app *only*.
 
 <sup>(see [RazorExpressExample repository](https://github.com/DevelAx/RazorExpressExample))</sup>
-
-<a name="register"></a>
-### register(app, ext)
-* **app** `<express>` instance of the Express app
-* **ext** `<String>` view template file extension, *default:* 'raz'
-
-Registers the Razor-Express engine so you don't have to do it via `app.set('view engine', 'raz')`:
-```JavaScript
-const app = require('express')(); // the Express web server app
-const raz = require('raz'); // the Razor-Express engine 
-raz.register(app);  // register the RAZ template engine
-// ...
-```
 
 <a name="handleErrors"></a>
 ### handleErrors(app, errorCode)
