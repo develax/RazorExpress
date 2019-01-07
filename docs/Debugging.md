@@ -77,9 +77,9 @@ When you run this JavaScript code and open http://localhost:1337 in your browser
 
 ![Razor-Express plain error](https://github.com/DevelAx/RazorExpressErrors/blob/master/docs/error-handling/PlainError.jpg?raw=true)
 
-This is a standard error of `RazorError` type. However, in debug mode, you would most likely want to see something more informative. To get this you just need to register a default error handler. To fulfil your wish you just need to register the Razor default error handler. 
+This is a standard error of `RazorError` type. However, in debug mode, you would most likely want to see something more informative. To fulfil your wish you just need to activate the Razor-Express default error handler:
 ```JS
-// Add this line after the `app.get(...)` line of the JS code.
+// This line must appear after all others Express app request handlers and middlewares.
 raz.handleErrors(app);
 ```
 Now run the app again and refresh the browser page. You will see the same error in HTML format:
@@ -97,6 +97,7 @@ Where appropriate you can create your own error handler and attach it to the Exp
 
 Example:
 ```JS
+// This line must appear after all others Express app request handlers and middlewares.
 app.use(appErrorHandler);
 
 function appErrorHandler(err, req, res, next) {
