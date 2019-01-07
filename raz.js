@@ -453,7 +453,7 @@ class ParserErrorFactory {
     }
 
     sectionsAlreadyRendered(sectionName, renderedBy, attemptedBy) {
-        var message = `Sections named '${sectionName}' have already been rendered by '${renderedBy}'. There is an atempt to rendered it again by '${attemptedBy}'.`;
+        var message = `Sections named '${sectionName}' has already been rendered by '${renderedBy}'. There is an atempt to rendered it again by '${attemptedBy}'.`;
         return RazorError.new({ message, info: this.info, capture: this.sectionsAlreadyRendered });
     }
 
@@ -823,28 +823,39 @@ module.exports = require("./errors.en");
 'use strict';
 require('./utils');
 
-function compilePageSync(Html, Model, ViewData, debug) {
-    'use strict';
-
-    if (debug) {
-        let sandbox = Html._sandbox;
-        let vm = Html._vm;
-        sandbox.Html = Html;
-        sandbox.Model = Model;
-        sandbox.ViewData = ViewData;
-        vm.runInNewContext(Html._js, sandbox);
+function compilePageSync(html, model, viewData, context, isDebugMode) {
+    if (isDebugMode) {
+        let sandbox = html._sandbox;
+        let vm = html._vm;
+        defineConstant(sandbox, "Html", html);
+        defineConstant(sandbox, "Model", model);
+        defineConstant(sandbox, "ViewData", viewData);
+        defineConstant(sandbox, "Context", context);
+        defineConstant(sandbox, "debug", isDebugMode);
+        vm.runInNewContext(html._js, sandbox);
     }
     else {
+        const Html = html;
+        const Model = model;
+        const ViewData = viewData;
+        const Context = context;
+        const debug = isDebugMode;
+        html = model = viewData = context = isDebugMode = undefined;
         eval(Html._js);
     }
 
-    return;
+    function defineConstant(obj, name, value) {
+        Object.defineProperty(obj, name, {
+            value,
+            writable: false
+        });
+    }
 }
 
-function compilePage(Html, Model, ViewData, debug, done) {
+function compilePage(html, model, viewData, context, isDebugMode, done) {
     try {
-        compilePageSync(Html, Model, ViewData, debug);
-        return Html.__renderLayout(done);
+        compilePageSync(html, model, viewData, context, isDebugMode);
+        return html.__renderLayout(done);
     }
     catch (exc) {
         done(exc);
@@ -907,6 +918,7 @@ module.exports = function (opts) {
                 args.er.isLayout = false;
                 if (err) return done(err);
                 let compileOpt = {
+                    context: args.context,
                     template: result.data,
                     filePath: result.filePath,
                     model: args.model,
@@ -1003,6 +1015,7 @@ module.exports = function (opts) {
 
         this.getPartial = function (viewName, viewModel) {
             let compileOpt = {
+                context: args.context,
                 model: viewModel || args.model, // if is not set explicitly, set default (parent) model
                 findPartial: args.findPartial,
                 findPartialSync: args.findPartialSync,
@@ -1146,7 +1159,7 @@ Html.__dbg.pos = null;`;
                 return error(exc);
             }
 
-            compilePage(htmlObj, this.args.model, this.args.viewData, debugMode, (err, html) => {
+            compilePage(htmlObj, this.args.model, this.args.viewData, this.args.context, debugMode, (err, html) => {
                 if (err)
                     return error(err, htmlObj.__dbg);
 
@@ -1172,7 +1185,7 @@ Html.__dbg.pos = null;`;
                 log.debug();
                 var htmlArgs = {};
                 var html = this.getHtml(htmlArgs);
-                compilePageSync(html, this.args.model, this.args.viewData, debugMode);
+                compilePageSync(html, this.args.model, this.args.viewData, this.args.context, debugMode);
                 this.checkSections();
             }
             catch (exc) {

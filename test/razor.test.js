@@ -286,7 +286,7 @@ describe("Testing 'Razor' module.", () => {
                         expect(err).to.exist;
                         expectError2({
                             err, 
-                            errMes: `Sections named '${sectionName}' have already been rendered by '${filePath}'. There is an atempt to rendered it again by '${filePath}'.`,
+                            errMes: `Sections named '${sectionName}' has already been rendered by '${filePath}'. There is an atempt to rendered it again by '${filePath}'.`,
                         });
                         done();
                     });
@@ -397,11 +397,14 @@ describe("Testing 'Razor' module.", () => {
 //////////////////
 // HELPERS
 
+const DefaultContext = require('../core/RazorContext');
+const razorOpts = { ext: 'raz' }
+
 function razor(model) {
     if (model)
         Object.assign(locals, model);
 
-    return new Razor(locals);
+    return new Razor(locals, razorOpts);
 }
 
 function mockRazor(errorFileName, errCode, model) {
@@ -411,7 +414,7 @@ function mockRazor(errorFileName, errCode, model) {
     if (model)
         Object.assign(locals, model);
 
-    return new RazorError(locals);
+    return new RazorError(locals, razorOpts);
 }
 
 function joinViewPath(viewPath, viewName) {

@@ -6,9 +6,8 @@ module.exports = function (args) {
     const express = require('express');
     const app = express();
 
-    const razor = require("../index");
-    razor.register(app);
-    
+    const razor = require("../index")(app);
+    razor.register();
 
     var viewsPath = path.join(__dirname, args.views || '/views');
     app.set('views', viewsPath);
@@ -79,7 +78,7 @@ module.exports = function (args) {
     //    rs.render("./test/index", { message: "This is my first NodeJS Express View engine!" });
     //});
 
-    razor.handleErrors(app, 500);
+    razor.handleErrors(500);
     const port = process.env.PORT || 1337;
 
     return {

@@ -21,6 +21,10 @@
         <footer>
             <!--@Html.partial("_text", Model.message)-->
             <p>&copy; 2018 - @footer</p>
+            <div>
+                <span>Page URL:</span>
+                <strong id="url">@Context.requestUrl</strong>
+            </div>
         </footer>
     </div>
     @Html.section("scriptsAfter")

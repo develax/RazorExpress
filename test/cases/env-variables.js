@@ -43,52 +43,62 @@
             error: 'constant'
         },
         {
-            name: "case 5 - `this` should be `undefined`",
+            name: "case 5 - `Context` must not exist (when is running as a string template (not as a file template)",
+            template: '<span>@Context</span>',
+            expected: '<span></span>'
+        },
+        {
+            name: "case 5.1 - `Context` variable must be `constant`",
+            template: '@{ Context = {}; }',
+            error: 'constant'
+        },
+        {
+            name: "case 10 - `this` should be `undefined`",
             template: '<span>@this</span>',
             expected: '<span></span>'
         },
         {
-            name: "case 6 - `Html._js` should be `undefined`",
+            name: "case 11 - `Html._js` should be `undefined`",
             template: '<span>@Html._js</span>',
             expected: '<span></span>'
         },
         {
-            name: "case 7 - `Html._vm` should be `undefined`",
+            name: "case 12 - `Html._vm` should be `undefined`",
             template: '<span>@Html._vm</span>',
             expected: '<span></span>'
         },
         {
-            name: "case 8 - `Html._sandbox` should be `undefined`",
+            name: "case 13 - `Html._sandbox` should be `undefined`",
             template: '<span>@Html._sandbox</span>',
             expected: '<span></span>'
         },
         {
-            name: "case 9 - `global` object should be `undefined`",
+            name: "case 14 - `global` object should be `undefined`",
             template: '<span>@global</span>',
             expected: '<span></span>'
         },
         {
-            name: "case 10 - `window` object should be `undefined`",
+            name: "case 15 - `window` object should be `undefined`",
             template: '<span>@window</span>',
             expected: '<span></span>'
         },
         {
-            name: "case 11 - `module` object should be `undefined`",
+            name: "case 16 - `module` object should be `undefined`",
             template: '<span>@module</span>',
             expected: '<span></span>'
         },
         {
-            name: "case 12 - `compilePage` object should be `undefined`",
+            name: "case 17 - `compilePage` object should be `undefined`",
             template: '<span>@compilePage</span>',
             expected: '<span></span>'
         },
         {
-            name: "case 13 - `compilePageSync` object should be `undefined`",
+            name: "case 18 - `compilePageSync` object should be `undefined`",
             template: '<span>@compilePageSync</span>',
             expected: '<span></span>'
         },
         {
-            name: "case 14 - `Html._jshtml` should be `undefined`",
+            name: "case 19 - `Html._jshtml` should be `undefined`",
             template: '<span>@Html._jshtml</span>',
             expected: '<span></span>'
         }

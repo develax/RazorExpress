@@ -138,7 +138,7 @@ class ParserErrorFactory {
     }
 
     sectionsAlreadyRendered(sectionName, renderedBy, attemptedBy) {
-        var message = `Sections named '${sectionName}' have already been rendered by '${renderedBy}'. There is an atempt to rendered it again by '${attemptedBy}'.`;
+        var message = `Sections named '${sectionName}' has already been rendered by '${renderedBy}'. There is an atempt to rendered it again by '${attemptedBy}'.`;
         return RazorError.new({ message, info: this.info, capture: this.sectionsAlreadyRendered });
     }
 

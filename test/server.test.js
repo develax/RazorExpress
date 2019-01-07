@@ -101,6 +101,9 @@ describe("server routes", () => {
                     expect(partial1.attr('id'), '#partial_1').to.be.equal('partial_1');
                     let partial2 = partial1.next();
                     expect(partial2.attr('id'), '#partial_2').to.be.equal('partial_2');
+                    let url = $('#url');
+                    expect(url, "site URL container must exist").to.have.lengthOf(1);
+                    expect(url.text()).to.startsWith("http://127.0.0.1:");
 
                     for (var i = 0; i < layouts.length; i++) {
                         let layout = layouts[i];
