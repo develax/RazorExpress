@@ -26,7 +26,6 @@ if (raz.debug) { /* logging */ }
 ```
 **3.** Directly via the global `process` object:
 ```JS
-const raz = require("raz");
 if (process.env.NODE_ENV !== "production") { /* logging */ }
 ```
 **4.** Or if you want to check it in a view template with Razor-Express syntax you can use the `debug` boolean constant:
@@ -53,8 +52,6 @@ Let's consider a minimum example of the Express web-server application which tri
 **Express web-server:**
 ```JS
 const app = require("express")();
-const raz = require("raz");
-
 app.set('view engine', "raz");
 
 app.get('/', (req, res) => {

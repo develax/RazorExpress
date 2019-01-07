@@ -184,7 +184,7 @@ const template = `
 
 ```JS
 // This code is meant for Node.js 
-const razor = require("raz");
+const razor = require("raz")();
 var html = razor.render({ model, template });
 ```
 
@@ -222,11 +222,13 @@ Express web-server example
 ```js
 // Create Express web server app.
 const app = require('express')();
-
-// Register 'Razor-Express' template engine.
-// 'Express' will automatically find the Razor-Express module (within the `node-modules` folder) using this extension. 
+// Register 'Razor' template engine and the default extesnion for the view-template files.
+// 'Express' will automatically find the Razor module (within the `node-modules` folder) using this extension. 
 // If you decide to skip registering the engine then you will have to explicitly specify the file extension in the route handler.
 app.set('view engine', "raz");
+// There is an alternative way to register Razor-Express engine (see more in Razor-Express API docs):
+//const raz = require('raz')(app);
+//raz.register();
 
 // Create the route for the "Index.raz" view-template.
 // Note that we do not specify the file extension explicitly in this route because we already did it when registering the engine.
