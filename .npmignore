@@ -14,3 +14,4 @@ bin/
 .npmignore
 docs/
 test/
+raz.js
