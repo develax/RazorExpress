@@ -14,7 +14,8 @@ module.exports = {
     renderFile,
     render: getParser().compileSync,
     handleErrors,
-    debug: isDebugMode()
+    debug: isDebugMode(),
+    DefaultContext
 }
 
 function setup(app, settings) {
