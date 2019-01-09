@@ -1,7 +1,7 @@
 # RAZ: Razor-Express view template engine for NodeJS
 
 <p align="center">
-    <a href="https://travis-ci.org/DevelAx/RazorExpress"><img src="https://travis-ci.org/DevelAx/RazorExpress.svg?branch=master&style=plastic&logo=appveyor" alt="Build Status" /></a>
+    <a href="https://travis-ci.org/DevelAx/RazorExpress"><img src="https://img.shields.io/travis/DevelAx/RazorExpress.svg?style=plastic" alt="Build Status" /></a>
 </p>
 
 > <pre>$ npm install <b>raz</b> --save</pre>
