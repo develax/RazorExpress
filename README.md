@@ -190,7 +190,7 @@ const template = `
 
 ```JS
 // This code is meant for Node.js 
-const razor = require("raz")();
+const razor = require("raz");
 var html = razor.render({ model, template });
 ```
 
@@ -234,7 +234,7 @@ const app = require('express')();
 app.set('view engine', "raz");
 // There is an alternative way to register Razor-Express engine (see more in Razor-Express API docs):
 //const raz = require('raz');
-//razor.setup(app, { register: true });
+//raz.register(app);
 
 // Create the route for the "Index.raz" view-template.
 // Note that we do not specify the file extension explicitly in this route because we already did it when registering the engine.
@@ -324,7 +324,7 @@ const template = `
 }
 </ul>`;
 
-const razor = require("raz")
+const razor = require("raz");
 
 try{
     var html = razor.render({ template });
