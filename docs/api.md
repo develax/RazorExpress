@@ -16,16 +16,15 @@ The Razor-Express module exports the following functions:
 <a name="for-express"></a>
 ## For NodeJS Express web-server
 
-<a name="setup"></a>
-### setup(app[, settings])
+<a name="register"></a>
+### register(app, ext)
 * **app** `<express>` instance of the Express app
-* **settings** `<Object>` setup settings
-  * **register** `<boolean>` if it's `true` the method will register the RAZ engine so you won't have to do it via `app.set('view engine', 'raz')`
-  * **ext** <String> view template file extension, *default:* 'raz'
+* **ext** <String> view template file extension, *default:* 'raz'
 
 Example:
 ```JavaScript
-razor.setup(app, { register: true, ext: "html" });
+const raz = require('raz');
+raz.register(app);
 // ...
 ```
 
