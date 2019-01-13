@@ -3,7 +3,7 @@
 # Razor-Express API
 
 - [**For NodeJS Express web-server**](#for-express)
-  - [`setup`](#setup)
+  - [`register`](#register)
   - [`renderFile`](#renderFile)
   - [`__express`](#__express)
   - [`handleErrors`](#handleErrors)
