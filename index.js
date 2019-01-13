@@ -9,7 +9,7 @@ var settings = { ext: 'raz' };
 module.exports = {
     __express: renderFile,
     set ext(val){
-        settings.ext = val;
+        settings.ext = val || settings.ext;
     },
     register,
     renderFile,
@@ -18,7 +18,6 @@ module.exports = {
     debug: isDebugMode(),
     HtmlString
 }
-
 
 function register(app, ext) {
     settings.ext = ext = settings.ext || ext;
