@@ -3,7 +3,6 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <base href="@Context.requestUrl" />
 </head>
 <body style="background-color: blue;">
     <div class="container body-content">

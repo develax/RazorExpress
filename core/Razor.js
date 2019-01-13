@@ -29,7 +29,6 @@ module.exports = class Razor {
     constructor(options, razorOpts) {
         this.options = options;
         this.ext = options.settings['view engine'] || razorOpts.ext;
-        this.context = razorOpts.context;
         this.env = options.settings.env;
         const debug = dbg.isDebugMode(this.env);
         const log = require('./dbg/logger')({ on: debug && allowLoggingInDebugModel });
@@ -61,7 +60,6 @@ module.exports = class Razor {
                     return done(err);
 
                 let parserArgs = {
-                    context: this.context,
                     filePath: filepath,
                     template: viewStartsJsHtml + jsHtml,
                     model: this.options,

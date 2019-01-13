@@ -2,49 +2,33 @@
 
 const dbg = require('./core/dbg/debugger');
 const Razor = require('./core/Razor');
-const DefaultContext = require('./core/RazorContext');
-var razor, parser, _requestContext;
-var isSetUp = false;
-var _settings = { ext: 'raz', context: DefaultContext };
+var parser;
+var settings = { ext: 'raz' };
 
 module.exports = {
     __express: renderFile,
-    setup,
-    initContext,
+    set ext(val){
+        settings.ext = val;
+    },
+    register,
     renderFile,
     render: getParser().compileSync,
     handleErrors,
-    debug: isDebugMode(),
-    DefaultContext
+    debug: isDebugMode()
 }
 
-function setup(app, settings) {
-    if (isSetUp)
-        throw new Error('The RAZ app has been setup already.');
-
-    _settings = Object.assign(_settings, settings);
-
-    if (_settings.context)
-        initContext(app, _settings.context);
-
-    if (_settings.register || _settings.ext !== "raz")
-        register(app, _settings.ext)
-}
 
 function register(app, ext) {
+    settings.ext = ext = settings.ext || ext;
     app.engine(ext, renderFile);
     app.set('view engine', ext);
 }
 
 function renderFile(filepath, options, done) {
-    const razorOpts = { ext: _settings.ext, context: _requestContext }
-
-    if (!razor)
-        razor = new Razor(options, razorOpts);
-
+    const razorOpts = { ext: settings.ext };
+    const razor = new Razor(options, razorOpts);
     razor.renderFile(filepath, done);
 }
-
 
 function getParser() {
     if (!parser) {
@@ -78,13 +62,4 @@ function isDebugMode() {
 
 function getEnv() {
     return process && process.env.NODE_ENV;
-}
-
-function initContext(app, context) {
-    const Context = context;
-
-    app.use((req, res, next) => {
-        _requestContext = new Context(req);
-        next();
-    });
 }

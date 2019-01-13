@@ -1,5 +1,14 @@
 //'use strict';
 
+class MyScope {
+    constructor() {
+        this.scopeTestFunc = function (val) {
+            return val;
+        }
+        this.scopeValue = "MY-SCOPE";
+    }
+}
+
 module.exports = function (args) {
     args = args || {};
     const path = require('path');
@@ -7,7 +16,7 @@ module.exports = function (args) {
     const app = express();
 
     const razor = require("../index");
-    razor.setup(app, { register: true });
+    razor.register(app);
 
     var viewsPath = path.join(__dirname, args.views || '/views');
     app.set('views', viewsPath);
@@ -23,30 +32,38 @@ module.exports = function (args) {
     // const raz = require("../index-browser");
     // var result = raz.compile("<div>@Model</div>", 5);
 
-    var logger = function(req, res, next) {
+    var logger = function (req, res, next) {
         console.log("request url: " + req.url);
         next(); // Passing the request to the next handler in the stack.
     }
 
+    function scope(req, res, next) {
+        res.locals.$ = new MyScope();
+        next();
+    }
+
     app.use(logger);
     var jsStatic = express.static(".");
-    app.use("/js", jsStatic);
-    
+    app.use("/js", jsStatic).use(scope);
+
+    app.get("/favicon.ico", (req, res)=>{
+        res.status("404").send("Not found.");
+    })
 
     app.get('/', (rq, rs) => {
         rs.render("./home/index", { message: "This is my first NodeJS Express View engine!" });
     });
 
     app.get('/invalid', (rq, rs) => {
-        rs.render("./home/invalid", { message: "This is my first NodeJS Express View engine!" });
+        rs.render("./home/invalid", { message: "This is an error page." });
     });
 
     app.get('/hidden', (rq, rs) => {
-        rs.render("./home/hidden", { message: "This is my first NodeJS Express View engine!" });
+        rs.render("./home/hidden", { message: "This is a hidden page." });
     });
 
     app.get('/browser', (rq, rs) => {
-        rs.render("./home/browser", { message: "This is my first NodeJS Express View engine!" });
+        rs.render("./home/browser", { message: "This is a browser page." });
     });
 
     app.get('/browser-error', (rq, rs) => {

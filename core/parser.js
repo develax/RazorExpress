@@ -1,25 +1,40 @@
 'use strict';
 require('./utils');
 
-function compilePageSync(html, model, viewData, context, isDebugMode) {
+function compilePageSync(html, model, viewData, scope, isDebugMode) {
     if (isDebugMode) {
         let sandbox = html._sandbox;
         let vm = html._vm;
+
+        // Creates cope variables.
+        if (scope) {
+            Object.keys(scope).forEach((k) => {
+                defineConstant(sandbox, k, scope[k]);
+            });
+        }
+
         defineConstant(sandbox, "Html", html);
         defineConstant(sandbox, "Model", model);
         defineConstant(sandbox, "ViewData", viewData);
-        defineConstant(sandbox, "Context", context);
         defineConstant(sandbox, "debug", isDebugMode);
         vm.runInNewContext(html._js, sandbox);
     }
     else {
-        const Html = html;
-        const Model = model;
-        const ViewData = viewData;
-        const Context = context;
-        const debug = isDebugMode;
-        html = model = viewData = context = isDebugMode = undefined;
-        eval(Html._js);
+        const argNames = ["Html", "Model", "ViewData", "debug"];
+        const argValues = [html, model, viewData, isDebugMode];
+
+        if (scope) {
+            // Add cope variables (we should but can't make them constants because of `eval` limitation in sctict-mode).
+            Object.keys(scope).forEach((k) => {
+                argNames.push(k);
+                argValues.push(scope[k]);
+            });
+        }
+
+        // Put the JS-scipt to be executed.
+        argNames.push(html._js);
+        // Execute JS-script via function with arguments.
+        Function.apply(undefined, argNames).apply(undefined, argValues);
     }
 
     function defineConstant(obj, name, value) {
@@ -30,9 +45,9 @@ function compilePageSync(html, model, viewData, context, isDebugMode) {
     }
 }
 
-function compilePage(html, model, viewData, context, isDebugMode, done) {
+function compilePage(html, model, viewData, scope, isDebugMode, done) {
     try {
-        compilePageSync(html, model, viewData, context, isDebugMode);
+        compilePageSync(html, model, viewData, scope, isDebugMode);
         return html.__renderLayout(done);
     }
     catch (exc) {
@@ -62,10 +77,11 @@ module.exports = function (opts) {
             vm.createContext(this._sandbox);
         }
 
+
         // function (process,...){...}() prevents [this] to exist for the 'vm.runInNewContext()' method
         this._js = `
+        'use strict';
 (function (process, window, global, module, compilePage, compilePageSync, undefined) { 
-    'use strict';
     delete Html._js;
     delete Html._vm;
     delete Html._sandbox;
@@ -96,7 +112,7 @@ module.exports = function (opts) {
                 args.er.isLayout = false;
                 if (err) return done(err);
                 let compileOpt = {
-                    context: args.context,
+                    scope: args.scope,
                     template: result.data,
                     filePath: result.filePath,
                     model: args.model,
@@ -193,7 +209,7 @@ module.exports = function (opts) {
 
         this.getPartial = function (viewName, viewModel) {
             let compileOpt = {
-                context: args.context,
+                scope: args.scope,
                 model: viewModel || args.model, // if is not set explicitly, set default (parent) model
                 findPartial: args.findPartial,
                 findPartialSync: args.findPartialSync,
@@ -311,7 +327,6 @@ Html.__dbg.pos = null;`;
     //const _functionKeyword = "function";
     const blockType = { none: 0, html: 1, code: 2, expr: 3, section: 4 };
 
-    const RazorError = require('./errors/RazorError');
     const ErrorsFactory = require('./errors/errors');
     const voidTags = "area|base|br|col|embed|hr|img|input|link|meta|param|source|track|wbr".toUpperCase().split("|").map(s => s.trim());
 
@@ -337,7 +352,7 @@ Html.__dbg.pos = null;`;
                 return error(exc);
             }
 
-            compilePage(htmlObj, this.args.model, this.args.viewData, this.args.context, debugMode, (err, html) => {
+            compilePage(htmlObj, this.args.model, this.args.viewData, this.args.scope, debugMode, (err, html) => {
                 if (err)
                     return error(err, htmlObj.__dbg);
 
@@ -363,7 +378,7 @@ Html.__dbg.pos = null;`;
                 log.debug();
                 var htmlArgs = {};
                 var html = this.getHtml(htmlArgs);
-                compilePageSync(html, this.args.model, this.args.viewData, this.args.context, debugMode);
+                compilePageSync(html, this.args.model, this.args.viewData, this.args.scope, debugMode);
                 this.checkSections();
             }
             catch (exc) {
@@ -376,6 +391,15 @@ Html.__dbg.pos = null;`;
 
         getHtml(htmlArgs) {
             log.debug(this.args.filePath);
+
+            // extract scope..
+            var model = this.args.model;
+
+            if (model && model.$) {
+                this.args.scope = model.$;
+                delete model.$;
+            }
+
             this.args.parsedSections = this.args.parsedSections || {};
             this.args.viewData = this.args.viewData || this.args.ViewData || {};
             this.args.partialsCache = this.args.partialsCache || {};
@@ -1466,10 +1490,7 @@ Html.__dbg.pos = null;`;
                 err.stack = err.stack.substring(pos + 1);
         }
 
-        // Is not "born" as RazorError.
-        let isNotRazorError = !err.__dbg && !err.isRazorError;
-
-        if (isNotRazorError || err.__dbg && err.__dbg.viewName !== (err.data && err.data.filename))
+        if (debugMode && !err.isRazorError || err.__dbg && err.__dbg.viewName !== (err.data && err.data.filename))
             errorFactory.extendError(err);
 
         return err;

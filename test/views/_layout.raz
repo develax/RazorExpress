@@ -17,13 +17,14 @@
         </div>
         <div class="shared-data">@ViewData.test</div>
         @Html.body()
+        <strong class="model-message">@Model.message</strong>
         <hr />
         <footer>
             <!--@Html.partial("_text", Model.message)-->
             <p>&copy; 2018 - @footer</p>
             <div>
-                <span>Page URL:</span>
-                <strong id="url">@Context.requestUrl</strong>
+                <span>Scope:</span>
+                <strong id="scope">@scopeTestFunc(scopeValue)</strong>
             </div>
         </footer>
     </div>

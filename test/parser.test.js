@@ -70,7 +70,7 @@
         });
     });
 
-    describe("MODEL & EXPRESSION CASES", () => {
+    describe("MODEL & SCOPE & EXPRESSION CASES", () => {
         describe("VALID MODELS", () => {
             let cases = require('./cases/model');
 
@@ -91,6 +91,18 @@
                 it(c.name, () => {
                     let result = () => parser.compileSync({ template: c.template, filePath: c.name });
                     expect(result).to.throw(c.error);
+                });
+            }
+        });
+
+        describe("SCOPES", () => {
+            let cases = require('./cases/scope');
+
+            for (let i = 0; i < cases.length; i++) {
+                let c = cases[i];
+                it(c.name, () => {
+                    let result = parser.compileSync({ template: c.template, model: c.model, filePath: c.name });
+                    expect(c.expected).to.equal(result);
                 });
             }
         });

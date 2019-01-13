@@ -94,6 +94,7 @@ describe("server routes", () => {
                     expect(layouts, "layouts count").to.have.lengthOf(layoutNames.length);
                     let sharedTests = $('div.shared-data:contains("Test shared object.")');
                     expect(sharedTests, "views shared data test").to.have.lengthOf(3);
+                    assertModelMessage($, "This is my first NodeJS Express View engine!");
                     // Check rendering partials from section with different path styles (they should be siblings).
                     let sectionTest = $('#section-test');
                     expect(sectionTest, '#section-test').to.have.lengthOf(1);
@@ -101,9 +102,9 @@ describe("server routes", () => {
                     expect(partial1.attr('id'), '#partial_1').to.be.equal('partial_1');
                     let partial2 = partial1.next();
                     expect(partial2.attr('id'), '#partial_2').to.be.equal('partial_2');
-                    let url = $('#url');
+                    let url = $('#scope');
                     expect(url, "site URL container must exist").to.have.lengthOf(1);
-                    expect(url.text()).to.startsWith("http://127.0.0.1:");
+                    expect(url.text()).to.startsWith("MY-SCOPE");
 
                     for (var i = 0; i < layouts.length; i++) {
                         let layout = layouts[i];
@@ -126,6 +127,7 @@ describe("server routes", () => {
                     expect(res).to.have.status(200);
                     let layoutNames = ['_layout', '_layoutHidden', '_layoutOrange'];
                     let $ = jQuery(res.text);
+                    assertModelMessage($, "This is a hidden page.");
                     let layouts = $(`div > strong:contains('${layoutNames[0]}')`);
                     expect(layouts, "layouts count").to.have.lengthOf(layoutNames.length);
 
@@ -228,11 +230,14 @@ describe("server routes", () => {
                             let h1 = $('h1');
                             expect(h1.length).to.be.equal(1);
                             expect(h1.text()).to.have.string("RAZ browser dynamic test");
+                            assertModelMessage($, "This is a browser page.");
                             console.log(`> testing rote  ${route} is done`);
                             done();
                         }, 1000);
                     },
-                        err => done(err));
+                        err => {
+                            done(err.message.substr(0, 200))
+                        });
             });
         });
 
@@ -256,9 +261,9 @@ describe("server routes", () => {
                                 done();
                             }, 1000);
                         },
-                        err => {
-                            done(err);
-                        });
+                            err => {
+                                done(err.message.substr(0, 200));
+                            });
                 });
             });
         }
@@ -295,4 +300,8 @@ function assertSourceViews($, viewNames, lastViewNameErrorToken) {
 
     let errorText = $(errorViews[errorViews.length - 1]).find('.source-error').text();
     expect(lastViewNameErrorToken).equal(errorText);
+}
+function assertModelMessage($, expectedText) {
+    var modelMessage = $(".model-message").text();
+    expect(modelMessage, "model message").to.have.string(expectedText);
 }

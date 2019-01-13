@@ -1,8 +1,8 @@
 const path = require('path');
 const app = require('express')();
 
-const razor = require("../index")(app);
-razor.register();
+const razor = require("../index");
+razor.register(app);
 
 var viewsPath = path.join(__dirname, '/views.draft');
 app.set('views', viewsPath);
