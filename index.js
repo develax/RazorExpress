@@ -2,6 +2,7 @@
 
 const dbg = require('./core/dbg/debugger');
 const Razor = require('./core/Razor');
+const HtmlString = require('./core/HtmlString');
 var parser;
 var settings = { ext: 'raz' };
 
@@ -14,7 +15,8 @@ module.exports = {
     renderFile,
     render: getParser().compileSync,
     handleErrors,
-    debug: isDebugMode()
+    debug: isDebugMode(),
+    HtmlString
 }
 
 
