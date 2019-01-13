@@ -21,7 +21,6 @@ The Razor-Express module exports the following functions:
 * **app** `<express>` instance of the Express app
 * **ext** <String> view template file extension, *default:* 'raz'
 
-Example:
 ```JavaScript
 const raz = require('raz');
 raz.register(app);
