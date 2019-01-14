@@ -2,10 +2,10 @@
 require('./utils');
 
 function compilePageSync(html, model, viewData, scope, isDebugMode) {
-    if (isDebugMode) {
-        let sandbox = html._sandbox;
-        let vm = html._vm;
+    let vm = html._vm;
 
+    if (vm) {
+        let sandbox = html._sandbox;
         // Creates cope variables.
         if (scope) {
             Object.keys(scope).forEach((k) => {
@@ -57,7 +57,9 @@ function compilePage(html, model, viewData, scope, isDebugMode, done) {
 
 module.exports = function (opts) {
     opts = opts || {};
-    const debugMode = opts.debug;
+    const dbg = require('../core/dbg/debugger');
+    const debugMode = dbg.isDebugMode;
+    const isBrowser = dbg.isBrowser;
     const log = opts.log || { debug: () => { } };
     log.debug(`Parse debug mode is '${!!debugMode}'.`);
 
@@ -72,11 +74,10 @@ module.exports = function (opts) {
         // Non-user section.
         this._vm = vm;
 
-        if (debugMode) {
+        if (debugMode && !isBrowser) {
             this._sandbox = Object.create(null);
             vm.createContext(this._sandbox);
         }
-
 
         // function (process,...){...}() prevents [this] to exist for the 'vm.runInNewContext()' method
         this._js = `
@@ -1490,7 +1491,7 @@ Html.__dbg.pos = null;`;
                 err.stack = err.stack.substring(pos + 1);
         }
 
-        if (debugMode && !err.isRazorError || err.__dbg && err.__dbg.viewName !== (err.data && err.data.filename))
+        if (!err.isRazorError || (err.__dbg && err.__dbg.viewName !== (err.data && err.data.filename)))
             errorFactory.extendError(err);
 
         return err;

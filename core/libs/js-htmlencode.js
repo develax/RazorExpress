@@ -10,10 +10,6 @@
 (function () {
     'use strict';
   
-    const isBrowser = typeof window !== 'undefined';
-    var root = isBrowser ? window : global;
-    var AMD = typeof define === 'function' && define.amd;
-  
     var HTML_ENTITIES = {
       '&nbsp;' : '\u00A0',
       '&iexcl;' : '\u00A1',

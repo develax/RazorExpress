@@ -6,6 +6,7 @@
     <script type="text/javascript">
         var browser = document.getElementById("browser");
         browser.style.backgroundColor = "white";
+        raz.debug = true;
         browser.innerHTML = raz.render("<h1>@@Model</h1>", "RAZ browser dynamic test");
     </script>
 }

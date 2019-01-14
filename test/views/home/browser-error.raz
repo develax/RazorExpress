@@ -26,6 +26,7 @@
     <div>@@Model.days[i]</span>
 }
 </div>`;
+        raz.debug = true;
         // https://developer.mozilla.org/en-US/docs/Web/API/Element/insertAdjacentHTML
         browser.insertAdjacentHTML('afterbegin', raz.render(template, model));
     </script>

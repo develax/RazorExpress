@@ -1,12 +1,5 @@
 const htmlEncode = require('../libs/js-htmlencode');
 
-/////////////////////////////////////////////////////////////////////////
-// https://gist.github.com/slavafomin/b164e3e710a6fc9352c934b9073e7216
-// https://rclayton.silvrback.com/custom-errors-in-node-js
-/////////////////////////////////////////////////////////////////////////
-
-// const regex = /.*Error:/;
-
 class RazorError extends Error {
     constructor(message, captureFrame) {
         super(message);
@@ -22,7 +15,22 @@ class RazorError extends Error {
     }
 
     static extend(exc, args) {
+        const { isDebugMode, isBrowser } = require('../dbg/debugger');
         exc.isRazorError = true;
+
+        if (!isDebugMode)
+        {
+            exc.html = () => {
+                const errorRefUrl = (isBrowser) ? "https://www.npmjs.com/package/razjs#example-2-handling-and-displaying-errors" : "https://github.com/DevelAx/RazorExpress/blob/master/docs/Debugging.md#production--development-modes";
+                const error = `Razor template compilation error occured.<br/>Turn <a href="${errorRefUrl}" target="_blank">DEBUG MODE</a> on to get details.`;
+                
+                if (isBrowser)
+                    return `<div style="color: red;">${htmlEncode(exc.message)}</div><hr/>${error}`;
+                else
+                    return error;
+            }
+            return;
+        }
 
         if (exc.data) {
             var oldData = exc.data;

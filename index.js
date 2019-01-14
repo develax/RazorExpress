@@ -1,6 +1,7 @@
 'use strict';
 
 const dbg = require('./core/dbg/debugger');
+dbg.isDebugMode = isDebugMode();
 const Razor = require('./core/Razor');
 const HtmlString = require('./core/HtmlString');
 var parser;
@@ -15,7 +16,7 @@ module.exports = {
     renderFile,
     render: getParser().compileSync,
     handleErrors,
-    debug: isDebugMode(),
+    debug: dbg.isDebugMode,
     HtmlString
 }
 
@@ -46,7 +47,7 @@ function handleErrors(app, errorCode) {
         if (res.headersSent)
             return next(err); // must
 
-        if (isDebugMode() && err.isRazorError) {
+        if (dbg.isDebugMode && err.isRazorError) {
             var errorHtml = err.html();
             res.status(errorCode || 500);
             res.send(errorHtml);
@@ -58,7 +59,7 @@ function handleErrors(app, errorCode) {
 }
 
 function isDebugMode() {
-    return dbg.isDebugMode(getEnv());
+    return getEnv() !== "production"
 }
 
 function getEnv() {

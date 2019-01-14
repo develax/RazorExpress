@@ -1,9 +1,16 @@
-// Version: 1.0.0
+'use strict';
 
-const parser = require('./parser')();
+window.raz = {
+    set debug(value) {
+        require('../core/dbg/debugger').isDebugMode = value;
+    },
+    get debug(){
+        return require('../core/dbg/debugger').isDebugMode;
+    },
+    render(template, model) {
+        if (!this.parser)
+            this.parser = require('./parser')();
 
-raz = {
-    render: (template, model) => {
-        return parser.compileSync(template, model);
+        return this.parser.compileSync(template, model);
     }
 }

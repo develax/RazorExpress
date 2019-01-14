@@ -1,5 +1,4 @@
 module.exports = {
-    isDebugMode(env){
-        return env !== "production";
-    }
+    isDebugMode: false,
+    isBrowser: (typeof window !== 'undefined')
 }

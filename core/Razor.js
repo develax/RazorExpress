@@ -30,10 +30,10 @@ module.exports = class Razor {
         this.options = options;
         this.ext = options.settings['view engine'] || razorOpts.ext;
         this.env = options.settings.env;
-        const debug = dbg.isDebugMode(this.env);
+        const debug = dbg.isDebugMode;
         const log = require('./dbg/logger')({ on: debug && allowLoggingInDebugModel });
         const vm = debug ? require('vm') : null;
-        this.parser = initParser({ debug, express: true, dbg, log, vm });
+        this.parser = initParser({ express: true, dbg, log, vm });
         this.viewsDir = path.normalize(this.options.settings.views);
     }
 
@@ -255,7 +255,7 @@ module.exports = class Razor {
         data = data.toString();
         let endNL = (data[data.length - 1] === '\n') ? '' : '\n';
 
-        if (dbg.isDebugMode(this.env))
+        if (dbg.isDebugMode)
             return this.wrapInHtmlComment(filename) + EOL + data + endNL;
 
         return data + endNL;

@@ -9,24 +9,29 @@ module.exports = class HtmlString {
     }
 }
 },{}],2:[function(require,module,exports){
-// Version: 1.0.0
+'use strict';
 
-const parser = require('./parser')();
+window.raz = {
+    set debug(value) {
+        require('../core/dbg/debugger').isDebugMode = value;
+    },
+    get debug(){
+        return require('../core/dbg/debugger').isDebugMode;
+    },
+    render(template, model) {
+        if (!this.parser)
+            this.parser = require('./parser')();
 
-raz = {
-    render: (template, model) => {
-        return parser.compileSync(template, model);
+        return this.parser.compileSync(template, model);
     }
 }
-},{"./parser":7}],3:[function(require,module,exports){
+},{"../core/dbg/debugger":3,"./parser":8}],3:[function(require,module,exports){
+module.exports = {
+    isDebugMode: false,
+    isBrowser: (typeof window !== 'undefined')
+}
+},{}],4:[function(require,module,exports){
 const htmlEncode = require('../libs/js-htmlencode');
-
-/////////////////////////////////////////////////////////////////////////
-// https://gist.github.com/slavafomin/b164e3e710a6fc9352c934b9073e7216
-// https://rclayton.silvrback.com/custom-errors-in-node-js
-/////////////////////////////////////////////////////////////////////////
-
-// const regex = /.*Error:/;
 
 class RazorError extends Error {
     constructor(message, captureFrame) {
@@ -43,7 +48,22 @@ class RazorError extends Error {
     }
 
     static extend(exc, args) {
+        const { isDebugMode, isBrowser } = require('../dbg/debugger');
         exc.isRazorError = true;
+
+        if (!isDebugMode)
+        {
+            exc.html = () => {
+                const errorRefUrl = (isBrowser) ? "https://www.npmjs.com/package/razjs#example-2-handling-and-displaying-errors" : "https://github.com/DevelAx/RazorExpress/blob/master/docs/Debugging.md#production--development-modes";
+                const error = `Razor template compilation error occured.<br/>Turn <a href="${errorRefUrl}" target="_blank">DEBUG MODE</a> on to get details.`;
+                
+                if (isBrowser)
+                    return `<div style="color: red;">${htmlEncode(exc.message)}</div><hr/>${error}`;
+                else
+                    return error;
+            }
+            return;
+        }
 
         if (exc.data) {
             var oldData = exc.data;
@@ -312,7 +332,7 @@ function dataToHtml(data, mainInfo) {
 
 //     return result;
 // }
-},{"../libs/js-htmlencode":6}],4:[function(require,module,exports){
+},{"../dbg/debugger":3,"../libs/js-htmlencode":7}],5:[function(require,module,exports){
 const RazorError = require('./RazorError');
 
 class ParserErrorFactory {
@@ -510,10 +530,9 @@ function setInnerError(parserError, error) {
 
 
 module.exports = ParserErrorFactory;
-},{"./RazorError":3}],5:[function(require,module,exports){
+},{"./RazorError":4}],6:[function(require,module,exports){
 module.exports = require("./errors.en");
-},{"./errors.en":4}],6:[function(require,module,exports){
-(function (global){
+},{"./errors.en":5}],7:[function(require,module,exports){
 /**
  * [js-htmlencode]{@link https://github.com/emn178/js-htmlencode}
  *
@@ -525,10 +544,6 @@ module.exports = require("./errors.en");
 /*jslint bitwise: true */
 (function () {
     'use strict';
-  
-    const isBrowser = typeof window !== 'undefined';
-    var root = isBrowser ? window : global;
-    var AMD = typeof define === 'function' && define.amd;
   
     var HTML_ENTITIES = {
       '&nbsp;' : '\u00A0',
@@ -818,16 +833,15 @@ module.exports = require("./errors.en");
     htmlEncode.htmlDecode = htmlDecode;
   })();
   
-}).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{}],7:[function(require,module,exports){
+},{}],8:[function(require,module,exports){
 'use strict';
 require('./utils');
 
 function compilePageSync(html, model, viewData, scope, isDebugMode) {
-    if (isDebugMode) {
-        let sandbox = html._sandbox;
-        let vm = html._vm;
+    let vm = html._vm;
 
+    if (vm) {
+        let sandbox = html._sandbox;
         // Creates cope variables.
         if (scope) {
             Object.keys(scope).forEach((k) => {
@@ -879,7 +893,9 @@ function compilePage(html, model, viewData, scope, isDebugMode, done) {
 
 module.exports = function (opts) {
     opts = opts || {};
-    const debugMode = opts.debug;
+    const dbg = require('../core/dbg/debugger');
+    const debugMode = dbg.isDebugMode;
+    const isBrowser = dbg.isBrowser;
     const log = opts.log || { debug: () => { } };
     log.debug(`Parse debug mode is '${!!debugMode}'.`);
 
@@ -894,11 +910,10 @@ module.exports = function (opts) {
         // Non-user section.
         this._vm = vm;
 
-        if (debugMode) {
+        if (debugMode && !isBrowser) {
             this._sandbox = Object.create(null);
             vm.createContext(this._sandbox);
         }
-
 
         // function (process,...){...}() prevents [this] to exist for the 'vm.runInNewContext()' method
         this._js = `
@@ -2312,7 +2327,7 @@ Html.__dbg.pos = null;`;
                 err.stack = err.stack.substring(pos + 1);
         }
 
-        if (debugMode && !err.isRazorError || err.__dbg && err.__dbg.viewName !== (err.data && err.data.filename))
+        if (!err.isRazorError || (err.__dbg && err.__dbg.viewName !== (err.data && err.data.filename)))
             errorFactory.extendError(err);
 
         return err;
@@ -2351,7 +2366,7 @@ Html.__dbg.pos = null;`;
 
 }; // module.export
 
-},{"./HtmlString":1,"./errors/errors":5,"./libs/js-htmlencode":6,"./utils":8}],8:[function(require,module,exports){
+},{"../core/dbg/debugger":3,"./HtmlString":1,"./errors/errors":6,"./libs/js-htmlencode":7,"./utils":9}],9:[function(require,module,exports){
 (function (global){
 ////////////////////////////////////////////////
 // String
