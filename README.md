@@ -1,4 +1,4 @@
-# Razor-Express view template engine for NodeJS (RAZ)
+# Razor-Express (RAZ): a view template engine for NodeJS/ExpressJS web servers
 
 <p align="center">
     <a href="https://travis-ci.org/DevelAx/RazorExpress" target="_blank"><img src="https://img.shields.io/travis/DevelAx/RazorExpress.svg?style=plastic" alt="Build Status" /></a>
