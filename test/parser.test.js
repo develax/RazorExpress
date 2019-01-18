@@ -117,7 +117,7 @@
                 it(c.name, () => {
                     if (typeof c.expected !== 'undefined') {
                         let result = parser.compileSync({ template: c.template, model: c.model, filePath: c.name });
-                        expect(c.expected).to.equal(result);
+                        expect(result).to.be.equal(c.expected);
                     }
                     else {
                         let result = () => parser.compileSync({ template: c.template, filePath: c.name });
