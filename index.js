@@ -9,8 +9,20 @@ var settings = { ext: 'raz' };
 
 module.exports = {
     __express: renderFile,
-    set ext(val){
+    set ext(val) {
         settings.ext = val || settings.ext;
+    },
+    get ext() {
+        return settings.ext;
+    },
+    set beforeRender(func){
+        if (typeof func !== "function")
+            throw new Error('`beforeRender` must be a function.');
+
+        settings.beforeRender = func;
+    },
+    get beforeRender(){
+        return settings.beforeRender;
     },
     register,
     renderFile,
@@ -27,6 +39,7 @@ function register(app, ext) {
 }
 
 function renderFile(filepath, options, done) {
+    settings.beforeRender && settings.beforeRender(options);
     const razorOpts = { ext: settings.ext };
     const razor = new Razor(options, razorOpts);
     razor.renderFile(filepath, done);
