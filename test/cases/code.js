@@ -738,6 +738,18 @@ finally
 }
 <div>@s</div>`,
             expected: "\n<div>1&quot;2&quot;3</div>"
+        },
+        {
+            name: "Code 69",
+            template: `
+@if (true) { 
+    <div>1</div>
+    if (true) {
+        <span>1</span>
+    }
+    <div>3</div>
+}`,
+            expected: "\n   <div>1</div>\n        <span>2</span>\n    <div>3</div>"
         }
     ];
     module.exports = cases;

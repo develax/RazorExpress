@@ -1051,7 +1051,7 @@ Html.__dbg.pos = null;`;
 
                 skipCh = false;
 
-                if (waitOperator && ch !== operatorExpectScope) {
+                if (waitOperator && ch !== '<' && ch !== operatorExpectScope) {
                     if (!Char.isWhiteSpace(ch)) {
                         waitAcc += ch;
 
@@ -1126,7 +1126,7 @@ Html.__dbg.pos = null;`;
                         if (endScopes.indexOf(ch) !== -1) { // IF it's an end-scope literal
                             if (wait === ch) {
                                 wait = waits.pop(); // collasping scope..
-                                if (!wait && (operatorName !== "if" || ch === firstScope)) {
+                                if (/*!wait && */(operatorName !== "if" || ch === firstScope)) {
                                     if (ch === '}') { // the last & closing scope..)
                                         switch (operatorName) {
                                             case "try":
@@ -1149,9 +1149,11 @@ Html.__dbg.pos = null;`;
 
                                         operatorName = null;
                                     }
-                                    waitAcc = '';
-                                    stop = !(waitOperator || operatorName);
-                                    skipCh = (ch === '}') && !hasOperator;// skip the outer {} of the code-block
+                                    if (!wait) {
+                                        waitAcc = '';
+                                        stop = !(waitOperator || operatorName);
+                                        skipCh = (ch === '}') && !hasOperator;// skip the outer {} of the code-block
+                                    }
                                 }
                             }
                             else {
@@ -1168,10 +1170,11 @@ Html.__dbg.pos = null;`;
                         }
                         else if (ch === '<') {
                             // ':' for `switch/case:`
-                            if (lastLiteral === '' || lastLiteral === '{' || lastLiteral === ';' || lastLiteral === ':') {
+                            if (['', '{', '}', ';', ':'].some((c) => c === lastLiteral)) {
                                 this.stepBack(blocks, 0);
                                 this.parseHtmlInsideCode(blocks);
                                 block = this.newBlock(blockType.code, blocks);
+                                waitOperator = null;
                                 continue;
                             }
                         }
