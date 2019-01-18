@@ -722,7 +722,7 @@ finally
             expected: `\n        <div>three</div>\n`
         },
         {
-            name: "Code 70",
+            name: "Code 68.1",
             template: `
 @{ 
     var s = "12'3'45";
@@ -731,7 +731,7 @@ finally
             expected: "\n<div>12&#39;3&#39;45</div>"
         },
         {
-            name: "Code 68.1",
+            name: "Code 68.2",
             template: `
 @{ 
     var s = "1\\"2\\"3";
@@ -762,6 +762,14 @@ finally
     <br>
 }`,
             expected: "\n    <br>\n        <span>1</span>\n    <br>\n"
+        },
+        {
+            name: "Code 70",
+            template: `
+@if (true) { 
+    @Html.raw("<br/>");
+}`,
+            error: "Unexpected '@' character at line 3 pos 5."
         }
     ];
     module.exports = cases;

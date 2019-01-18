@@ -1165,7 +1165,7 @@ Html.__dbg.pos = null;`;
                             wait = ch;
                             inText = true; // put on waits-stack
                         }
-                        else if (ch === '@' && (!lastLiteral || Char.isWhiteSpace(lastLiteral))) {
+                        else if (ch === '@'/* && (!lastLiteral || Char.isWhiteSpace(lastLiteral))*/) {
                             throw this.er.unexpectedAtCharacter(this.lineNum, this.linePos(), this.line); // [Invalid-HTML 9], [Section 1]
                         }
                         else if (ch === '<') {
