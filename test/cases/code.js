@@ -745,11 +745,11 @@ finally
 @if (true) { 
     <div>1</div>
     if (true) {
-        <span>1</span>
+        <span>2</span>
     }
     <div>3</div>
 }`,
-            expected: "\n   <div>1</div>\n        <span>2</span>\n    <div>3</div>"
+            expected: "\n    <div>1</div>\n        <span>2</span>\n    <div>3</div>\n"
         }
     ];
     module.exports = cases;
