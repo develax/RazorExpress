@@ -1,4 +1,4 @@
-# RAZ: Razor-Express view template engine for NodeJS
+# Razor-Express (RAZ): a view template engine for NodeJS/ExpressJS web servers
 
 <p align="center">
     <a href="https://travis-ci.org/DevelAx/RazorExpress" target="_blank"><img src="https://img.shields.io/travis/DevelAx/RazorExpress.svg?style=plastic" alt="Build Status" /></a>
@@ -410,7 +410,7 @@ TODO list (Ideas for the next version)
 ---
 
 1. Implement [Razor-style `@* *@` comments](https://github.com/DevelAx/RazorExpress/blob/master/docs/syntax.md#comments).
-2. Make the library available for use on the client side (in the browser).
+2. ~~Make the library available for use on the client side (in the browser).~~([done](https://www.npmjs.com/package/razjs))
 3. Implement caching compiled templates.
 4. Async partial views.
 5. Make `HtmlString` class public for making functions returnin *raw-values* as expessions.
