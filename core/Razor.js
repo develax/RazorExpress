@@ -34,7 +34,7 @@ module.exports = class Razor {
         const log = require('./dbg/logger')({ on: debug && allowLoggingInDebugModel });
         const vm = debug ? require('vm') : null;
         this.parser = initParser({ express: true, dbg, log, vm });
-        this.viewsDir = path.normalize(this.options.settings.views);
+        this.viewsDir = path.resolve(this.options.settings.views);
     }
 
     renderFile(filepath, done) {
