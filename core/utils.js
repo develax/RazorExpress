@@ -6,7 +6,7 @@ if (typeof Utils === 'undefined') Utils = {};
 
 String.whitespaces = '\r\n\t ';
 
-String.is = function(val){
+String.is = function (val) {
     // return typeof val === "string" || val instanceof String;
     return Object.prototype.toString.call(val) === "[object String]";
 }
@@ -68,6 +68,21 @@ String.prototype.equal = function (string2, ignoreCase, useLocale) {
     return String.equal(this.valueOf(), string2, ignoreCase, useLocale);
 }
 
+String.prototype.numberOfOccurrences = function(str, max = 2) {
+    let pos = 0, num = 0, idx = 0;
+
+    do {
+        idx = this.indexOf(str, pos);
+
+        if (idx !== -1){
+            num++;
+            pos = idx;
+        }
+    } while (num < max && idx !== -1);
+
+    return { num, pos };
+}
+
 ////////////////////////////////////////////////
 // Char
 ////////////////////////////////////////////////
@@ -94,6 +109,6 @@ Char.isWhiteSpace = Char.isWhiteSpace || function (c) {
     return String.whitespaces.indexOf(c) !== -1;
 };
 
-Char.isIdentifier = function(c){
+Char.isIdentifier = function (c) {
     return Char.isLetter(c) || Char.isDigit(c) || '_$'.includes(c);
 }

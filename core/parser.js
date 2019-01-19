@@ -82,7 +82,7 @@ module.exports = function (opts) {
         // function (process,...){...}() prevents [this] to exist for the 'vm.runInNewContext()' method
         this._js = `
         'use strict';
-(function (process, window, global, module, compilePage, compilePageSync, undefined) { 
+(function (process, window, global, module, compilePage, compilePageSync, navigator, undefined) { 
     delete Html._js;
     delete Html._vm;
     delete Html._sandbox;
@@ -899,7 +899,7 @@ Html.__dbg.pos = null;`;
                     }
                     else if (ch === '{') {
                         //this.flushPadding(blocks);
-                        this.padding = padding;
+                        this.padding = padding + this.padding;
                         block.type = blockType.code;
                         return this.parseJsBlock(blocks, block, operatorName);
                     }

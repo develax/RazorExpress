@@ -192,11 +192,14 @@ function stackToHtml(exc, data, mainInfo) {
         let style = '';
 
         if (trim && trim !== '^' && !trim.startsWith("at ")) {
-            if (trim.startsWith('RazorError') || mainInfo.title)
+            if (trim.startsWith('RazorError') || mainInfo.title){
                 style = 'id="error" class="error"'; // the second line is the error description
-            else
+            }
+            else {
+                mainInfo.errorLine = trim;
                 style = 'class="error"';
-
+            }
+                
             if (mainInfo.title)
                 mainInfo.title += '\r\n';
 
@@ -218,6 +221,19 @@ function dataToHtml(data, mainInfo) {
         lines = data.jshtml.split('\n');
         let startLine = data.startLine ? data.startLine : 0; 
         html = `<ol start='${startLine}'>`;
+        let isLastData = !data.inner;
+        let hasErrorCoordinates = data.posRange && data.posRange.start || data.pos;
+
+        if (isLastData && !hasErrorCoordinates && mainInfo.errorLine && mainInfo.errorLine.length > 2) {
+            let occur = data.jshtml.numberOfOccurrences(mainInfo.errorLine);
+
+            if (occur.num === 1) {
+                data.posRange = {
+                    start: occur.pos,
+                    end: occur.pos + mainInfo.errorLine.length
+                };
+            }
+        }
 
         for (let i = 0; i < lines.length; i++) {
             let line = lines[i];
