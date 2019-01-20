@@ -72,7 +72,8 @@ String.prototype.numberOfOccurrences = function(str, max = 2) {
     let pos = 0, num = 0, idx = 0;
 
     do {
-        idx = this.indexOf(str, pos);
+        let start = pos && pos + str.length;
+        idx = this.indexOf(str, start);
 
         if (idx !== -1){
             num++;
