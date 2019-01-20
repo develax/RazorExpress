@@ -187,8 +187,16 @@ function stackToHtml(exc, data, mainInfo) {
             continue; // skip the very first line like "evalmachine.<anonymous>:22"
         }
 
-        let encodedLine = htmlEncode(line);
-        let trim = line.trim();
+        if (mainInfo.title && !pointer){
+            var trim = line.substring(dLen);
+            var pointer = trim;
+        }
+        else{
+            trim = line.trim();
+        }
+
+        var dLen = line.length - trim.length;
+        let encodedLine = htmlEncode(trim);
         let style = '';
 
         if (trim && trim !== '^' && !trim.startsWith("at ")) {
@@ -224,12 +232,17 @@ function dataToHtml(data, mainInfo) {
         let isLastData = !data.inner;
         let hasErrorCoordinates = data.posRange && data.posRange.start || data.pos;
 
-        if (isLastData && !hasErrorCoordinates && mainInfo.errorLine && mainInfo.errorLine.length > 2) {
+        if (isLastData && !hasErrorCoordinates && mainInfo.errorLine) {
             let occur = data.jshtml.numberOfOccurrences(mainInfo.errorLine);
 
             if (occur.num === 1) {
+                let extend = 0;
+
+                if (occur.pos > 0 && data.jshtml[occur.pos - 1] === '@')
+                    extend = 1; // Include the '@' symbol for beauty.
+
                 data.posRange = {
-                    start: occur.pos,
+                    start: occur.pos - extend,
                     end: occur.pos + mainInfo.errorLine.length
                 };
             }
