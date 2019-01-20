@@ -898,8 +898,6 @@ Html.__dbg.pos = null;`;
                         this.padding += ch;
                     }
                     else if (ch === '{') {
-                        //this.flushPadding(blocks);
-                        this.padding = padding + this.padding;
                         block.type = blockType.code;
                         return this.parseJsBlock(blocks, block, operatorName);
                     }
