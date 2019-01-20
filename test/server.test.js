@@ -215,6 +215,46 @@ describe("server routes", () => {
     }
 
     {
+        let route = "/errors/jsSyntaxError";
+        describe(route, () => {
+            console.log(`> testing rote ${route}...`);
+            it("syntax error must be found in the template source text and highlighted", (done) => {
+                chai.request(server)
+                    .get(route)
+                    .end((err, res) => {
+                        expect(res).to.have.status(500);
+                        let $ = jQuery(res.text);
+                        assertErrorHeader($);
+                        assertErrorText($, "for(int i = 0; i < 5; i++) {");
+                        assertSourceViews($, ["jsSyntaxError.raz"], "@for(int i = 0; i < 5; i++) {");
+                        console.log(`> testing rote  ${route} is done`);
+                        done();
+                    });
+            });
+        });
+    }
+
+    {
+        let route = "/errors/jsSyntaxErrorNotDetected";
+        describe(route, () => {
+            console.log(`> testing rote ${route}...`);
+            it("syntax error must NOT be highlighted in the template source text if it contains more than 1 occurrences of the error string ", (done) => {
+                chai.request(server)
+                    .get(route)
+                    .end((err, res) => {
+                        expect(res).to.have.status(500);
+                        let $ = jQuery(res.text);
+                        assertErrorHeader($);
+                        assertErrorText($, "for(int i = 0; i < 5; i++) {");
+                        assertSourceViews($, ["jsSyntaxErrorNotDetected.raz"]);
+                        console.log(`> testing rote  ${route} is done`);
+                        done();
+                    });
+            });
+        });
+    }
+
+    {
         let route = "/browser";
         describe(route, () => {
             console.log(`> testing rote ${route}...`);
@@ -240,33 +280,33 @@ describe("server routes", () => {
                         });
             });
         });
+    }
 
-        {
-            let route = "/browser-error";
-            describe(route, () => {
-                console.log(`> testing rote ${route}...`);
-                it("razor-js-error", (done) => {
-                    let options = {
-                        resources: "usable",
-                        runScripts: "dangerously"
-                    };
-                    JSDOM.fromURL("http://localhost:" + port + route, options)
-                        .then(dom => {
-                            setTimeout(() => {
-                                let $ = jquery(dom.window);
-                                assertErrorHeader($);
-                                assertErrorText($, "Error: '</span>' tag at line 5 pos 24 is missing matching start tag.");
-                                assertSourceViews($, ["Template:"]);
-                                console.log(`> testing rote  ${route} is done`);
-                                done();
-                            }, 1000);
-                        },
-                            err => {
-                                done(err.message.substr(0, 200));
-                            });
-                });
+    {
+        let route = "/browser-error";
+        describe(route, () => {
+            console.log(`> testing rote ${route}...`);
+            it("razor-js-error", (done) => {
+                let options = {
+                    resources: "usable",
+                    runScripts: "dangerously"
+                };
+                JSDOM.fromURL("http://localhost:" + port + route, options)
+                    .then(dom => {
+                        setTimeout(() => {
+                            let $ = jquery(dom.window);
+                            assertErrorHeader($);
+                            assertErrorText($, "Error: '</span>' tag at line 5 pos 24 is missing matching start tag.");
+                            assertSourceViews($, ["Template:"]);
+                            console.log(`> testing rote  ${route} is done`);
+                            done();
+                        }, 1000);
+                    },
+                        err => {
+                            done(err.message.substr(0, 200));
+                        });
             });
-        }
+        });
     }
 });
 
@@ -279,8 +319,8 @@ function assertErrorHeader($) {
 
 function assertErrorText($, text) {
     let errorMainLines = $('.error');
-    expect(errorMainLines, '1 error line is expected').to.have.lengthOf(1);
-    expect(errorMainLines.text(), "error message").to.have.string(text);
+    expect(errorMainLines, '1 error line is expected').to.have.lengthOf.at.least(1);
+    expect(errorMainLines[0].textContent, "error message").to.have.string(text);
 }
 
 function assertSourceViews($, viewNames, lastViewNameErrorToken) {
@@ -299,7 +339,7 @@ function assertSourceViews($, viewNames, lastViewNameErrorToken) {
     if (!lastViewNameErrorToken) return;
 
     let errorText = $(errorViews[errorViews.length - 1]).find('.source-error').text();
-    expect(lastViewNameErrorToken).equal(errorText);
+    expect(lastViewNameErrorToken, "highlighted error text in the template source code").equal(errorText);
 }
 function assertModelMessage($, expectedText) {
     var modelMessage = $(".model-message").text();
