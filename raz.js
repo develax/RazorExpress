@@ -220,16 +220,27 @@ function stackToHtml(exc, data, mainInfo) {
             continue; // skip the very first line like "evalmachine.<anonymous>:22"
         }
 
-        let encodedLine = htmlEncode(line);
-        let trim = line.trim();
+        if (mainInfo.title && !pointer){
+            var trim = line.substring(dLen);
+            var pointer = trim;
+        }
+        else{
+            trim = line.trim();
+        }
+
+        var dLen = line.length - trim.length;
+        let encodedLine = htmlEncode(trim);
         let style = '';
 
         if (trim && trim !== '^' && !trim.startsWith("at ")) {
-            if (trim.startsWith('RazorError') || mainInfo.title)
+            if (trim.startsWith('RazorError') || mainInfo.title){
                 style = 'id="error" class="error"'; // the second line is the error description
-            else
+            }
+            else {
+                mainInfo.errorLine = trim;
                 style = 'class="error"';
-
+            }
+                
             if (mainInfo.title)
                 mainInfo.title += '\r\n';
 
@@ -251,6 +262,24 @@ function dataToHtml(data, mainInfo) {
         lines = data.jshtml.split('\n');
         let startLine = data.startLine ? data.startLine : 0; 
         html = `<ol start='${startLine}'>`;
+        let isLastData = !data.inner;
+        let hasErrorCoordinates = data.posRange && data.posRange.start || data.pos;
+
+        if (isLastData && !hasErrorCoordinates && mainInfo.errorLine) {
+            let occur = data.jshtml.numberOfOccurrences(mainInfo.errorLine);
+
+            if (occur.num === 1) {
+                let extend = 0;
+
+                if (occur.pos > 0 && data.jshtml[occur.pos - 1] === '@')
+                    extend = 1; // Include the '@' symbol for beauty.
+
+                data.posRange = {
+                    start: occur.pos - extend,
+                    end: occur.pos + mainInfo.errorLine.length
+                };
+            }
+        }
 
         for (let i = 0; i < lines.length; i++) {
             let line = lines[i];
@@ -918,7 +947,7 @@ module.exports = function (opts) {
         // function (process,...){...}() prevents [this] to exist for the 'vm.runInNewContext()' method
         this._js = `
         'use strict';
-(function (process, window, global, module, compilePage, compilePageSync, undefined) { 
+(function (process, window, global, module, compilePage, compilePageSync, navigator, undefined) { 
     delete Html._js;
     delete Html._vm;
     delete Html._sandbox;
@@ -1734,8 +1763,6 @@ Html.__dbg.pos = null;`;
                         this.padding += ch;
                     }
                     else if (ch === '{') {
-                        //this.flushPadding(blocks);
-                        this.padding = padding;
                         block.type = blockType.code;
                         return this.parseJsBlock(blocks, block, operatorName);
                     }
@@ -1887,7 +1914,7 @@ Html.__dbg.pos = null;`;
 
                 skipCh = false;
 
-                if (waitOperator && ch !== operatorExpectScope) {
+                if (waitOperator && ch !== '<' && ch !== operatorExpectScope) {
                     if (!Char.isWhiteSpace(ch)) {
                         waitAcc += ch;
 
@@ -1962,7 +1989,7 @@ Html.__dbg.pos = null;`;
                         if (endScopes.indexOf(ch) !== -1) { // IF it's an end-scope literal
                             if (wait === ch) {
                                 wait = waits.pop(); // collasping scope..
-                                if (!wait && (operatorName !== "if" || ch === firstScope)) {
+                                if (/*!wait && */(operatorName !== "if" || ch === firstScope)) {
                                     if (ch === '}') { // the last & closing scope..)
                                         switch (operatorName) {
                                             case "try":
@@ -1985,9 +2012,11 @@ Html.__dbg.pos = null;`;
 
                                         operatorName = null;
                                     }
-                                    waitAcc = '';
-                                    stop = !(waitOperator || operatorName);
-                                    skipCh = (ch === '}') && !hasOperator;// skip the outer {} of the code-block
+                                    if (!wait) {
+                                        waitAcc = '';
+                                        stop = !(waitOperator || operatorName);
+                                        skipCh = (ch === '}') && !hasOperator;// skip the outer {} of the code-block
+                                    }
                                 }
                             }
                             else {
@@ -1999,15 +2028,16 @@ Html.__dbg.pos = null;`;
                             wait = ch;
                             inText = true; // put on waits-stack
                         }
-                        else if (ch === '@' && (!lastLiteral || Char.isWhiteSpace(lastLiteral))) {
+                        else if (ch === '@'/* && (!lastLiteral || Char.isWhiteSpace(lastLiteral))*/) {
                             throw this.er.unexpectedAtCharacter(this.lineNum, this.linePos(), this.line); // [Invalid-HTML 9], [Section 1]
                         }
                         else if (ch === '<') {
                             // ':' for `switch/case:`
-                            if (lastLiteral === '' || lastLiteral === '{' || lastLiteral === ';' || lastLiteral === ':') {
+                            if (['', '{', '}', ';', ':'].some((c) => c === lastLiteral)) {
                                 this.stepBack(blocks, 0);
                                 this.parseHtmlInsideCode(blocks);
                                 block = this.newBlock(blockType.code, blocks);
+                                waitOperator = null;
                                 continue;
                             }
                         }
@@ -2376,7 +2406,7 @@ if (typeof Utils === 'undefined') Utils = {};
 
 String.whitespaces = '\r\n\t ';
 
-String.is = function(val){
+String.is = function (val) {
     // return typeof val === "string" || val instanceof String;
     return Object.prototype.toString.call(val) === "[object String]";
 }
@@ -2438,6 +2468,22 @@ String.prototype.equal = function (string2, ignoreCase, useLocale) {
     return String.equal(this.valueOf(), string2, ignoreCase, useLocale);
 }
 
+String.prototype.numberOfOccurrences = function(str, max = 2) {
+    let pos = 0, num = 0, idx = 0;
+
+    do {
+        let start = pos && pos + str.length;
+        idx = this.indexOf(str, start);
+
+        if (idx !== -1){
+            num++;
+            pos = idx;
+        }
+    } while (num < max && idx !== -1);
+
+    return { num, pos };
+}
+
 ////////////////////////////////////////////////
 // Char
 ////////////////////////////////////////////////
@@ -2464,7 +2510,7 @@ Char.isWhiteSpace = Char.isWhiteSpace || function (c) {
     return String.whitespaces.indexOf(c) !== -1;
 };
 
-Char.isIdentifier = function(c){
+Char.isIdentifier = function (c) {
     return Char.isLetter(c) || Char.isDigit(c) || '_$'.includes(c);
 }
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
