@@ -251,8 +251,8 @@ module.exports = class Razor {
         return viewStartName + '.' + this.ext;
     }
 
-    addFileNameIfDev(data, filename) {
-        data = data.toString();
+    addFileNameIfDev(data, filename) {        
+        data = String.stripBOM(data.toString());
         let endNL = (data[data.length - 1] === '\n') ? '' : '\n';
 
         if (dbg.isDebugMode)

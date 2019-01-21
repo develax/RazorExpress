@@ -68,20 +68,27 @@ String.prototype.equal = function (string2, ignoreCase, useLocale) {
     return String.equal(this.valueOf(), string2, ignoreCase, useLocale);
 }
 
-String.prototype.numberOfOccurrences = function(str, max = 2) {
+String.prototype.numberOfOccurrences = function (str, max = 2) {
     let pos = 0, num = 0, idx = 0;
 
     do {
         let start = pos && pos + str.length;
         idx = this.indexOf(str, start);
 
-        if (idx !== -1){
+        if (idx !== -1) {
             num++;
             pos = idx;
         }
     } while (num < max && idx !== -1);
 
     return { num, pos };
+}
+
+String.stripBOM = function (str) {
+    if (str.charCodeAt(0) === 0xFEFF)
+        return str.slice(1);
+    
+    return str;
 }
 
 ////////////////////////////////////////////////
