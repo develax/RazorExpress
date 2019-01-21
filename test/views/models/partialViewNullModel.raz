@@ -1,0 +1,4 @@
+<div class="partial-view-null-model-container" style="border: 1px solid black;">
+    <span>@Model</span>
+    <!-- <span>@Html.raw(Model)</span> -->
+</div>

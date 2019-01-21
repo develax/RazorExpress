@@ -23,4 +23,6 @@
     <a href="/errors/index">Test layout error</a>
     <br />
     <a href="/errors/jsSyntaxError">JavaScript syntax error</a>
+    <br />
+    <a href="/models/index">Empty model in a partial view</a>
 </div>

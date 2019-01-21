@@ -1,0 +1,19 @@
+@{
+    Html.layout = null;
+}
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+</head>
+<body style="background-color: white;">
+    @Html.partial("partialViewNullModel", "")
+    @Html.partial("partialViewNullModel", null)
+    @Html.partial("partialViewNullModel", 0)
+    @Html.partial("partialViewNullModel", undefined)
+</body>
+</html>
+    
+    

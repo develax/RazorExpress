@@ -255,6 +255,28 @@ describe("server routes", () => {
     }
 
     {
+        let route = "/models/index";
+        describe(route, () => {
+            console.log(`> testing rote ${route}...`);
+            it("partial view's `null` or `empty-string` value model should not be replaced with the main model and must be displayed as an empty string", (done) => {
+                chai.request(server)
+                    .get(route)
+                    .end((err, res) => {
+                        expect(res).to.have.status(200);
+                        let $ = jQuery(res.text);
+                        let partialViewNullModel = $(".partial-view-null-model-container");
+                        expect(partialViewNullModel, "containers coun = 4").to.have.length(4);
+                        expect(partialViewNullModel[0].textContent.trim(), "'' is rendered as ''").to.equal("");
+                        expect(partialViewNullModel[1].textContent.trim(), "`null` is rendered as ''").to.equal("");
+                        expect(partialViewNullModel[2].textContent.trim(), "`0` is rendered as '0'").to.equal("0");
+                        expect(partialViewNullModel[3].textContent.trim(), "`undefined` is substituted with the parent view object").to.equal("[object Object]");
+                        done();
+                    });
+            });
+        });
+    }
+
+    {
         let route = "/browser";
         describe(route, () => {
             console.log(`> testing rote ${route}...`);

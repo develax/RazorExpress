@@ -142,7 +142,7 @@ module.exports = function (opts) {
         };
 
         this.raw = function (val) { // render
-            if (typeof val === 'undefined' || val === '') // 'undefined' can be passed when `Html.raw()` is used by user in the view, in this case it will be wrapped into `Html.ecnode()` anyway an it will call `Html.raw` passing 'undefined' to it.
+            if (!isVisibleValue(val)) // 'undefined' can be passed when `Html.raw()` is used by user in the view, in this case it will be wrapped into `Html.ecnode()` anyway an it will call `Html.raw` passing 'undefined' to it.
                 return;
 
             if (sectionName) {
@@ -161,7 +161,10 @@ module.exports = function (opts) {
         };
 
         this.getEncoded = function (val) {
-            if (!val || typeof val === "number" || val instanceof Number || val instanceof HtmlString)
+            if (!isVisibleValue(val))
+                return '';
+
+            if (typeof val === "number" || val instanceof Number || val instanceof HtmlString)
                 return val;
 
             if (String.is(val))
@@ -211,7 +214,7 @@ module.exports = function (opts) {
         this.getPartial = function (viewName, viewModel) {
             let compileOpt = {
                 scope: args.scope,
-                model: viewModel || args.model, // if is not set explicitly, set default (parent) model
+                model: viewModel === undefined ? args.model : viewModel, // if is not set explicitly, set default (parent) model
                 findPartial: args.findPartial,
                 findPartialSync: args.findPartialSync,
                 sections,
@@ -259,6 +262,10 @@ module.exports = function (opts) {
         toScript(jsValues) {
             return toScript(this, jsValues);
         }
+    }
+
+    function isVisibleValue(val) {
+        return (val != null && val !== '');
     }
 
     function toScript(block, jsValues) {
