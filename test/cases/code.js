@@ -775,14 +775,14 @@ finally
             name: "Code 71",
             template: `
 @{
-    const errors = ["error-1", "error-2"];
+    const errors = ["'error-1'", "'error-2'"];
 }
 @if (errors) {
     for (let err of errors) {
         <div>@err</div>
     }
 }`,
-            expected: "\n        <div>error-1</div>\n        <div>error-2</div>\n"
+            expected: "\n        <div>&#39;error-1&#39;</div>\n        <div>&#39;error-2&#39;</div>\n"
         }
     ];
     module.exports = cases;
