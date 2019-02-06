@@ -82,7 +82,7 @@ module.exports = function (opts) {
         // function (process,...){...}() prevents [this] to exist for the 'vm.runInNewContext()' method
         this._js = `
         'use strict';
-(function (process, window, global, module, compilePage, compilePageSync, navigator, undefined) { 
+(function (process, window, global, module, require, compilePage, compilePageSync, navigator, undefined) { 
     delete Html._js;
     delete Html._vm;
     delete Html._sandbox;
@@ -1056,7 +1056,7 @@ Html.__dbg.pos = null;`;
 
                 skipCh = false;
 
-                if (waitOperator && ch !== '<' && ch !== operatorExpectScope) {
+                if (waitOperator && ch !== '<' && ch !== '}' && ch !== operatorExpectScope) {
                     if (!Char.isWhiteSpace(ch)) {
                         waitAcc += ch;
 

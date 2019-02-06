@@ -770,6 +770,19 @@ finally
     @Html.raw("<br/>");
 }`,
             error: "Unexpected '@' character at line 3 pos 5."
+        },
+        {
+            name: "Code 71",
+            template: `
+@{
+    const errors = ["error-1", "error-2"];
+}
+@if (errors) {
+    for (let err of errors) {
+        <div>@err</div>
+    }
+}`,
+            expected: "\n        <div>error-1</div>\n        <div>error-2</div>\n"
         }
     ];
     module.exports = cases;
