@@ -947,7 +947,7 @@ module.exports = function (opts) {
         // function (process,...){...}() prevents [this] to exist for the 'vm.runInNewContext()' method
         this._js = `
         'use strict';
-(function (process, window, global, module, compilePage, compilePageSync, navigator, undefined) { 
+(function (process, window, global, module, require, compilePage, compilePageSync, navigator, undefined) { 
     delete Html._js;
     delete Html._vm;
     delete Html._sandbox;
@@ -1007,7 +1007,7 @@ module.exports = function (opts) {
         };
 
         this.raw = function (val) { // render
-            if (typeof val === 'undefined' || val === '') // 'undefined' can be passed when `Html.raw()` is used by user in the view, in this case it will be wrapped into `Html.ecnode()` anyway an it will call `Html.raw` passing 'undefined' to it.
+            if (!isVisibleValue(val)) // 'undefined' can be passed when `Html.raw()` is used by user in the view, in this case it will be wrapped into `Html.ecnode()` anyway an it will call `Html.raw` passing 'undefined' to it.
                 return;
 
             if (sectionName) {
@@ -1026,7 +1026,10 @@ module.exports = function (opts) {
         };
 
         this.getEncoded = function (val) {
-            if (!val || typeof val === "number" || val instanceof Number || val instanceof HtmlString)
+            if (!isVisibleValue(val))
+                return '';
+
+            if (typeof val === "number" || val instanceof Number || val instanceof HtmlString)
                 return val;
 
             if (String.is(val))
@@ -1076,7 +1079,7 @@ module.exports = function (opts) {
         this.getPartial = function (viewName, viewModel) {
             let compileOpt = {
                 scope: args.scope,
-                model: viewModel || args.model, // if is not set explicitly, set default (parent) model
+                model: viewModel === undefined ? args.model : viewModel, // if is not set explicitly, set default (parent) model
                 findPartial: args.findPartial,
                 findPartialSync: args.findPartialSync,
                 sections,
@@ -1124,6 +1127,10 @@ module.exports = function (opts) {
         toScript(jsValues) {
             return toScript(this, jsValues);
         }
+    }
+
+    function isVisibleValue(val) {
+        return (val != null && val !== '');
     }
 
     function toScript(block, jsValues) {
@@ -1914,7 +1921,7 @@ Html.__dbg.pos = null;`;
 
                 skipCh = false;
 
-                if (waitOperator && ch !== '<' && ch !== operatorExpectScope) {
+                if (waitOperator && ch !== '<' && ch !== '}' && ch !== operatorExpectScope) {
                     if (!Char.isWhiteSpace(ch)) {
                         waitAcc += ch;
 
@@ -2468,20 +2475,27 @@ String.prototype.equal = function (string2, ignoreCase, useLocale) {
     return String.equal(this.valueOf(), string2, ignoreCase, useLocale);
 }
 
-String.prototype.numberOfOccurrences = function(str, max = 2) {
+String.prototype.numberOfOccurrences = function (str, max = 2) {
     let pos = 0, num = 0, idx = 0;
 
     do {
         let start = pos && pos + str.length;
         idx = this.indexOf(str, start);
 
-        if (idx !== -1){
+        if (idx !== -1) {
             num++;
             pos = idx;
         }
     } while (num < max && idx !== -1);
 
     return { num, pos };
+}
+
+String.stripBOM = function (str) {
+    if (str.charCodeAt(0) === 0xFEFF)
+        return str.slice(1);
+    
+    return str;
 }
 
 ////////////////////////////////////////////////
