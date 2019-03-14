@@ -61,28 +61,27 @@ module.exports = function (opts) {
     const debugMode = dbg.isDebugMode;
     const isBrowser = dbg.isBrowser;
     const log = opts.log || { debug: () => { } };
-    log.debug(`Parse debug mode is '${!!debugMode}'.`);
+    log.debug(`Parser debug mode is '${!!debugMode}'.`);
 
     const HtmlString = require('./HtmlString');
     const htmlEncode = require('./libs/js-htmlencode');
-    const vm = opts.vm;
 
     ////////////////////
     ///   Html class
     ////////////////////
     function Html(args) {
-        // Non-user section.
-        this._vm = vm;
+        this._vm = null;
 
         if (debugMode && !isBrowser) {
+            this._vm = require('vm');
             this._sandbox = Object.create(null);
-            vm.createContext(this._sandbox);
+            this._vm.createContext(this._sandbox);
         }
 
         // function (process,...){...}() prevents [this] to exist for the 'vm.runInNewContext()' method
         this._js = `
         'use strict';
-(function (process, window, global, module, require, compilePage, compilePageSync, navigator, undefined) { 
+(function (process, window, global, module, require, compilePage, compilePageSync, navigator, undefined) {
     delete Html._js;
     delete Html._vm;
     delete Html._sandbox;
@@ -205,7 +204,7 @@ module.exports = function (opts) {
             }
             else {
                 if (required)
-                    throw args.er.sectionIsNotFound(name, args.filePath); // [#3.3] 
+                    throw args.er.sectionIsNotFound(name, args.filePath); // [#3.3]
             }
 
             return '';
@@ -690,7 +689,7 @@ Html.__dbg.pos = null;`;
                     if (this.pickNextChar() === '@') { // checking for '@@' that means just text '@'
                         ch = this.fetchChar(); // skip the next '@'
                     }
-                    else if (openTagName || tag) { // it must be an expression somewhere inside HTML  
+                    else if (openTagName || tag) { // it must be an expression somewhere inside HTML
                         this.fetchChar(); // skip current '@'
                         this.parseCode(blocks);
 
@@ -1258,9 +1257,9 @@ Html.__dbg.pos = null;`;
             }
 
             if (spaceCount < 1)
-                throw this.er.whiteSpaceExpectedAfter("@" + _sectionKeyword, this.lineNum, this.linePos()); // unreachable due to previous function check 
+                throw this.er.whiteSpaceExpectedAfter("@" + _sectionKeyword, this.lineNum, this.linePos()); // unreachable due to previous function check
 
-            //let sectionLine = this.lineNum; 
+            //let sectionLine = this.lineNum;
             let sectionNamePos = this.linePos();
             let sectionName = '';
 

@@ -32,8 +32,7 @@ module.exports = class Razor {
         this.env = options.settings.env;
         const debug = dbg.isDebugMode;
         const log = require('./dbg/logger')({ on: debug && allowLoggingInDebugModel });
-        const vm = debug ? require('vm') : null;
-        this.parser = initParser({ express: true, dbg, log, vm });
+        this.parser = initParser({ express: true, dbg, log });
         this.viewsDir = path.resolve(this.options.settings.views);
     }
 
@@ -129,7 +128,7 @@ module.exports = class Razor {
             try {
                 searchedLocations.push(viewPath);
                 let cachedData = cache && cache[viewPath];
-                
+
                 if (cachedData)
                     return cachedData;
 
@@ -152,7 +151,7 @@ module.exports = class Razor {
         try {
             searchedLocations.push(filePath);
             let cachedData = cache && cache[filePath];
-                
+
             if (cachedData)
                 return cachedData;
 
@@ -176,10 +175,10 @@ module.exports = class Razor {
 
         function successResult(data, filePath) {
             var result = { data, filePath };
-            
+
             if (cache)
                 cache[filePath] = result;
-            
+
             return result;
         }
     }
@@ -203,7 +202,7 @@ module.exports = class Razor {
                     viewPath = path.join(this.viewsDir, viewPath);
             }
             else if (partialViewName[0] === '.') { // it's relative to the current folder
-                viewPath = path.join(startDir, viewPath); 
+                viewPath = path.join(startDir, viewPath);
             }
 
             searchedLocations.push(viewPath);
@@ -251,7 +250,7 @@ module.exports = class Razor {
         return viewStartName + '.' + this.ext;
     }
 
-    addFileNameIfDev(data, filename) {        
+    addFileNameIfDev(data, filename) {
         data = String.stripBOM(data.toString());
         let endNL = (data[data.length - 1] === '\n') ? '' : '\n';
 
