@@ -123,7 +123,7 @@ Or let's consider an example from http://haml.info/tutorial.html
 ```Haml
 .item{:id => "item#{item.id}"}= item.body
 ```
-Maybe I'm wrong and this kind of markup really simplifies the development and perception of the code, but to me, it doesn't seem to be so. Let's just compare it to the equivalent **Razor markup**:
+Maybe I'm wrong and this kind of markup really simplifies the development and perception of the code, but to me it doesn't seem to be so. Let's just compare it to the equivalent **Razor markup**:
 ```HTML+Razor
 <div class='item' id='item@item.id'>
   @item.body
