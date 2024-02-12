@@ -5,7 +5,7 @@ const scope = {
     }
 }
 
-module.exports = [
+export default [
     {
         name: "Scope 1",
         template: '<span>@Model.test</span><span>@test</span><span>@fnTest()</span><span>@Model.$</span>',

@@ -1,6 +1,7 @@
-const htmlEncode = require('../libs/js-htmlencode');
-
-class RazorError extends Error {
+import {htmlEncode} from '../libs/js-htmlencode.js';
+import { isDebugMode, isBrowser } from '../dbg/debugger.mjs';
+import { Utils } from '../utils.mjs';
+export default class RazorError extends Error {
     constructor(message, captureFrame) {
         super(message);
 
@@ -15,7 +16,6 @@ class RazorError extends Error {
     }
 
     static extend(exc, args) {
-        const { isDebugMode, isBrowser } = require('../dbg/debugger');
         exc.isRazorError = true;
 
         if (!isDebugMode)
@@ -138,8 +138,6 @@ class RazorError extends Error {
     }
 }
 
-module.exports = RazorError;
-
 function stackToHtml(exc, data, mainInfo) {
     let lines = exc.stack.split('\n');
     let fireFox = (typeof navigator !== 'undefined') && navigator.userAgent.toLowerCase().indexOf('firefox') !== -1; // for compatibility with FireFox
@@ -226,7 +224,7 @@ function dataToHtml(data, mainInfo) {
 
     if (data.jshtml) {
         let textCursor = 0;
-        lines = data.jshtml.split('\n');
+        let lines = data.jshtml.split('\n');
         let startLine = data.startLine ? data.startLine : 0; 
         html = `<ol start='${startLine}'>`;
         let isLastData = !data.inner;

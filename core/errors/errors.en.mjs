@@ -1,12 +1,15 @@
-const RazorError = require('./RazorError');
+import RazorError from "./RazorError.mjs";
 
-class ParserErrorFactory {
+export class ParserErrorFactory {
     constructor(templateInfo, linesBaseNumber) {
         this.startLineNum = linesBaseNumber;
         this.info = templateInfo;
         this.info.startLine = linesBaseNumber;
     }
-
+    endOfFileFoundAfterComment(lineNum, posNum) {
+        var message = `End-of-file was found after the "@*" character at line ${lineNum + this.startLineNum} pos ${posNum + 1}. Comments must be closed `;
+        return RazorError.new({ message, info: this.info, line: lineNum, pos: posNum, capture: this.endOfFileFoundAfterAtSign });
+    }
     endOfFileFoundAfterAtSign(lineNum, posNum) {
         var message = `End-of-file was found after the "@" character at line ${lineNum + this.startLineNum} pos ${posNum + 1}. "@" must be followed by a valid code block. If you want to output an "@", escape it using the sequence: "@@"`;
         return RazorError.new({ message, info: this.info, line: lineNum, pos: posNum, capture: this.endOfFileFoundAfterAtSign });
@@ -192,6 +195,3 @@ function setInnerError(parserError, error) {
     if (error.message)
         parserError.inner = error;
 }
-
-
-module.exports = ParserErrorFactory;

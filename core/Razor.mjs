@@ -1,42 +1,49 @@
-require('./utils');
-const fs = require('fs');
+import * as utils from "./utils.mjs"
 
-const path = require('path');
-Utils.path = path;
-Utils.isServer = true;
+import * as fs from "fs"
+import * as pfs from "fs/promises"
+import * as path from "path"
+
+utils.Utils.path = path;
+utils.Utils.isServer = true;
 // path.fileName = function (fullFileName, withExt) {
 //     if (withExt) return path.win32.basename(fullFileName);
 //     let extension = path.extname(fullFileName);
 //     return path.win32.basename(fullFileName, extension);
 // };
-path.cutLastSegment = function (dir) {
+export let cutLastSegment = function (dir) {
     dir = path.normalize(dir);
     let pos = dir.lastIndexOf(path.sep);
     if (pos === -1) return '';
     return dir.substring(0, pos);
 };
 
-const initParser = require('./parser');
-const ErrorsFactory = require('./errors/errors');
-const dbg = require('./dbg/debugger');
+import * as initParser_ from "./parser.mjs"
+const initParser = initParser_.default;
+import { ParserErrorFactory } from "./errors/errors.en.mjs"
+import * as dbg from "./dbg/debugger.mjs"
+import * as logger from "./dbg/logger.mjs"
 const allowLoggingInDebugModel = false;
 
 'use strict';
 const viewStartName = '_viewStart';
-const EOL = require('os').EOL;
+import { EOL } from "os";
 
-module.exports = class Razor {
+export class Razor {
     constructor(options, razorOpts) {
         this.options = options;
         this.ext = options.settings['view engine'] || razorOpts.ext;
         this.env = options.settings.env;
         const debug = dbg.isDebugMode;
-        const log = require('./dbg/logger')({ on: debug && allowLoggingInDebugModel });
+        const log = logger.default({ on: debug && allowLoggingInDebugModel });
         this.parser = initParser({ express: true, dbg, log });
         this.viewsDir = path.resolve(this.options.settings.views);
     }
 
     renderFile(filepath, done) {
+
+
+
         let originFilePath = filepath;
         filepath = path.normalize(filepath);
         //let fileName = path.fileName(filepath);
@@ -47,7 +54,7 @@ module.exports = class Razor {
 
         fs.readFile(filepath, (err, data) => {
             if (err) {
-                let error = new ErrorsFactory({ filename: path.basename(originFilePath) }).errorReadingFile(err);
+                let error = new ParserErrorFactory({ filename: path.basename(originFilePath) }).errorReadingFile(err);
                 return done(error); // Tested by [0# Razor.readFile].
             }
 
@@ -69,12 +76,85 @@ module.exports = class Razor {
                     findPartialSync: (layoutName, filePath, errorsFactory, cache) => {
                         var startDir = path.dirname(filePath);
                         return this.findPartialSync(startDir, layoutName, [], errorsFactory, cache);
+                    },
+                    findPartialAsync: (layoutName, filePath, errorsFactory, cache) => {
+                        var startDir = path.dirname(filePath);
+                        return this.findPartialAsync(startDir, layoutName, [], errorsFactory, cache);
                     }
                 };
-
-                this.parser.compile(parserArgs, done);
+                this.parser.compileAsync(parserArgs).then((data) => {
+                    done(null, data);
+                }).catch((error) => {
+                    done(error);
+                });
+                //this.parser.compile(parserArgs,done);
             });
         });
+    }
+    async renderFileAsync(filepath) {
+        let originFilePath = filepath;
+        filepath = path.normalize(filepath);
+        //let fileName = path.fileName(filepath);
+        //let viewsPath = path.normalize(this.options.settings.views);
+
+        if (!path.extname(filepath))
+            filepath += '.' + this.ext;
+
+        try {
+            var data = await pfs.readFile(filepath);
+            let currentDir = path.dirname(filepath);
+            let jsHtml = this.addFileNameIfDev(data, filepath);
+
+
+            var viewStartsJsHtml = await this.findViewStartsAsync(currentDir, '')
+
+            let parserArgs = {
+                filePath: filepath,
+                template: viewStartsJsHtml + jsHtml,
+                model: this.options,
+                findPartial: (layoutName, filePath, errorsFactory, done) => {
+                    var startDir = path.dirname(filePath);
+                    this.findPartial(startDir, layoutName, [], errorsFactory, done);
+                },
+                findPartialSync: (layoutName, filePath, errorsFactory, cache) => {
+                    var startDir = path.dirname(filePath);
+                    return this.findPartialSync(startDir, layoutName, [], errorsFactory, cache);
+                },
+                findPartialAsync: (layoutName, filePath, errorsFactory, cache) => {
+                    var startDir = path.dirname(filePath);
+                    return this.findPartialAsync(startDir, layoutName, [], errorsFactory, cache);
+                }
+            };
+
+            return this.parser.compileAsync(parserArgs);
+        }
+        catch (err) {
+            let error = new ErrorsFactory({ filename: path.basename(originFilePath) }).errorReadingFile(err);
+            throw error; // Tested by [0# Razor.readFile].
+        }
+    }
+
+    async findViewStartsAsync(startDir, buffer, done) {
+        const fileName = this.viewStartName();
+        const filePath = path.join(startDir, fileName);
+
+        try {
+            var data = await pfs.readFile(filePath)
+            let dataStr = this.addFileNameIfDev(data, filePath);
+            buffer = (buffer) ? dataStr + buffer : dataStr; // the `concat` order is important here!
+        }
+        catch (err) {
+            if (err.code !== 'ENOENT') {
+                let error = new ErrorsFactory({ filename: path.basename(filePath) }).errorReadingFile(err);
+                return done(error); // Tested by [#1 Razor.findViewStarts].
+            }
+        }
+        startDir = startDir.equal(this.viewsDir, true) ? null : cutLastSegment(startDir);
+
+        if (startDir)
+            return await this.findViewStartsAsync(startDir, buffer, done);
+
+        return buffer;
     }
 
     findViewStarts(startDir, buffer, done) {
@@ -93,7 +173,7 @@ module.exports = class Razor {
                 buffer = (buffer) ? dataStr + buffer : dataStr; // the `concat` order is important here!
             }
 
-            startDir = startDir.equal(this.viewsDir, true) ? null : path.cutLastSegment(startDir);
+            startDir = startDir.equal(this.viewsDir, true) ? null : cutLastSegment(startDir);
 
             if (startDir)
                 return this.findViewStarts(startDir, buffer, done);
@@ -161,12 +241,92 @@ module.exports = class Razor {
         }
         catch (err) {
             if (err.code === 'ENOENT') { // the file doesn't exist, lets see a dir up..
-                startDir = startDir.equal(this.viewsDir, true) ? null : path.cutLastSegment(startDir);
+                startDir = startDir.equal(this.viewsDir, true) ? null : cutLastSegment(startDir);
 
                 if (!startDir)
                     throw errorsFactory.partialViewNotFound(partialViewName, searchedLocations); // [#2.1].
                 else
                     return this.findPartialSync(startDir, partialViewName, searchedLocations, errorsFactory, cache);
+            }
+            else {
+                throw errorsFactory.errorReadingView(filePath, err);  // [#2].
+            }
+        }
+
+        function successResult(data, filePath) {
+            var result = { data, filePath };
+
+            if (cache)
+                cache[filePath] = result;
+
+            return result;
+        }
+    }
+    async findPartialAsync(startDir, partialViewName, searchedLocations, errorsFactory, cache) {
+        searchedLocations = searchedLocations || [];
+
+        if (!partialViewName || !partialViewName.length)
+            throw errorsFactory.partialLayoutNameExpected(); // Tested by [2.2].
+
+        let viewFileExt = path.extname(partialViewName);
+
+        if (!viewFileExt.equal('.' + this.ext))
+            partialViewName += '.' + this.ext;
+
+        if (partialViewName[0] === '/' || partialViewName[0] === '.') {
+            let viewPath = path.normalize(partialViewName);
+
+            if (partialViewName[0] === '/') { // it's relative to the `views` root folder
+                if (!viewPath.startsWithIC(this.viewsDir)) // for linux only (in Windows an absolute path cannot start with '/')
+                    viewPath = path.join(this.viewsDir, viewPath);
+                // [#2.4.1], [#2.4.2], [#2.4.3]
+            }
+            else if (partialViewName[0] === '.') { // it's relative to the current folder
+                viewPath = path.join(startDir, viewPath); // [#2.4.4], [#2.4.5]
+            }
+
+            try {
+                searchedLocations.push(viewPath);
+                let cachedData = cache && cache[viewPath];
+
+                if (cachedData)
+                    return cachedData;
+
+                let data = await pfs.readFile(viewPath);
+                let dataStr = this.addFileNameIfDev(data, viewPath);
+                return successResult(dataStr, viewPath);
+            }
+            catch (err) {
+                if (err.code === 'ENOENT')
+                    throw errorsFactory.partialViewNotFound(path.basename(partialViewName), searchedLocations); // [#2.3]
+
+                throw errorsFactory.errorReadingView(viewPath, err);  // [#2.3.1]
+            }
+        }
+
+        partialViewName = path.normalize(partialViewName);
+        // it's just a layout name without any path, start search from the current dir..
+        let filePath = path.join(startDir, partialViewName);
+
+        try {
+            searchedLocations.push(filePath);
+            let cachedData = cache && cache[filePath];
+
+            if (cachedData)
+                return cachedData;
+
+            let data = await pfs.readFile(filePath);
+            let dataStr = this.addFileNameIfDev(data, filePath);
+            return successResult(dataStr, filePath);
+        }
+        catch (err) {
+            if (err.code === 'ENOENT') { // the file doesn't exist, lets see a dir up..
+                startDir = startDir.equal(this.viewsDir, true) ? null : cutLastSegment(startDir);
+
+                if (!startDir)
+                    throw errorsFactory.partialViewNotFound(partialViewName, searchedLocations); // [#2.1].
+                else
+                    return await this.findPartialAsync(startDir, partialViewName, searchedLocations, errorsFactory, cache);
             }
             else {
                 throw errorsFactory.errorReadingView(filePath, err);  // [#2].
@@ -228,7 +388,7 @@ module.exports = class Razor {
         fs.readFile(filePath, (err, data) => {
             if (err) {
                 if (err.code === 'ENOENT') { // the file doesn't exist, lets see a dir up..
-                    startDir = startDir.equal(this.viewsDir, true) ? null : path.cutLastSegment(startDir);
+                    startDir = startDir.equal(this.viewsDir, true) ? null : cutLastSegment(startDir);
 
                     if (!startDir)
                         return done(errorsFactory.partialViewNotFound(partialViewName, searchedLocations)); // [#2.5]

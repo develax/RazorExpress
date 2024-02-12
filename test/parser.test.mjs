@@ -1,11 +1,21 @@
+import { expect } from 'chai';
+import * as er from "../core/errors/errors.en.mjs"
+import * as p from "../core/parser.mjs"
+import * as cases from "./cases/env-variables.mjs"
+import * as casesHtml from "./cases/html.mjs"
+import * as casesInvalidHtml from "./cases/invalid-html.mjs"
+import * as casesInvalidModel from "./cases/invalid-model.mjs"
+import * as casesModel from "./cases/model.mjs"
+import * as casesScope from "./cases/scope.mjs"
+import * as casesSection from "./cases/section.mjs"
+import * as casesCode from "./cases/code.mjs"
+
 (function () {
     console.clear();
     console.log("=============================================");
     console.log("STARTED: parser.test.js");
 
-    var expect = require('chai').expect;
-    const parser = require('../core/parser')({ debug: false, mode: "development" });
-    const er = new require('../core/errors/errors');
+    const parser = p.default({ debug: false, mode: "development" });
 
     describe("INVALID INPUT ARGUMENTS", () => {
         it("should throw an exception if argument is not a string", () => {
@@ -18,12 +28,10 @@
 
     describe("ENVIRONMENTAL VARIABLES VISIBILITY CASES", () => {
         describe("HIDDEN", () => {
-            let cases = require('./cases/env-variables');
-
             for (let i = 0; i < cases.length; i++) {
                 let c = cases[i];
                 it(c.name, () => {
-                    
+
                     if (typeof c.expected !== 'undefined') {
                         let result = parser.compileSync({ template: c.template, model: c.model, filePath: c.name });
                         expect(c.expected).to.equal(result);
@@ -46,7 +54,7 @@
 
     describe("HTML CASES", () => {
         describe("VALID HTML", () => {
-            let cases = require('./cases/html');
+            let cases = casesHtml;
 
             for (let i = 0; i < cases.length; i++) {
                 let c = cases[i];
@@ -58,7 +66,7 @@
         });
 
         describe("INVALID HTML", () => {
-            let cases = require('./cases/invalid-html');
+            let cases = casesInvalidHtml;
 
             for (let i = 0; i < cases.length; i++) {
                 let c = cases[i];
@@ -72,7 +80,7 @@
 
     describe("MODEL & SCOPE & EXPRESSION CASES", () => {
         describe("VALID MODELS", () => {
-            let cases = require('./cases/model');
+            let cases = casesModel;
 
             for (let i = 0; i < cases.length; i++) {
                 let c = cases[i];
@@ -84,7 +92,7 @@
         });
 
         describe("INVALID MODELS", () => {
-            let cases = require('./cases/invalid-model');
+            let cases = casesInvalidModel;
 
             for (let i = 0; i < cases.length; i++) {
                 let c = cases[i];
@@ -96,7 +104,7 @@
         });
 
         describe("SCOPES", () => {
-            let cases = require('./cases/scope');
+            let cases = casesScope;
 
             for (let i = 0; i < cases.length; i++) {
                 let c = cases[i];
@@ -110,7 +118,7 @@
 
     describe("CODE-BLOCKS CASES", () => {
         describe("VALID", () => {
-            let cases = require('./cases/code');
+            let cases = casesCode;
 
             for (let i = 0; i < cases.length; i++) {
                 let c = cases[i];
@@ -130,7 +138,7 @@
 
     describe("SECTIONS CASES", () => {
         describe("VALID", () => {
-            let cases = require('./cases/section');
+            let cases = casesSection;
 
             for (let i = 0; i < cases.length; i++) {
                 let c = cases[i];
@@ -145,6 +153,16 @@
                     }
                 });
             }
+        });
+    });
+
+    describe("AWAIT CODE", () => {
+        describe("VALID", async (done) => {
+            let result = parser.compileSync({ template: "@(Model?.a??1)", model: {}, filePath: "index.raz" });
+            expect(result).to.be.equal("1");
+
+            let result2 = await parser.compileAsync({ template: "[@(Promise.resolve(1))]", model: {}, filePath: "index.raz" });
+            expect(result2).to.be.equal("[1]");
         });
     });
 

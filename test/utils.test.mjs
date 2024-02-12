@@ -1,7 +1,7 @@
 console.log("> UTILS.test.js");
 
-require('../core/utils');
-const expect = require('chai').expect;
+import { Utils } from "../core/utils.mjs"
+import { expect } from "chai";
 
 describe("Utils.js", () => {
     describe(`String.prototype.${String.prototype.equal.name}`, () => {

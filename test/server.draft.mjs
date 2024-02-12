@@ -1,7 +1,8 @@
-const path = require('path');
-const app = require('express')();
+import * as path from "path"
+import * as express from "express"
+import * as razor from "../index.mjs"
+const app = express();
 
-const razor = require("../index");
 razor.register(app);
 
 var viewsPath = path.join(__dirname, '/views.draft');
