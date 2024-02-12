@@ -2,7 +2,7 @@
 </div>
 
 @section scriptsAfter{
-    <script type="text/javascript" src="/js/raz.js"></script>
+    <script type="text/javascript" src="/js/raz.mjs"></script>
     <script type="text/javascript">
         // https://developer.mozilla.org/en-US/docs/Web/API/GlobalEventHandlers/onerror
         window.addEventListener('error', function(e) {            

@@ -31,7 +31,7 @@ import * as casesCode from "./cases/code.mjs"
             for (let i = 0; i < cases.length; i++) {
                 let c = cases[i];
                 it(c.name, () => {
-                    
+
                     if (typeof c.expected !== 'undefined') {
                         let result = parser.compileSync({ template: c.template, model: c.model, filePath: c.name });
                         expect(c.expected).to.equal(result);
@@ -153,6 +153,16 @@ import * as casesCode from "./cases/code.mjs"
                     }
                 });
             }
+        });
+    });
+
+    describe("AWAIT CODE", () => {
+        describe("VALID", async (done) => {
+            let result = parser.compileSync({ template: "@(Model?.a??1)", model: {}, filePath: "index.raz" });
+            expect(result).to.be.equal("1");
+
+            let result2 = await parser.compileAsync({ template: "[@(Promise.resolve(1))]", model: {}, filePath: "index.raz" });
+            expect(result2).to.be.equal("[1]");
         });
     });
 

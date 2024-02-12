@@ -1,0 +1,9 @@
+
+@Html.raw(1)
+
+@{
+    ViewData.test = 12345;
+}
+SDSDajngkdfngskdjfgnkzdnfk
+
+@Html.partialAsync("./_text.raz")

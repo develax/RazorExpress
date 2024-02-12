@@ -2,10 +2,21 @@
 import * as utils from "./utils.mjs"
 import * as dbg from "./dbg/debugger.mjs"
 import { HtmlString } from "./HtmlString.mjs";
-import {htmlEncode} from "./libs/js-htmlencode.js";
-import {ParserErrorFactory} from "./errors/errors.en.mjs"
+import { htmlEncode } from "./libs/js-htmlencode.js";
+import { ParserErrorFactory } from "./errors/errors.en.mjs"
 import * as vm from "vm"
+/**
+ * 
+ * @param {Html} html 
+ * @param {*} model 
+ * @param {*} viewData 
+ * @param {*} scope 
+ * @param {*} isDebugMode 
+ */
 function compilePageSync(html, model, viewData, scope, isDebugMode) {
+    /**
+     * @type {vm.Context}
+     */
     let vm = html._vm;
 
     if (vm) {
@@ -21,7 +32,8 @@ function compilePageSync(html, model, viewData, scope, isDebugMode) {
         defineConstant(sandbox, "Model", model);
         defineConstant(sandbox, "ViewData", viewData);
         defineConstant(sandbox, "debug", isDebugMode);
-        vm.runInNewContext(html._js, sandbox);
+
+        vm.runInNewContext(html._js.replace(/await/, "").replace("/async/", ""), sandbox);
     }
     else {
         const argNames = ["Html", "Model", "ViewData", "debug"];
@@ -52,7 +64,8 @@ function compilePageSync(html, model, viewData, scope, isDebugMode) {
 async function compilePageAsync(html, model, viewData, scope, isDebugMode) {
     let vm = html._vm;
 
-    if (vm) {
+    if (false && vm) {
+
         let sandbox = html._sandbox;
         // Creates cope variables.
         if (scope) {
@@ -65,7 +78,7 @@ async function compilePageAsync(html, model, viewData, scope, isDebugMode) {
         defineConstant(sandbox, "Model", model);
         defineConstant(sandbox, "ViewData", viewData);
         defineConstant(sandbox, "debug", isDebugMode);
-        vm.runInNewContext(html._js, sandbox);
+        await vm.runInNewContext(html._js.replace("(function", "await (async function"), sandbox);
     }
     else {
         const argNames = ["Html", "Model", "ViewData", "debug"];
@@ -80,9 +93,9 @@ async function compilePageAsync(html, model, viewData, scope, isDebugMode) {
         }
 
         // Put the JS-scipt to be executed.
-        argNames.push(html._js);
+        argNames.push(html._js.replace("(function", "await (async function"));
         // Execute JS-script via function with arguments.
-        Function.apply(undefined, argNames).apply(undefined, argValues);
+        await (async function a() { }).__proto__.constructor.apply(undefined, argNames).apply(undefined, argValues);
     }
 
     function defineConstant(obj, name, value) {
@@ -121,6 +134,9 @@ export default function (opts) {
         if (debugMode && !isBrowser) {
             this._vm = vm;
             this._sandbox = Object.create(null);
+            /**
+             * @type {vm.Context}
+             */
             this._vm.createContext(this._sandbox);
         }
 
@@ -181,7 +197,6 @@ export default function (opts) {
             args.er.isLayout = true; // the crutch
             var result = await args.findPartialAsync(this.layout, args.filePath, args.er)
             args.er.isLayout = false;
-            if (err) throw (err);
             let compileOpt = {
                 scope: args.scope,
                 template: result.data,
@@ -339,10 +354,10 @@ export default function (opts) {
                 compileOpt.js = partial.js;
                 compileOpt.jsValues = partial.jsValues;
             }
-
-            let { html, precompiled } = await compileAsync(compileOpt);
-            partial.js = precompiled.js; // put to cache
-            partial.jsValues = precompiled.jsValues; // put to cache
+            let html = await compileAsync(compileOpt);;
+            //let { html, precompiled } = output;
+            //partial.js = precompiled.js; // put to cache
+            //partial.jsValues = precompiled.jsValues; // put to cache
 
             return html;
         };
@@ -366,8 +381,8 @@ export default function (opts) {
             //this.text += (ch === '"') ? '\\"' : ch;
         }
 
-        toScript(jsValues) {
-            return toScript(this, jsValues);
+        toScript(jsValues, isAsync) {
+            return toScript(this, jsValues, isAsync);
         }
     }
 
@@ -375,14 +390,14 @@ export default function (opts) {
         return (val != null && val !== '');
     }
 
-    function toScript(block, jsValues) {
+    function toScript(block, jsValues, isAsync) {
         if (block.type === blockType.section) {
             let secMarker = `\r\nHtml.__sec("${block.name}");`;
             let script = secMarker;
 
             for (let n = 0; n < block.blocks.length; n++) {
                 let sectionBlock = block.blocks[n];
-                script += toScript(sectionBlock, jsValues);
+                script += toScript(sectionBlock, jsValues, isAsync);
             }
 
             script += secMarker;
@@ -394,10 +409,10 @@ export default function (opts) {
             switch (block.type) {
                 case blockType.html:
                     i = jsValues.enq(block.text);
-                    return "\r\nHtml.raw(Html.__val(" + i + "));";
+                    return "\r\nHtml.raw(" + (isAsync ? "await " : "") + "Html.__val(" + i + "));";
                 case blockType.expr:
                     i = jsValues.enq(block.text);
-                    let code = `Html.encode(eval(Html.__val(${i})));`;
+                    let code = `Html.encode(` + (isAsync ? "await " : "") + `eval(Html.__val(${i})));`;
                     return debugMode ? setDbg(code, block) : "\r\n" + code;
                 case blockType.code:
                     return debugMode ? setDbg(block.text, block) : "\r\n" + block.text;
@@ -456,6 +471,7 @@ Html.__dbg.pos = null;`;
         }
 
         compile(done) {
+
             log.debug();
             let errorFactory = this.er;
 
@@ -493,7 +509,7 @@ Html.__dbg.pos = null;`;
                 let errorFactory = this.er;
 
                 try {
-                    var htmlObj = this.getHtml({}, reject);
+                    var htmlObj = this.getHtml({ async: true }, reject);
                 }
                 catch (exc) {
                     return error(exc);
@@ -507,6 +523,9 @@ Html.__dbg.pos = null;`;
                         catch (exc) {
                             return error(exc, htmlObj.__dbg);
                         }
+                        //return { html: html.html, precompiled: { js: html.js, jsValues: html.jsValues } };
+
+
                         return accept(html);
                     }
                 ).catch(
@@ -567,7 +586,7 @@ Html.__dbg.pos = null;`;
                 this.blocks = [];
                 this.parseHtml(this.blocks);
                 jsValues = new Queue();
-                var scripts = this.blocks.map(b => b.toScript(jsValues));
+                var scripts = this.blocks.map(b => b.toScript(jsValues, htmlArgs.async || false));
                 js = scripts.join("");
             }
 
@@ -642,6 +661,19 @@ Html.__dbg.pos = null;`;
                     if (nextCh === '@') { // checking for '@@' that means just text '@'
                         ch = this.fetchChar(); // skip the next '@'
                         nextCh = this.pickNextChar();
+                    }
+                    else if (nextCh === '*') { // begin comment
+                        //Look for end of comment
+                        ch = this.fetchChar(); // skip the next '@'
+                        while (!(ch === "*" && nextCh === "@")) {
+                            nextCh = this.pickNextChar();
+                            ch = this.fetchChar(); // skip the next '@'
+                            if (!ch)
+                                throw Error(this.er.endOfFileFoundAfterComment(this.lineNum, this.linePos())); // tests: "Code 39"
+                        }
+                        nextCh = this.pickNextChar();
+                        ch = this.fetchChar(); // skip the next '@'
+                        continue;
                     }
                     else {
                         this.fetchChar();

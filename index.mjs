@@ -3,7 +3,7 @@ dbg.setDebugMode(isDebugMode());
 import {Razor} from "./core/Razor.mjs"
 export const HtmlString = (await import('./core/HtmlString.mjs')).default;;
 var parser;
-var settings = { ext: 'raz' };
+export var settings = { ext: 'raz' };
 
 
 export const __express = renderFile;

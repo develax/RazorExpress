@@ -51,7 +51,7 @@ export default function (args) {
     app.use("/js", jsStatic).use(scope);
 
     app.get("/favicon.ico", (req, res)=>{
-        res.status("404").send("Not found.");
+        res.status(404).send("Not found.");
     })
 
     app.get('/', (rq, rs) => {

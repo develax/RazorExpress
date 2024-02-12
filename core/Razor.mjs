@@ -20,7 +20,7 @@ export let cutLastSegment = function (dir) {
 
 import * as initParser_ from "./parser.mjs"
 const initParser = initParser_.default;
-import * as ErrorsFactory from "./errors/errors.mjs"
+import { ParserErrorFactory } from "./errors/errors.en.mjs"
 import * as dbg from "./dbg/debugger.mjs"
 import * as logger from "./dbg/logger.mjs"
 const allowLoggingInDebugModel = false;
@@ -41,6 +41,9 @@ export class Razor {
     }
 
     renderFile(filepath, done) {
+
+
+
         let originFilePath = filepath;
         filepath = path.normalize(filepath);
         //let fileName = path.fileName(filepath);
@@ -51,7 +54,7 @@ export class Razor {
 
         fs.readFile(filepath, (err, data) => {
             if (err) {
-                let error = new ErrorsFactory({ filename: path.basename(originFilePath) }).errorReadingFile(err);
+                let error = new ParserErrorFactory({ filename: path.basename(originFilePath) }).errorReadingFile(err);
                 return done(error); // Tested by [0# Razor.readFile].
             }
 
@@ -79,8 +82,12 @@ export class Razor {
                         return this.findPartialAsync(startDir, layoutName, [], errorsFactory, cache);
                     }
                 };
-
-                this.parser.compile(parserArgs,done);
+                this.parser.compileAsync(parserArgs).then((data) => {
+                    done(null, data);
+                }).catch((error) => {
+                    done(error);
+                });
+                //this.parser.compile(parserArgs,done);
             });
         });
     }

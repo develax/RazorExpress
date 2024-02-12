@@ -1,5 +1,6 @@
 'use strict';
 import { setDebugMode, isDebugMode } from './dbg/debugger.mjs';
+import * as p from "./parser.mjs"
 window.raz = {
     set debug(value) {
         setDebugMode(value);
@@ -9,7 +10,7 @@ window.raz = {
     },
     render(template, model) {
         if (!this.parser)
-            this.parser = require('./parser')();
+            this.parser = p.default();
 
         return this.parser.compileSync(template, model);
     }

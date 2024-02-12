@@ -2,7 +2,7 @@
 </div>
 
 @section scriptsAfter{
-    <script type="text/javascript" src="/js/raz.js"></script>
+    <script type="text/javascript" src="/js/raz.mjs"></script>
     <script type="text/javascript">
         var browser = document.getElementById("browser");
         browser.style.backgroundColor = "white";

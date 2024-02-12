@@ -408,9 +408,4 @@ Here are the links to all repositories with examples used in the documentation:
 <a name="todo-list"></a>
 TODO list (Ideas for the next version)
 ---
-
-1. Implement [Razor-style `@* *@` comments](https://github.com/DevelAx/RazorExpress/blob/master/docs/syntax.md#comments).
-2. ~~Make the library available for use on the client side (in the browser).~~([done](https://www.npmjs.com/package/razjs))
-3. Implement caching compiled templates.
-4. Async partial views.
-5. Make `HtmlString` class public for making functions returnin *raw-values* as expessions.
+1. Implement caching compiled templates.

@@ -56,6 +56,7 @@ describe("Testing 'Razor' module.", () => {
     let nonExistView = "_nonExisting.raz";
     let viewIndex = "index.raz";
     let viewStart = "_viewStart.raz";
+    let errorSuffix = "_error.raz"
     //let partial = "_partial.raz";
 
 
@@ -92,9 +93,9 @@ describe("Testing 'Razor' module.", () => {
         it(`[#1 Razor.${method} | ${errCode}]`, (done) => {
             let filePath = viewErrorPath(viewIndex);
             mockRazor(viewStart, errCode).renderFile(filePath, (err) => {
-                //console.log(err, viewStart, method, errCode);
                 //expectError(err, viewStart, method, errCode);
                 assert(err);
+                console.log("Line 100", "calling done")
                 done();
             });
         });

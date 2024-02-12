@@ -19,6 +19,9 @@ exports.HtmlString = HtmlString;
 'use strict';
 
 var _debugger = require("./dbg/debugger.mjs");
+var p = _interopRequireWildcard(require("./parser.mjs"));
+function _getRequireWildcardCache(e) { if ("function" != typeof WeakMap) return null; var r = new WeakMap(), t = new WeakMap(); return (_getRequireWildcardCache = function (e) { return e ? t : r; })(e); }
+function _interopRequireWildcard(e, r) { if (!r && e && e.__esModule) return e; if (null === e || "object" != typeof e && "function" != typeof e) return { default: e }; var t = _getRequireWildcardCache(r); if (t && t.has(e)) return t.get(e); var n = { __proto__: null }, a = Object.defineProperty && Object.getOwnPropertyDescriptor; for (var u in e) if ("default" !== u && Object.prototype.hasOwnProperty.call(e, u)) { var i = a ? Object.getOwnPropertyDescriptor(e, u) : null; i && (i.get || i.set) ? Object.defineProperty(n, u, i) : n[u] = e[u]; } return n.default = e, t && t.set(e, n), n; }
 window.raz = {
   set debug(value) {
     (0, _debugger.setDebugMode)(value);
@@ -27,12 +30,12 @@ window.raz = {
     return _debugger.isDebugMode;
   },
   render(template, model) {
-    if (!this.parser) this.parser = require('./parser')();
+    if (!this.parser) this.parser = p.default();
     return this.parser.compileSync(template, model);
   }
 };
 
-},{"./dbg/debugger.mjs":3,"./parser":7}],3:[function(require,module,exports){
+},{"./dbg/debugger.mjs":3,"./parser.mjs":7}],3:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -55,6 +58,7 @@ Object.defineProperty(exports, "__esModule", {
 exports.default = void 0;
 var _jsHtmlencode = require("../libs/js-htmlencode.js");
 var _debugger = require("../dbg/debugger.mjs");
+var _utils = require("../utils.mjs");
 class RazorError extends Error {
   constructor(message, captureFrame) {
     super(message);
@@ -99,7 +103,7 @@ class RazorError extends Error {
       };
     let stackHtml = stackToHtml(this, this.data, mainInfo);
     for (var data = this.data; data; data = data.inner) {
-      if (Utils.isServer) codeHtml += "<div class='arrow'>&#8681;</div>";
+      if (_utils.Utils.isServer) codeHtml += "<div class='arrow'>&#8681;</div>";
       codeHtml += dataToHtml(data, mainInfo);
       codeHtml += '<hr />';
     }
@@ -248,7 +252,7 @@ function dataToHtml(data, mainInfo) {
   let html;
   if (data.jshtml) {
     let textCursor = 0;
-    lines = data.jshtml.split('\n');
+    let lines = data.jshtml.split('\n');
     let startLine = data.startLine ? data.startLine : 0;
     html = `<ol start='${startLine}'>`;
     let isLastData = !data.inner;
@@ -307,7 +311,7 @@ function dataToHtml(data, mainInfo) {
     } // for
 
     //let fileFolder = path.dirname(data.filename);
-    let fileName = `<div class="filepath">${Utils.isServer ? Utils.path.basename(data.filename) : "Template:"}</div>`;
+    let fileName = `<div class="filepath">${_utils.Utils.isServer ? _utils.Utils.path.basename(data.filename) : "Template:"}</div>`;
     html += "</ol>";
     html = `
 <div class="code">
@@ -334,7 +338,7 @@ function dataToHtml(data, mainInfo) {
 //     return result;
 // }
 
-},{"../dbg/debugger.mjs":3,"../libs/js-htmlencode.js":6}],5:[function(require,module,exports){
+},{"../dbg/debugger.mjs":3,"../libs/js-htmlencode.js":6,"../utils.mjs":8}],5:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -348,6 +352,16 @@ class ParserErrorFactory {
     this.startLineNum = linesBaseNumber;
     this.info = templateInfo;
     this.info.startLine = linesBaseNumber;
+  }
+  endOfFileFoundAfterComment(lineNum, posNum) {
+    var message = `End-of-file was found after the "@*" character at line ${lineNum + this.startLineNum} pos ${posNum + 1}. Comments must be closed `;
+    return _RazorError.default.new({
+      message,
+      info: this.info,
+      line: lineNum,
+      pos: posNum,
+      capture: this.endOfFileFoundAfterAtSign
+    });
   }
   endOfFileFoundAfterAtSign(lineNum, posNum) {
     var message = `End-of-file was found after the "@" character at line ${lineNum + this.startLineNum} pos ${posNum + 1}. "@" must be followed by a valid code block. If you want to output an "@", escape it using the sequence: "@@"`;
@@ -986,7 +1000,18 @@ var _errorsEn = require("./errors/errors.en.mjs");
 var vm = _interopRequireWildcard(require("vm"));
 function _getRequireWildcardCache(e) { if ("function" != typeof WeakMap) return null; var r = new WeakMap(), t = new WeakMap(); return (_getRequireWildcardCache = function (e) { return e ? t : r; })(e); }
 function _interopRequireWildcard(e, r) { if (!r && e && e.__esModule) return e; if (null === e || "object" != typeof e && "function" != typeof e) return { default: e }; var t = _getRequireWildcardCache(r); if (t && t.has(e)) return t.get(e); var n = { __proto__: null }, a = Object.defineProperty && Object.getOwnPropertyDescriptor; for (var u in e) if ("default" !== u && Object.prototype.hasOwnProperty.call(e, u)) { var i = a ? Object.getOwnPropertyDescriptor(e, u) : null; i && (i.get || i.set) ? Object.defineProperty(n, u, i) : n[u] = e[u]; } return n.default = e, t && t.set(e, n), n; }
+/**
+ * 
+ * @param {Html} html 
+ * @param {*} model 
+ * @param {*} viewData 
+ * @param {*} scope 
+ * @param {*} isDebugMode 
+ */
 function compilePageSync(html, model, viewData, scope, isDebugMode) {
+  /**
+   * @type {vm.Context}
+   */
   let vm = html._vm;
   if (vm) {
     let sandbox = html._sandbox;
@@ -1026,7 +1051,7 @@ function compilePageSync(html, model, viewData, scope, isDebugMode) {
 }
 async function compilePageAsync(html, model, viewData, scope, isDebugMode) {
   let vm = html._vm;
-  if (vm) {
+  if (false && vm) {
     let sandbox = html._sandbox;
     // Creates cope variables.
     if (scope) {
@@ -1038,7 +1063,7 @@ async function compilePageAsync(html, model, viewData, scope, isDebugMode) {
     defineConstant(sandbox, "Model", model);
     defineConstant(sandbox, "ViewData", viewData);
     defineConstant(sandbox, "debug", isDebugMode);
-    vm.runInNewContext(html._js, sandbox);
+    await vm.runInNewContext(html._js.replace("(async function", "await (async function"), sandbox);
   } else {
     const argNames = ["Html", "Model", "ViewData", "debug"];
     const argValues = [html, model, viewData, isDebugMode];
@@ -1051,9 +1076,9 @@ async function compilePageAsync(html, model, viewData, scope, isDebugMode) {
     }
 
     // Put the JS-scipt to be executed.
-    argNames.push(html._js);
+    argNames.push(html._js.replace("(async function", "await (async function"));
     // Execute JS-script via function with arguments.
-    Function.apply(undefined, argNames).apply(undefined, argValues);
+    await async function a() {}.__proto__.constructor.apply(undefined, argNames).apply(undefined, argValues);
   }
   function defineConstant(obj, name, value) {
     Object.defineProperty(obj, name, {
@@ -1088,13 +1113,16 @@ function _default(opts) {
     if (debugMode && !isBrowser) {
       this._vm = vm;
       this._sandbox = Object.create(null);
+      /**
+       * @type {vm.Context}
+       */
       this._vm.createContext(this._sandbox);
     }
 
     // function (process,...){...}() prevents [this] to exist for the 'vm.runInNewContext()' method
     this._js = `
         'use strict';
-(function (process, window, global, module, require, compilePage, compilePageSync, navigator, undefined) {
+(async function (process, window, global, module, require, compilePage, compilePageSync, navigator, undefined) {
     delete Html._js;
     delete Html._vm;
     delete Html._sandbox;
@@ -1308,20 +1336,20 @@ function _default(opts) {
       this.text += ch;
       //this.text += (ch === '"') ? '\\"' : ch;
     }
-    toScript(jsValues) {
-      return toScript(this, jsValues);
+    toScript(jsValues, isAsync) {
+      return toScript(this, jsValues, isAsync);
     }
   }
   function isVisibleValue(val) {
     return val != null && val !== '';
   }
-  function toScript(block, jsValues) {
+  function toScript(block, jsValues, isAsync) {
     if (block.type === blockType.section) {
       let secMarker = `\r\nHtml.__sec("${block.name}");`;
       let script = secMarker;
       for (let n = 0; n < block.blocks.length; n++) {
         let sectionBlock = block.blocks[n];
-        script += toScript(sectionBlock, jsValues);
+        script += toScript(sectionBlock, jsValues, isAsync);
       }
       script += secMarker;
       return script;
@@ -1330,10 +1358,10 @@ function _default(opts) {
       switch (block.type) {
         case blockType.html:
           i = jsValues.enq(block.text);
-          return "\r\nHtml.raw(Html.__val(" + i + "));";
+          return "\r\nHtml.raw(" + (isAsync ? "await " : "") + "Html.__val(" + i + "));";
         case blockType.expr:
           i = jsValues.enq(block.text);
-          let code = `Html.encode(eval(Html.__val(${i})));`;
+          let code = `Html.encode(` + (isAsync ? "await " : "") + `eval(Html.__val(${i})));`;
           return debugMode ? setDbg(code, block) : "\r\n" + code;
         case blockType.code:
           return debugMode ? setDbg(block.text, block) : "\r\n" + block.text;
@@ -1419,7 +1447,9 @@ Html.__dbg.pos = null;`;
         log.debug();
         let errorFactory = this.er;
         try {
-          var htmlObj = this.getHtml({}, reject);
+          var htmlObj = this.getHtml({
+            async: true
+          }, reject);
         } catch (exc) {
           return error(exc);
         }
@@ -1481,7 +1511,7 @@ Html.__dbg.pos = null;`;
         this.blocks = [];
         this.parseHtml(this.blocks);
         jsValues = new Queue();
-        var scripts = this.blocks.map(b => b.toScript(jsValues));
+        var scripts = this.blocks.map(b => b.toScript(jsValues, htmlArgs.async || false));
         js = scripts.join("");
       }
       Object.assign(htmlArgs, {
@@ -1547,6 +1577,18 @@ Html.__dbg.pos = null;`;
             // checking for '@@' that means just text '@'
             ch = this.fetchChar(); // skip the next '@'
             nextCh = this.pickNextChar();
+          } else if (nextCh === '*') {
+            // begin comment
+            //Look for end of comment
+            ch = this.fetchChar(); // skip the next '@'
+            while (!(ch === "*" && nextCh === "@")) {
+              nextCh = this.pickNextChar();
+              ch = this.fetchChar(); // skip the next '@'
+              if (!ch) throw Error(this.er.endOfFileFoundAfterComment(this.lineNum, this.linePos())); // tests: "Code 39"
+            }
+            nextCh = this.pickNextChar();
+            ch = this.fetchChar(); // skip the next '@'
+            continue;
           } else {
             this.fetchChar();
             this.parseCode(blocks);
