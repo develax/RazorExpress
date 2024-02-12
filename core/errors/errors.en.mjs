@@ -1,6 +1,6 @@
-const RazorError = require('./RazorError');
+import RazorError from "./RazorError.mjs";
 
-class ParserErrorFactory {
+export class ParserErrorFactory {
     constructor(templateInfo, linesBaseNumber) {
         this.startLineNum = linesBaseNumber;
         this.info = templateInfo;
@@ -192,6 +192,3 @@ function setInnerError(parserError, error) {
     if (error.message)
         parserError.inner = error;
 }
-
-
-module.exports = ParserErrorFactory;

@@ -647,7 +647,7 @@ els
 @numbers.forEach((n)=>{
     <div>@n</div>
 });`,
-            error: "Unexpected token <"
+            error: "Unexpected token '<'"
         },
         {
             name: "Code 66",

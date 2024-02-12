@@ -1,4 +1,4 @@
-module.exports = class HtmlString {
+export class HtmlString {
     constructor(html) {
         this.html = html;
     }

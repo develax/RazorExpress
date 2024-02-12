@@ -1,11 +1,11 @@
 'use strict';
-
+import { setDebugMode, isDebugMode } from './dbg/debugger.mjs';
 window.raz = {
     set debug(value) {
-        require('../core/dbg/debugger').isDebugMode = value;
+        setDebugMode(value);
     },
     get debug(){
-        return require('../core/dbg/debugger').isDebugMode;
+        return isDebugMode;
     },
     render(template, model) {
         if (!this.parser)

@@ -14,8 +14,8 @@ const proxyquire = require('proxyquire');
 const fs = require('fs');
 
 
-const Razor = require("../core/Razor");
-const RazorError = require('../core/errors/RazorError');
+const Razor = require("../core/Razor.mjs");
+const RazorError = require('../core/errors/RazorError.mjs');
 //const ErrorFactory = require('../core/errors/errors');
 
 const locals = server.locals;

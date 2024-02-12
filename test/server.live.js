@@ -15,7 +15,7 @@ module.exports = function (args) {
     const express = require('express');
     const app = express();
 
-    const razor = require("../index");
+    const razor = require("../index.mjs");
     razor.register(app);
 
     var viewsPath = path.join(__dirname, args.views || '/views');

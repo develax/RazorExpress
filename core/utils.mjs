@@ -2,7 +2,7 @@
 // String
 ////////////////////////////////////////////////
 
-if (typeof Utils === 'undefined') Utils = {};
+export let Utils = {};
 
 String.whitespaces = '\r\n\t ';
 
@@ -96,7 +96,7 @@ String.stripBOM = function (str) {
 ////////////////////////////////////////////////
 
 if (!global.Char) {
-    Char = {};
+    global.Char = {};
 }
 
 if (!Char.isLetter) {

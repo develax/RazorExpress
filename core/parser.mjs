@@ -1,6 +1,11 @@
 'use strict';
-require('./utils');
-
+import * as utils from "./utils.mjs"
+import * as dbg from "./dbg/debugger.mjs"
+import { HtmlString } from "./HtmlString.mjs";
+import pkg from "./libs/js-htmlencode.js";
+const {htmlEncode} = pkg;
+import {ParserErrorFactory} from "./errors/errors.en.mjs"
+import * as vm from "vm"
 function compilePageSync(html, model, viewData, scope, isDebugMode) {
     let vm = html._vm;
 
@@ -45,6 +50,52 @@ function compilePageSync(html, model, viewData, scope, isDebugMode) {
     }
 }
 
+async function compilePageAsync(html, model, viewData, scope, isDebugMode) {
+    let vm = html._vm;
+
+    if (vm) {
+        let sandbox = html._sandbox;
+        // Creates cope variables.
+        if (scope) {
+            Object.keys(scope).forEach((k) => {
+                defineConstant(sandbox, k, scope[k]);
+            });
+        }
+
+        defineConstant(sandbox, "Html", html);
+        defineConstant(sandbox, "Model", model);
+        defineConstant(sandbox, "ViewData", viewData);
+        defineConstant(sandbox, "debug", isDebugMode);
+        vm.runInNewContext(html._js, sandbox);
+    }
+    else {
+        const argNames = ["Html", "Model", "ViewData", "debug"];
+        const argValues = [html, model, viewData, isDebugMode];
+
+        if (scope) {
+            // Add scope variables (we should but can't make them constants because of `eval` limitation in strict-mode).
+            Object.keys(scope).forEach((k) => {
+                argNames.push(k);
+                argValues.push(scope[k]);
+            });
+        }
+
+        // Put the JS-scipt to be executed.
+        argNames.push(html._js);
+        // Execute JS-script via function with arguments.
+        Function.apply(undefined, argNames).apply(undefined, argValues);
+    }
+
+    function defineConstant(obj, name, value) {
+        Object.defineProperty(obj, name, {
+            value,
+            writable: false
+        });
+    }
+    return html.__renderLayoutAsync();
+}
+
+
 function compilePage(html, model, viewData, scope, isDebugMode, done) {
     try {
         compilePageSync(html, model, viewData, scope, isDebugMode);
@@ -55,16 +106,12 @@ function compilePage(html, model, viewData, scope, isDebugMode, done) {
     }
 }
 
-module.exports = function (opts) {
+export default function (opts) {
     opts = opts || {};
-    const dbg = require('../core/dbg/debugger');
     const debugMode = dbg.isDebugMode;
     const isBrowser = dbg.isBrowser;
     const log = opts.log || { debug: () => { } };
     log.debug(`Parser debug mode is '${!!debugMode}'.`);
-
-    const HtmlString = require('./HtmlString');
-    const htmlEncode = require('./libs/js-htmlencode');
 
     ////////////////////
     ///   Html class
@@ -73,7 +120,7 @@ module.exports = function (opts) {
         this._vm = null;
 
         if (debugMode && !isBrowser) {
-            this._vm = require('vm');
+            this._vm = vm;
             this._sandbox = Object.create(null);
             this._vm.createContext(this._sandbox);
         }
@@ -119,12 +166,38 @@ module.exports = function (opts) {
                     bodyHtml: args.html,
                     findPartial: args.findPartial,
                     findPartialSync: args.findPartialSync,
+                    findPartialAsync: args.findPartialAsync,
                     parsedSections: args.parsedSections,
                     partialsCache: args.partialsCache,
                     viewData: args.viewData
                 };
                 compile(compileOpt, done);
             });
+        };
+        this.__renderLayoutAsync = async () => {
+            if (!this.layout) // if the layout is not defined..
+                return args.html;
+
+            // looking for the `Layout`..
+            args.er.isLayout = true; // the crutch
+            var result = await args.findPartialAsync(this.layout, args.filePath, args.er)
+            args.er.isLayout = false;
+            if (err) throw (err);
+            let compileOpt = {
+                scope: args.scope,
+                template: result.data,
+                filePath: result.filePath,
+                model: args.model,
+                bodyHtml: args.html,
+                findPartial: args.findPartial,
+                findPartialSync: args.findPartialSync,
+                findPartialAsync: args.findPartialAsync,
+                parsedSections: args.parsedSections,
+                partialsCache: args.partialsCache,
+                viewData: args.viewData
+            };
+            return await compileAsync(compileOpt);
+
         };
 
         this.__sec = function (name) { // in section
@@ -216,13 +289,14 @@ module.exports = function (opts) {
                 model: viewModel === undefined ? args.model : viewModel, // if is not set explicitly, set default (parent) model
                 findPartial: args.findPartial,
                 findPartialSync: args.findPartialSync,
+                findPartialAsync: args.findPartialAsync,
                 sections,
                 parsedSections: args.parsedSections,
                 partialsCache: args.partialsCache,
                 viewData: args.viewData
             };
 
-            // Read file and complie to JS.
+            // Read file and compile to JS.
             let partial = args.findPartialSync(viewName, args.filePath, args.er, args.partialsCache);
             compileOpt.template = partial.data;
             compileOpt.filePath = partial.filePath;
@@ -241,6 +315,41 @@ module.exports = function (opts) {
 
         this.partial = function (viewName, viewModel) {
             var partialHtml = this.getPartial(viewName, viewModel);
+            this.raw(partialHtml)
+        };
+
+        this.getPartialAsync = async function (viewName, viewModel) {
+            let compileOpt = {
+                scope: args.scope,
+                model: viewModel === undefined ? args.model : viewModel, // if is not set explicitly, set default (parent) model
+                findPartial: args.findPartial,
+                findPartialSync: args.findPartialSync,
+                findPartialAsync: args.findPartialAsync,
+                sections,
+                parsedSections: args.parsedSections,
+                partialsCache: args.partialsCache,
+                viewData: args.viewData
+            };
+
+            // Read file and compile to JS.
+            let partial = await args.findPartialAsync(viewName, args.filePath, args.er, args.partialsCache);
+            compileOpt.template = partial.data;
+            compileOpt.filePath = partial.filePath;
+
+            if (partial.js) { // if it's taken from cache
+                compileOpt.js = partial.js;
+                compileOpt.jsValues = partial.jsValues;
+            }
+
+            let { html, precompiled } = await compileAsync(compileOpt);
+            partial.js = precompiled.js; // put to cache
+            partial.jsValues = precompiled.jsValues; // put to cache
+
+            return html;
+        };
+
+        this.partialAsync = async function (viewName, viewModel) {
+            var partialHtml = await this.getPartialAsync(viewName, viewModel);
             this.raw(partialHtml)
         };
     }
@@ -334,7 +443,6 @@ Html.__dbg.pos = null;`;
     //const _functionKeyword = "function";
     const blockType = { none: 0, html: 1, code: 2, expr: 3, section: 4 };
 
-    const ErrorsFactory = require('./errors/errors');
     const voidTags = "area|base|br|col|embed|hr|img|input|link|meta|param|source|track|wbr".toUpperCase().split("|").map(s => s.trim());
 
     ////////////////
@@ -345,7 +453,7 @@ Html.__dbg.pos = null;`;
             args.filePath = args.filePath || "js-script";
             let linesBaseNumber = (debugMode && opts.express) ? 0 : 1; // in debug-mode the file-path of a template is added as a very first line comment
             this.args = args;
-            this.er = new ErrorsFactory({ filename: args.filePath, jshtml: args.template }, linesBaseNumber);
+            this.er = new ParserErrorFactory({ filename: args.filePath, jshtml: args.template }, linesBaseNumber);
         }
 
         compile(done) {
@@ -378,6 +486,40 @@ Html.__dbg.pos = null;`;
                 var parserError = toParserError(err, errorFactory);
                 return Promise.resolve().then(() => done(parserError)), null;
             }
+        }
+
+        compileAsync() {
+            return new Promise((accept, reject) => {
+                log.debug();
+                let errorFactory = this.er;
+
+                try {
+                    var htmlObj = this.getHtml({}, reject);
+                }
+                catch (exc) {
+                    return error(exc);
+                }
+
+                compilePageAsync(htmlObj, this.args.model, this.args.viewData, this.args.scope, debugMode).then(
+                    (html) => {
+                        try {
+                            this.checkSections();
+                        }
+                        catch (exc) {
+                            return error(exc, htmlObj.__dbg);
+                        }
+                        return accept(html);
+                    }
+                ).catch(
+                    (err) => error(err, htmlObj.__dbg)
+                );
+
+                function error(err, dbg) {
+                    err.__dbg = dbg;
+                    var parserError = toParserError(err, errorFactory);
+                    return Promise.resolve().then(() => reject(parserError)), null;
+                }
+            })
         }
 
         compileSync() {
@@ -1509,6 +1651,7 @@ Html.__dbg.pos = null;`;
     ////////////////
     var compile = (args, done) => new Parser(args).compile(done);
     var compileSync = args => new Parser(args).compileSync();
+    var compileAsync = args => new Parser(args).compileAsync();
 
     // Module/Exports..
     return {
@@ -1520,6 +1663,11 @@ Html.__dbg.pos = null;`;
             let args = Array.prototype.slice.call(arguments);
             args = prepareArgs(args);
             return compileSync(args).html;
+        },
+        compileAsync: async function () {
+            let args = Array.prototype.slice.call(arguments);
+            args = prepareArgs(args);
+            return await compileAsync(args);
         }
     };
 

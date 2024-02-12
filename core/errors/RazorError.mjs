@@ -1,6 +1,7 @@
-const htmlEncode = require('../libs/js-htmlencode');
+import htmlEncode from '../libs/js-htmlencode.js';
+import { isDebugMode, isBrowser } from '../dbg/debugger.mjs';
 
-class RazorError extends Error {
+export default class RazorError extends Error {
     constructor(message, captureFrame) {
         super(message);
 
@@ -15,7 +16,6 @@ class RazorError extends Error {
     }
 
     static extend(exc, args) {
-        const { isDebugMode, isBrowser } = require('../dbg/debugger');
         exc.isRazorError = true;
 
         if (!isDebugMode)
@@ -137,8 +137,6 @@ class RazorError extends Error {
         return html;
     }
 }
-
-module.exports = RazorError;
 
 function stackToHtml(exc, data, mainInfo) {
     let lines = exc.stack.split('\n');

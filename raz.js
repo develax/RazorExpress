@@ -910,6 +910,52 @@ function compilePageSync(html, model, viewData, scope, isDebugMode) {
     }
 }
 
+async function compilePageAsync(html, model, viewData, scope, isDebugMode) {
+    let vm = html._vm;
+
+    if (vm) {
+        let sandbox = html._sandbox;
+        // Creates cope variables.
+        if (scope) {
+            Object.keys(scope).forEach((k) => {
+                defineConstant(sandbox, k, scope[k]);
+            });
+        }
+
+        defineConstant(sandbox, "Html", html);
+        defineConstant(sandbox, "Model", model);
+        defineConstant(sandbox, "ViewData", viewData);
+        defineConstant(sandbox, "debug", isDebugMode);
+        vm.runInNewContext(html._js, sandbox);
+    }
+    else {
+        const argNames = ["Html", "Model", "ViewData", "debug"];
+        const argValues = [html, model, viewData, isDebugMode];
+
+        if (scope) {
+            // Add scope variables (we should but can't make them constants because of `eval` limitation in strict-mode).
+            Object.keys(scope).forEach((k) => {
+                argNames.push(k);
+                argValues.push(scope[k]);
+            });
+        }
+
+        // Put the JS-scipt to be executed.
+        argNames.push(html._js);
+        // Execute JS-script via function with arguments.
+        Function.apply(undefined, argNames).apply(undefined, argValues);
+    }
+
+    function defineConstant(obj, name, value) {
+        Object.defineProperty(obj, name, {
+            value,
+            writable: false
+        });
+    }
+    return html.__renderLayoutAsync();
+}
+
+
 function compilePage(html, model, viewData, scope, isDebugMode, done) {
     try {
         compilePageSync(html, model, viewData, scope, isDebugMode);
@@ -926,28 +972,27 @@ module.exports = function (opts) {
     const debugMode = dbg.isDebugMode;
     const isBrowser = dbg.isBrowser;
     const log = opts.log || { debug: () => { } };
-    log.debug(`Parse debug mode is '${!!debugMode}'.`);
+    log.debug(`Parser debug mode is '${!!debugMode}'.`);
 
     const HtmlString = require('./HtmlString');
     const htmlEncode = require('./libs/js-htmlencode');
-    const vm = opts.vm;
 
     ////////////////////
     ///   Html class
     ////////////////////
     function Html(args) {
-        // Non-user section.
-        this._vm = vm;
+        this._vm = null;
 
         if (debugMode && !isBrowser) {
+            this._vm = require('vm');
             this._sandbox = Object.create(null);
-            vm.createContext(this._sandbox);
+            this._vm.createContext(this._sandbox);
         }
 
         // function (process,...){...}() prevents [this] to exist for the 'vm.runInNewContext()' method
         this._js = `
         'use strict';
-(function (process, window, global, module, require, compilePage, compilePageSync, navigator, undefined) { 
+(function (process, window, global, module, require, compilePage, compilePageSync, navigator, undefined) {
     delete Html._js;
     delete Html._vm;
     delete Html._sandbox;
@@ -985,12 +1030,38 @@ module.exports = function (opts) {
                     bodyHtml: args.html,
                     findPartial: args.findPartial,
                     findPartialSync: args.findPartialSync,
+                    findPartialAsync: args.findPartialAsync,
                     parsedSections: args.parsedSections,
                     partialsCache: args.partialsCache,
                     viewData: args.viewData
                 };
                 compile(compileOpt, done);
             });
+        };
+        this.__renderLayoutAsync = async () => {
+            if (!this.layout) // if the layout is not defined..
+                return args.html;
+
+            // looking for the `Layout`..
+            args.er.isLayout = true; // the crutch
+            var result = await args.findPartialAsync(this.layout, args.filePath, args.er)
+            args.er.isLayout = false;
+            if (err) throw (err);
+            let compileOpt = {
+                scope: args.scope,
+                template: result.data,
+                filePath: result.filePath,
+                model: args.model,
+                bodyHtml: args.html,
+                findPartial: args.findPartial,
+                findPartialSync: args.findPartialSync,
+                findPartialAsync: args.findPartialAsync,
+                parsedSections: args.parsedSections,
+                partialsCache: args.partialsCache,
+                viewData: args.viewData
+            };
+            return await compileAsync(compileOpt);
+
         };
 
         this.__sec = function (name) { // in section
@@ -1070,7 +1141,7 @@ module.exports = function (opts) {
             }
             else {
                 if (required)
-                    throw args.er.sectionIsNotFound(name, args.filePath); // [#3.3] 
+                    throw args.er.sectionIsNotFound(name, args.filePath); // [#3.3]
             }
 
             return '';
@@ -1082,13 +1153,14 @@ module.exports = function (opts) {
                 model: viewModel === undefined ? args.model : viewModel, // if is not set explicitly, set default (parent) model
                 findPartial: args.findPartial,
                 findPartialSync: args.findPartialSync,
+                findPartialAsync: args.findPartialAsync,
                 sections,
                 parsedSections: args.parsedSections,
                 partialsCache: args.partialsCache,
                 viewData: args.viewData
             };
 
-            // Read file and complie to JS.
+            // Read file and compile to JS.
             let partial = args.findPartialSync(viewName, args.filePath, args.er, args.partialsCache);
             compileOpt.template = partial.data;
             compileOpt.filePath = partial.filePath;
@@ -1107,6 +1179,41 @@ module.exports = function (opts) {
 
         this.partial = function (viewName, viewModel) {
             var partialHtml = this.getPartial(viewName, viewModel);
+            this.raw(partialHtml)
+        };
+
+        this.getPartialAsync = async function (viewName, viewModel) {
+            let compileOpt = {
+                scope: args.scope,
+                model: viewModel === undefined ? args.model : viewModel, // if is not set explicitly, set default (parent) model
+                findPartial: args.findPartial,
+                findPartialSync: args.findPartialSync,
+                findPartialAsync: args.findPartialAsync,
+                sections,
+                parsedSections: args.parsedSections,
+                partialsCache: args.partialsCache,
+                viewData: args.viewData
+            };
+
+            // Read file and compile to JS.
+            let partial = await args.findPartialAsync(viewName, args.filePath, args.er, args.partialsCache);
+            compileOpt.template = partial.data;
+            compileOpt.filePath = partial.filePath;
+
+            if (partial.js) { // if it's taken from cache
+                compileOpt.js = partial.js;
+                compileOpt.jsValues = partial.jsValues;
+            }
+
+            let { html, precompiled } = await compileAsync(compileOpt);
+            partial.js = precompiled.js; // put to cache
+            partial.jsValues = precompiled.jsValues; // put to cache
+
+            return html;
+        };
+
+        this.partialAsync = async function (viewName, viewModel) {
+            var partialHtml = await this.getPartialAsync(viewName, viewModel);
             this.raw(partialHtml)
         };
     }
@@ -1244,6 +1351,40 @@ Html.__dbg.pos = null;`;
                 var parserError = toParserError(err, errorFactory);
                 return Promise.resolve().then(() => done(parserError)), null;
             }
+        }
+
+        compileAsync() {
+            return new Promise((accept, reject) => {
+                log.debug();
+                let errorFactory = this.er;
+
+                try {
+                    var htmlObj = this.getHtml({}, reject);
+                }
+                catch (exc) {
+                    return error(exc);
+                }
+
+                compilePageAsync(htmlObj, this.args.model, this.args.viewData, this.args.scope, debugMode).then(
+                    (html) => {
+                        try {
+                            this.checkSections();
+                        }
+                        catch (exc) {
+                            return error(exc, htmlObj.__dbg);
+                        }
+                        return accept(html);
+                    }
+                ).catch(
+                    (err) => error(err, htmlObj.__dbg)
+                );
+
+                function error(err, dbg) {
+                    err.__dbg = dbg;
+                    var parserError = toParserError(err, errorFactory);
+                    return Promise.resolve().then(() => reject(parserError)), null;
+                }
+            })
         }
 
         compileSync() {
@@ -1555,7 +1696,7 @@ Html.__dbg.pos = null;`;
                     if (this.pickNextChar() === '@') { // checking for '@@' that means just text '@'
                         ch = this.fetchChar(); // skip the next '@'
                     }
-                    else if (openTagName || tag) { // it must be an expression somewhere inside HTML  
+                    else if (openTagName || tag) { // it must be an expression somewhere inside HTML
                         this.fetchChar(); // skip current '@'
                         this.parseCode(blocks);
 
@@ -2123,9 +2264,9 @@ Html.__dbg.pos = null;`;
             }
 
             if (spaceCount < 1)
-                throw this.er.whiteSpaceExpectedAfter("@" + _sectionKeyword, this.lineNum, this.linePos()); // unreachable due to previous function check 
+                throw this.er.whiteSpaceExpectedAfter("@" + _sectionKeyword, this.lineNum, this.linePos()); // unreachable due to previous function check
 
-            //let sectionLine = this.lineNum; 
+            //let sectionLine = this.lineNum;
             let sectionNamePos = this.linePos();
             let sectionName = '';
 
@@ -2375,6 +2516,7 @@ Html.__dbg.pos = null;`;
     ////////////////
     var compile = (args, done) => new Parser(args).compile(done);
     var compileSync = args => new Parser(args).compileSync();
+    var compileAsync = args => new Parser(args).compileAsync();
 
     // Module/Exports..
     return {
@@ -2386,6 +2528,11 @@ Html.__dbg.pos = null;`;
             let args = Array.prototype.slice.call(arguments);
             args = prepareArgs(args);
             return compileSync(args).html;
+        },
+        compileAsync: async function () {
+            let args = Array.prototype.slice.call(arguments);
+            args = prepareArgs(args);
+            return await compileAsync(args);
         }
     };
 
@@ -2403,8 +2550,8 @@ Html.__dbg.pos = null;`;
 
 }; // module.export
 
-},{"../core/dbg/debugger":3,"./HtmlString":1,"./errors/errors":6,"./libs/js-htmlencode":7,"./utils":9}],9:[function(require,module,exports){
-(function (global){
+},{"../core/dbg/debugger":3,"./HtmlString":1,"./errors/errors":6,"./libs/js-htmlencode":7,"./utils":9,"vm":10}],9:[function(require,module,exports){
+(function (global){(function (){
 ////////////////////////////////////////////////
 // String
 ////////////////////////////////////////////////
@@ -2527,5 +2674,156 @@ Char.isWhiteSpace = Char.isWhiteSpace || function (c) {
 Char.isIdentifier = function (c) {
     return Char.isLetter(c) || Char.isDigit(c) || '_$'.includes(c);
 }
-}).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
+}).call(this)}).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
+},{}],10:[function(require,module,exports){
+var indexOf = function (xs, item) {
+    if (xs.indexOf) return xs.indexOf(item);
+    else for (var i = 0; i < xs.length; i++) {
+        if (xs[i] === item) return i;
+    }
+    return -1;
+};
+var Object_keys = function (obj) {
+    if (Object.keys) return Object.keys(obj)
+    else {
+        var res = [];
+        for (var key in obj) res.push(key)
+        return res;
+    }
+};
+
+var forEach = function (xs, fn) {
+    if (xs.forEach) return xs.forEach(fn)
+    else for (var i = 0; i < xs.length; i++) {
+        fn(xs[i], i, xs);
+    }
+};
+
+var defineProp = (function() {
+    try {
+        Object.defineProperty({}, '_', {});
+        return function(obj, name, value) {
+            Object.defineProperty(obj, name, {
+                writable: true,
+                enumerable: false,
+                configurable: true,
+                value: value
+            })
+        };
+    } catch(e) {
+        return function(obj, name, value) {
+            obj[name] = value;
+        };
+    }
+}());
+
+var globals = ['Array', 'Boolean', 'Date', 'Error', 'EvalError', 'Function',
+'Infinity', 'JSON', 'Math', 'NaN', 'Number', 'Object', 'RangeError',
+'ReferenceError', 'RegExp', 'String', 'SyntaxError', 'TypeError', 'URIError',
+'decodeURI', 'decodeURIComponent', 'encodeURI', 'encodeURIComponent', 'escape',
+'eval', 'isFinite', 'isNaN', 'parseFloat', 'parseInt', 'undefined', 'unescape'];
+
+function Context() {}
+Context.prototype = {};
+
+var Script = exports.Script = function NodeScript (code) {
+    if (!(this instanceof Script)) return new Script(code);
+    this.code = code;
+};
+
+Script.prototype.runInContext = function (context) {
+    if (!(context instanceof Context)) {
+        throw new TypeError("needs a 'context' argument.");
+    }
+    
+    var iframe = document.createElement('iframe');
+    if (!iframe.style) iframe.style = {};
+    iframe.style.display = 'none';
+    
+    document.body.appendChild(iframe);
+    
+    var win = iframe.contentWindow;
+    var wEval = win.eval, wExecScript = win.execScript;
+
+    if (!wEval && wExecScript) {
+        // win.eval() magically appears when this is called in IE:
+        wExecScript.call(win, 'null');
+        wEval = win.eval;
+    }
+    
+    forEach(Object_keys(context), function (key) {
+        win[key] = context[key];
+    });
+    forEach(globals, function (key) {
+        if (context[key]) {
+            win[key] = context[key];
+        }
+    });
+    
+    var winKeys = Object_keys(win);
+
+    var res = wEval.call(win, this.code);
+    
+    forEach(Object_keys(win), function (key) {
+        // Avoid copying circular objects like `top` and `window` by only
+        // updating existing context properties or new properties in the `win`
+        // that was only introduced after the eval.
+        if (key in context || indexOf(winKeys, key) === -1) {
+            context[key] = win[key];
+        }
+    });
+
+    forEach(globals, function (key) {
+        if (!(key in context)) {
+            defineProp(context, key, win[key]);
+        }
+    });
+    
+    document.body.removeChild(iframe);
+    
+    return res;
+};
+
+Script.prototype.runInThisContext = function () {
+    return eval(this.code); // maybe...
+};
+
+Script.prototype.runInNewContext = function (context) {
+    var ctx = Script.createContext(context);
+    var res = this.runInContext(ctx);
+
+    if (context) {
+        forEach(Object_keys(ctx), function (key) {
+            context[key] = ctx[key];
+        });
+    }
+
+    return res;
+};
+
+forEach(Object_keys(Script.prototype), function (name) {
+    exports[name] = Script[name] = function (code) {
+        var s = Script(code);
+        return s[name].apply(s, [].slice.call(arguments, 1));
+    };
+});
+
+exports.isContext = function (context) {
+    return context instanceof Context;
+};
+
+exports.createScript = function (code) {
+    return exports.Script(code);
+};
+
+exports.createContext = Script.createContext = function (context) {
+    var copy = new Context();
+    if(typeof context === 'object') {
+        forEach(Object_keys(context), function (key) {
+            copy[key] = context[key];
+        });
+    }
+    return copy;
+};
+
 },{}]},{},[2]);
