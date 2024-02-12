@@ -2,8 +2,7 @@
 import * as utils from "./utils.mjs"
 import * as dbg from "./dbg/debugger.mjs"
 import { HtmlString } from "./HtmlString.mjs";
-import pkg from "./libs/js-htmlencode.js";
-const {htmlEncode} = pkg;
+import {htmlEncode} from "./libs/js-htmlencode.js";
 import {ParserErrorFactory} from "./errors/errors.en.mjs"
 import * as vm from "vm"
 function compilePageSync(html, model, viewData, scope, isDebugMode) {

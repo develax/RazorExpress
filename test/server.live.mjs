@@ -1,4 +1,11 @@
 //'use strict';
+import * as path from "path"
+import express from 'express';
+import * as razor from "../index.mjs"
+import { dirname } from 'node:path';
+import { fileURLToPath } from 'node:url';
+
+const __dirname = dirname(fileURLToPath(import.meta.url));
 
 class MyScope {
     constructor() {
@@ -9,13 +16,10 @@ class MyScope {
     }
 }
 
-module.exports = function (args) {
+export default function (args) {
     args = args || {};
-    const path = require('path');
-    const express = require('express');
     const app = express();
 
-    const razor = require("../index.mjs");
     razor.register(app);
 
     var viewsPath = path.join(__dirname, args.views || '/views');

@@ -1,6 +1,6 @@
-import htmlEncode from '../libs/js-htmlencode.js';
+import {htmlEncode} from '../libs/js-htmlencode.js';
 import { isDebugMode, isBrowser } from '../dbg/debugger.mjs';
-
+import { Utils } from '../utils.mjs';
 export default class RazorError extends Error {
     constructor(message, captureFrame) {
         super(message);
@@ -224,7 +224,7 @@ function dataToHtml(data, mainInfo) {
 
     if (data.jshtml) {
         let textCursor = 0;
-        lines = data.jshtml.split('\n');
+        let lines = data.jshtml.split('\n');
         let startLine = data.startLine ? data.startLine : 0; 
         html = `<ol start='${startLine}'>`;
         let isLastData = !data.inner;

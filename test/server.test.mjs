@@ -1,13 +1,15 @@
 console.log("STARTED: server.test.js");
 
-const chai = require('chai');
-const chaiHttp = require('chai-http');
+import chai from 'chai';
+import chaiHttp from 'chai-http';
 const expect = chai.expect;
 chai.use(chaiHttp);
-const jsdom = require("jsdom");
+import * as jsdom from "jsdom"
 const { JSDOM } = jsdom;
-const jquery = require('jquery');
+import * as jquery_ from "jquery"
+const jquery = jquery_.default;
 const port = 8000;
+import * as P from "./server.live.mjs"
 
 const errorHeader = "A template compilation error occured";
 
@@ -35,7 +37,7 @@ function find(html, selector, text) {
 
 describe("server routes", () => {
     console.log(`Testing live Server...`);
-    const server = require('./server.live')().app;
+    const server = P.default().app;
     var socket;
 
     function startServer(done) {
@@ -82,7 +84,7 @@ describe("server routes", () => {
     });
 
     describe("/", () => {
-        console.log(`> testing rote "/"...`);
+        console.log(`> testing route "/"...`);
         it("check html-layouts hierarchy", (done) => {
             chai.request(server)
                 .get('/')
@@ -151,6 +153,7 @@ describe("server routes", () => {
                 .end((err, res) => {
                     expect(res).to.have.status(500);
                     let $ = jQuery(res.text);
+                    console.log(res.text);
                     let h1 = $('h1');
                     expect(h1.length).to.be.equal(1);
                     expect(h1.text()).to.have.string(errorHeader);

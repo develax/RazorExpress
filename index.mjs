@@ -1,6 +1,6 @@
 const dbg = (await import('./core/dbg/debugger.mjs'));
 dbg.setDebugMode(isDebugMode());
-const Razor = (await import('./core/Razor.mjs')).default;;
+import {Razor} from "./core/Razor.mjs"
 export const HtmlString = (await import('./core/HtmlString.mjs')).default;;
 var parser;
 var settings = { ext: 'raz' };

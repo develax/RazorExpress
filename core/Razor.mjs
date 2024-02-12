@@ -18,22 +18,24 @@ export let cutLastSegment = function (dir) {
     return dir.substring(0, pos);
 };
 
-import * as initParser from "./parser.mjs"
+import * as initParser_ from "./parser.mjs"
+const initParser = initParser_.default;
 import * as ErrorsFactory from "./errors/errors.mjs"
 import * as dbg from "./dbg/debugger.mjs"
+import * as logger from "./dbg/logger.mjs"
 const allowLoggingInDebugModel = false;
 
 'use strict';
 const viewStartName = '_viewStart';
 import { EOL } from "os";
 
-export default class Razor {
+export class Razor {
     constructor(options, razorOpts) {
         this.options = options;
         this.ext = options.settings['view engine'] || razorOpts.ext;
         this.env = options.settings.env;
         const debug = dbg.isDebugMode;
-        const log = require('./dbg/logger.mjs')({ on: debug && allowLoggingInDebugModel });
+        const log = logger.default({ on: debug && allowLoggingInDebugModel });
         this.parser = initParser({ express: true, dbg, log });
         this.viewsDir = path.resolve(this.options.settings.views);
     }
