@@ -114,14 +114,14 @@ describe("server routes", () => {
                         expect(layout.textContent, name).to.be.equal(name);
                     }
 
-                    console.log(`> testing rote "/"...done`);
+                    console.log(`> testing route "/"...done`);
                     done();
                 });
         });
     });
 
     describe("/hidden", () => {
-        console.log(`> testing rote "/hidden"...`);
+        console.log(`> testing route "/hidden"...`);
         it("check layout explicit path", (done) => {
             chai.request(server)
                 .get('/hidden')
@@ -139,14 +139,14 @@ describe("server routes", () => {
                         expect(layout.textContent, name).to.be.equal(name);
                     }
 
-                    console.log(`> testing rote "/hidden"...done`);
+                    console.log(`> testing route "/hidden"...done`);
                     done();
                 });
         });
     });
 
     describe("/invalid", () => {
-        console.log(`> testing rote "/invalid"...`);
+        console.log(`> testing route "/invalid"...`);
         it("check failure of finding layout", (done) => {
             chai.request(server)
                 .get('/invalid')
@@ -159,7 +159,7 @@ describe("server routes", () => {
                     expect(h1.text()).to.have.string(errorHeader);
                     let layouts = $(`:contains(invalid.raz" cannot find the layout view)`);
                     expect(layouts, "error message").to.have.lengthOf.above(0);
-                    console.log(`> testing rote "/invalid"...done`);
+                    console.log(`> testing route "/invalid"...done`);
                     done();
                 });
         });
@@ -168,7 +168,7 @@ describe("server routes", () => {
     {
         let route = "/errors/laytouterror";
         describe(route, () => {
-            console.log(`> testing rote ${route}...`);
+            console.log(`> testing route ${route}...`);
             it("check failure of rendering layout", (done) => {
                 chai.request(server)
                     .get(route)
@@ -190,7 +190,7 @@ describe("server routes", () => {
                         expect(layoutHeader, '"_layout.raz" header is expected').to.have.lengthOf(1);
                         let errorText = $(errorViews[1]).find('.multilight').text();
                         expect(errorText).equal("@temp");
-                        console.log(`> testing rote  ${route} is done`);
+                        console.log(`> testing route  ${route} is done`);
                         done();
                     });
             });
@@ -200,7 +200,7 @@ describe("server routes", () => {
     {
         let route = "/errors/partialerror";
         describe(route, () => {
-            console.log(`> testing rote ${route}...`);
+            console.log(`> testing route ${route}...`);
             it("check failure of rendering partial view", (done) => {
                 chai.request(server)
                     .get(route)
@@ -210,7 +210,7 @@ describe("server routes", () => {
                         assertErrorHeader($);
                         assertErrorText($, "'</div>' tag at line 6 pos 1 is missing matching start tag");
                         assertSourceViews($, ["partialerror.raz", "_layout.raz", "_partial.raz"], "</div>");
-                        console.log(`> testing rote  ${route} is done`);
+                        console.log(`> testing route  ${route} is done`);
                         done();
                     });
             });
@@ -220,7 +220,7 @@ describe("server routes", () => {
     {
         let route = "/errors/jsSyntaxError";
         describe(route, () => {
-            console.log(`> testing rote ${route}...`);
+            console.log(`> testing route ${route}...`);
             it("syntax error must be found in the template source text and highlighted", (done) => {
                 chai.request(server)
                     .get(route)
@@ -230,7 +230,7 @@ describe("server routes", () => {
                         assertErrorHeader($);
                         assertErrorText($, "Unexpected identifier");
                         assertSourceViews($, ["jsSyntaxError.raz"], "@for(int i = 0; i < 5; i++) {");
-                        console.log(`> testing rote  ${route} is done`);
+                        console.log(`> testing route  ${route} is done`);
                         done();
                     });
             });
@@ -240,7 +240,7 @@ describe("server routes", () => {
     {
         let route = "/errors/jsSyntaxErrorNotDetected";
         describe(route, () => {
-            console.log(`> testing rote ${route}...`);
+            console.log(`> testing route ${route}...`);
             it("syntax error must NOT be highlighted in the template source text if it contains more than 1 occurrences of the error string ", (done) => {
                 chai.request(server)
                     .get(route)
@@ -250,7 +250,7 @@ describe("server routes", () => {
                         assertErrorHeader($);
                         assertErrorText($, "Unexpected identifier");
                         assertSourceViews($, ["jsSyntaxErrorNotDetected.raz"]);
-                        console.log(`> testing rote  ${route} is done`);
+                        console.log(`> testing route  ${route} is done`);
                         done();
                     });
             });
@@ -260,7 +260,7 @@ describe("server routes", () => {
     {
         let route = "/models/index";
         describe(route, () => {
-            console.log(`> testing rote ${route}...`);
+            console.log(`> testing route ${route}...`);
             it("partial view's `null` or `empty-string` value model should not be replaced with the main model and must be displayed as an empty string", (done) => {
                 chai.request(server)
                     .get(route)
@@ -280,9 +280,30 @@ describe("server routes", () => {
     }
 
     {
+        let route = "/home/partialAsync";
+        describe(route, () => {
+            console.log(`> testing route ${route}...`);
+            it("partial view's `null` or `empty-string` value model should not be replaced with the main model and must be displayed as an empty string", (done) => {
+                chai.request(server)
+                    .get(route)
+                    .end((err, res) => {
+                        expect(res).to.have.status(200);
+                        let $ = jQuery(res.text);
+                        let partialViewNullModel = $("text");
+                        expect(partialViewNullModel, "text blocks").to.have.length(2);
+                        expect(res.text).includes("4;");
+                        expect(res.text).includes("abc");
+                        expect(res.text).to.not.include("promise");
+                        done();
+                    });
+            });
+        });
+    }
+
+    {
         let route = "/browser";
         describe(route, () => {
-            console.log(`> testing rote ${route}...`);
+            console.log(`> testing route ${route}...`);
             it("razor-js", (done) => {
                 let options = {
                     resources: "usable",
@@ -296,7 +317,7 @@ describe("server routes", () => {
                             expect(h1.length).to.be.equal(1);
                             expect(h1.text()).to.have.string("RAZ browser dynamic test");
                             assertModelMessage($, "This is a browser page.");
-                            console.log(`> testing rote  ${route} is done`);
+                            console.log(`> testing route  ${route} is done`);
                             done();
                         }, 1000);
                     },
@@ -310,7 +331,7 @@ describe("server routes", () => {
     {
         let route = "/browser-error";
         describe(route, () => {
-            console.log(`> testing rote ${route}...`);
+            console.log(`> testing route ${route}...`);
             it("razor-js-error", (done) => {
                 let options = {
                     resources: "usable",
@@ -323,7 +344,7 @@ describe("server routes", () => {
                             assertErrorHeader($);
                             assertErrorText($, "Error: '</span>' tag at line 5 pos 24 is missing matching start tag.");
                             assertSourceViews($, ["Template:"]);
-                            console.log(`> testing rote  ${route} is done`);
+                            console.log(`> testing route  ${route} is done`);
                             done();
                         }, 1000);
                     },

@@ -144,6 +144,9 @@ export default function (opts) {
         this._js = `
         'use strict';
 (function (process, window, global, module, require, compilePage, compilePageSync, navigator, undefined) {
+    function _eval_(code){
+        return Object.getPrototypeOf(async function(){}).constructor("Html", "Model", "ViewData", "debug",code)(Html, Model, ViewData, debug);
+    }
     delete Html._js;
     delete Html._vm;
     delete Html._sandbox;
@@ -226,7 +229,11 @@ export default function (opts) {
                 throw new Error(`Unexpected section name = '${name}'.`); // Cannot be tested via user-inputs.
             }
         };
-
+        this.wait = async function(promise)
+        {
+            await promise;
+            return;
+        }
         this.raw = function (val) { // render
             if (!isVisibleValue(val)) // 'undefined' can be passed when `Html.raw()` is used by user in the view, in this case it will be wrapped into `Html.ecnode()` anyway an it will call `Html.raw` passing 'undefined' to it.
                 return;
@@ -409,10 +416,10 @@ export default function (opts) {
             switch (block.type) {
                 case blockType.html:
                     i = jsValues.enq(block.text);
-                    return "\r\nHtml.raw(" + (isAsync ? "await " : "") + "Html.__val(" + i + "));";
+                    return "\r\nHtml.raw(Html.__val(" + i + "));";
                 case blockType.expr:
                     i = jsValues.enq(block.text);
-                    let code = `Html.encode(` + (isAsync ? "await " : "") + `eval(Html.__val(${i})));`;
+                    let code = `Html.encode(` + (isAsync ? "await eval" : "eval") + `(Html.__val(${i})));`;
                     return debugMode ? setDbg(code, block) : "\r\n" + code;
                 case blockType.code:
                     return debugMode ? setDbg(block.text, block) : "\r\n" + block.text;

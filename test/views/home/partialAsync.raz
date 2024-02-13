@@ -1,9 +1,16 @@
 
-@Html.raw(1)
+@{
+    Html.layout = "";
+}
+@Promise.resolve(Html.raw(1))
+@Promise.resolve(null)
+@(new Promise((res)=>setTimeout(()=>{res(4)},1000)));
+@Promise.resolve("abc")
 
 @{
     ViewData.test = 12345;
 }
-SDSDajngkdfngskdjfgnkzdnfk
-
-@Html.partialAsync("./_text.raz")
+@for(var i=0;i<2;i++)
+{
+    <text>@Html.wait(Html.partialAsync("./_text.raz"))</text>
+}
